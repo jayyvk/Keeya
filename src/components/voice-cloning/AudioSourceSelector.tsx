@@ -34,51 +34,14 @@ const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
   };
   
   const handleUploadClick = () => {
-    fileInputRef.current?.click();
+    toast({
+      title: "Coming Soon",
+      description: "Audio and video upload will be available soon!",
+    });
   };
   
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !user) return;
-    
-    try {
-      const processedFile = await processAndUploadFile(file, user.id);
-      
-      if (!processedFile) {
-        toast({
-          title: "Invalid file",
-          description: "Please upload an audio or video file",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      const success = await uploadToVault(
-        processedFile,
-        user.id,
-        file.name.replace(/\.[^/.]+$/, '')
-      );
-      
-      if (success) {
-        toast({
-          title: "Upload successful",
-          description: processedFile.type === 'video' 
-            ? "Video processed and audio extracted successfully"
-            : "Audio uploaded successfully"
-        });
-      } else {
-        throw new Error("Failed to upload file");
-      }
-    } catch (error) {
-      console.error('Upload error:', error);
-      toast({
-        title: "Upload failed",
-        description: "Failed to upload file. Please try again.",
-        variant: "destructive"
-      });
-    }
-    
-    // Clear the input
+    // Functionality disabled
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -95,18 +58,23 @@ const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
 
       <ScrollArea className="h-[400px]">
         <div className={`flex ${isMobile ? 'flex-wrap' : ''} gap-3 p-4`}>
-          {/* Upload option */}
+          {/* Upload option (disabled with coming soon) */}
           <input 
             type="file"
             ref={fileInputRef}
             className="hidden"
             accept="audio/*,video/*"
             onChange={handleFileChange}
+            disabled
           />
           <div 
-            className={`${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg border-2 border-dashed border-voicevault-softpurple bg-voicevault-softgray/30 flex flex-col items-center justify-center cursor-pointer hover:bg-voicevault-softgray/50 transition-colors`} 
+            className={`${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg border-2 border-dashed border-voicevault-softpurple bg-voicevault-softgray/30 flex flex-col items-center justify-center cursor-pointer hover:bg-voicevault-softgray/50 transition-colors relative`} 
             onClick={handleUploadClick}
           >
+            {/* Blur overlay with coming soon message */}
+            <div className="absolute inset-0 backdrop-blur-[2px] bg-white/30 flex flex-col items-center justify-center">
+              <span className="text-sm font-medium text-voicevault-primary bg-white/70 px-2 py-1 rounded-md">Coming Soon</span>
+            </div>
             <Upload className="h-8 w-8 text-voicevault-primary mb-2" />
             <span className="text-sm text-voicevault-tertiary">Upload Audio/Video</span>
           </div>
