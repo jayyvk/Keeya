@@ -30,7 +30,7 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
       
       <div className="flex items-center gap-4 pr-6">
         {showCredits && <CreditDisplay credits={credits} onManageSubscription={handleManageSubscription} onAddCredits={handleAddCredits} />}
-        {title && <span className="text-lg md:text-xl">{title}</span>}
+        {title}
       </div>
     </div>;
 };
