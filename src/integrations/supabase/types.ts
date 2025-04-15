@@ -43,6 +43,7 @@ export type Database = {
         Row: {
           created_at: string
           duration: number
+          file_type: string | null
           file_url: string
           id: string
           tags: string[] | null
@@ -52,6 +53,7 @@ export type Database = {
         Insert: {
           created_at?: string
           duration: number
+          file_type?: string | null
           file_url: string
           id?: string
           tags?: string[] | null
@@ -61,6 +63,7 @@ export type Database = {
         Update: {
           created_at?: string
           duration?: number
+          file_type?: string | null
           file_url?: string
           id?: string
           tags?: string[] | null

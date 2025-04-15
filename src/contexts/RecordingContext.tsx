@@ -31,13 +31,11 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const { toast } = useToast();
   
-  // Refs for managing MediaRecorder
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
   const timerRef = useRef<number | null>(null);
 
-  // Fetch user recordings from Supabase
   useEffect(() => {
     const fetchRecordings = async () => {
       if (!user) {
@@ -77,30 +75,23 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
     fetchRecordings();
   }, [user]);
 
-  // Function to convert any audio blob to MP3 format using Web Audio API
   const convertToMp3 = async (audioBlob: Blob): Promise<Blob> => {
-    // Just to be safe, let's make sure we're getting the correct blob
     console.log(`Converting audio, original size: ${audioBlob.size} bytes, type: ${audioBlob.type}`);
     
     if (audioBlob.size === 0) {
       throw new Error("Audio blob is empty");
     }
     
-    // Directly return the blob as MP3
-    // The MP3 conversion is best handled by the MediaRecorder directly
-    // We'll set the proper mime type
     return new Blob([audioBlob], { type: 'audio/mp3' });
   };
 
   const startRecording = async () => {
     try {
-      // Reset state
       audioChunksRef.current = [];
       setRecordingTime(0);
       
       console.log("Requesting microphone access...");
       
-      // Check if the browser supports the necessary APIs
       if (!navigator.mediaDevices || !window.MediaRecorder) {
         toast({
           variant: "destructive",
@@ -110,10 +101,8 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
         return;
       }
       
-      // Get microphone access with explicit error handling
       let stream;
       try {
-        // Added audio constraints for better compatibility
         stream = await navigator.mediaDevices.getUserMedia({ 
           audio: {
             echoCancellation: true,
@@ -125,7 +114,6 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
       } catch (error: any) {
         console.error("Microphone access error:", error);
         
-        // Provide detailed error messages based on the error type
         if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
           toast({
             variant: "destructive",
@@ -157,7 +145,6 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
       
       streamRef.current = stream;
       
-      // Check that we actually got audio tracks
       if (stream.getAudioTracks().length === 0) {
         toast({
           variant: "destructive",
@@ -169,7 +156,6 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
       
       console.log(`Got ${stream.getAudioTracks().length} audio tracks`);
       
-      // Try different supported formats in order of preference
       const mimeTypes = [
         'audio/mp3',
         'audio/webm;codecs=opus',
@@ -190,10 +176,9 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
       
       if (!selectedMimeType) {
         console.warn("None of the preferred MIME types are supported, using default");
-        selectedMimeType = '';  // Let the browser choose
+        selectedMimeType = '';
       }
       
-      // Create recorder with options for better quality
       const mediaRecorder = new MediaRecorder(stream, { 
         mimeType: selectedMimeType,
         audioBitsPerSecond: 128000
@@ -201,7 +186,6 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
       
       mediaRecorderRef.current = mediaRecorder;
       
-      // Set up event handlers
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           console.log(`Received audio chunk: ${event.data.size} bytes`);
@@ -222,7 +206,6 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
           return;
         }
         
-        // Combine audio chunks into a single blob
         const rawAudioBlob = new Blob(audioChunksRef.current, { type: mediaRecorder.mimeType || 'audio/webm' });
         console.log(`Raw recording complete. Type: ${mediaRecorder.mimeType}, Size: ${rawAudioBlob.size} bytes`);
         
@@ -237,17 +220,14 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
         }
         
         try {
-          // Convert to MP3 format if needed
           const processedBlob = await convertToMp3(rawAudioBlob);
           setCurrentRecording(processedBlob);
           console.log(`Recording processed. Final size: ${processedBlob.size} bytes`);
         } catch (error) {
           console.error("Error processing recording:", error);
-          // Fall back to raw blob
           setCurrentRecording(rawAudioBlob);
         }
         
-        // Stop the recording stream
         if (streamRef.current) {
           streamRef.current.getTracks().forEach(track => {
             console.log(`Stopping track: ${track.kind}, ${track.label}`);
@@ -255,7 +235,6 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
           });
         }
         
-        // Stop the timer
         if (timerRef.current) {
           clearInterval(timerRef.current);
           timerRef.current = null;
@@ -271,12 +250,10 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
         });
       };
       
-      // Start recording with smaller chunk size for more frequent updates
       mediaRecorder.start(500); 
       setRecordingStatus("recording");
       console.log("Recording started");
       
-      // Start timer
       timerRef.current = window.setInterval(() => {
         setRecordingTime(prev => prev + 1);
       }, 1000);
@@ -298,7 +275,6 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
         console.log("Recording stopped successfully");
       } catch (error) {
         console.error("Error stopping recording:", error);
-        // Clean up even if stop fails
         if (streamRef.current) {
           streamRef.current.getTracks().forEach(track => track.stop());
         }
@@ -316,7 +292,6 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
       mediaRecorderRef.current.pause();
       setRecordingStatus("paused");
       
-      // Pause the timer
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -329,10 +304,11 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
       mediaRecorderRef.current.resume();
       setRecordingStatus("recording");
       
-      // Resume the timer
-      timerRef.current = window.setInterval(() => {
-        setRecordingTime(prev => prev + 1);
-      }, 1000);
+      if (timerRef.current) {
+        timerRef.current = window.setInterval(() => {
+          setRecordingTime(prev => prev + 1);
+        }, 1000);
+      }
     }
   };
 
@@ -349,19 +325,13 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
     try {
       console.log("Starting to save recording...");
       
-      // Generate a unique filename to prevent collisions
       const fileName = generateUniqueFilename();
-      
-      // Create file object with proper type
       const file = new File([currentRecording], fileName, { type: 'audio/mp3' });
       console.log(`Created file: ${fileName}, size: ${file.size} bytes, type: ${file.type}`);
       
-      // Define the path where the file will be stored in Supabase
       const filePath = `${user.id}/${fileName}`;
       console.log(`Uploading to path: ${filePath}`);
       
-      // Create the bucket if it doesn't exist (happens automatically in Supabase)
-      // Upload to Supabase Storage
       const { data: uploadData, error: uploadError } = await supabase
         .storage
         .from('voice_memories')
@@ -369,7 +339,7 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
           cacheControl: '3600',
           contentType: 'audio/mp3'
         });
-        
+      
       if (uploadError) {
         console.error("Upload error:", uploadError);
         throw new Error(`Storage upload failed: ${uploadError.message}`);
@@ -377,7 +347,6 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
       
       console.log("Upload successful:", uploadData);
       
-      // Get public URL for the uploaded file
       const { data: { publicUrl } } = supabase
         .storage
         .from('voice_memories')
@@ -385,7 +354,6 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
       
       console.log("Generated public URL:", publicUrl);
       
-      // Save metadata to database
       const { data, error } = await supabase
         .from('voice_memories')
         .insert({
@@ -398,13 +366,12 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
         })
         .select()
         .single();
-        
+      
       if (error) {
         console.error("Database error:", error);
         throw new Error(`Database insert failed: ${error.message}`);
       }
       
-      // Add new recording to state
       const newRecording: Recording = {
         id: data.id,
         title,
@@ -417,7 +384,6 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
       setRecordings(prev => [newRecording, ...prev]);
       console.log("Recording saved successfully:", newRecording);
       
-      // Reset current recording state
       setCurrentRecording(null);
       setRecordingStatus("inactive");
       setRecordingTime(0);
@@ -440,31 +406,27 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
     if (!user) return false;
     
     try {
-      // Find the recording to delete
       const recordingToDelete = recordings.find(r => r.id === id);
       if (!recordingToDelete) {
         throw new Error("Recording not found");
       }
       
-      // Extract the file path from the URL
       const urlParts = recordingToDelete.audioUrl.split('/');
       const fileName = urlParts[urlParts.length - 1];
       const filePath = `${user.id}/${fileName}`;
       
       console.log(`Deleting recording: ${id}, file path: ${filePath}`);
       
-      // Delete the recording from the database
       const { error: dbError } = await supabase
         .from('voice_memories')
         .delete()
         .eq('id', id);
-        
+      
       if (dbError) {
         console.error("Database delete error:", dbError);
         throw dbError;
       }
       
-      // Delete the file from storage
       const { error: storageError } = await supabase
         .storage
         .from('voice_memories')
@@ -472,12 +434,10 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
       
       if (storageError) {
         console.warn("Failed to delete file from storage:", storageError);
-        // Continue even if file deletion fails
       } else {
         console.log("File deleted from storage successfully");
       }
       
-      // Update local state
       setRecordings(prev => prev.filter(recording => recording.id !== id));
       
       toast({
@@ -498,7 +458,6 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
   };
 
   const discardRecording = () => {
-    // Reset state
     setCurrentRecording(null);
     setRecordingStatus("inactive");
     setRecordingTime(0);
