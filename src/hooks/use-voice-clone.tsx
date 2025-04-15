@@ -2,12 +2,7 @@
 import { useState } from "react";
 import { Recording } from "@/types";
 import { useToast } from "@/hooks/use-toast";
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+import { supabase } from "@/integrations/supabase/client";
 
 export function useVoiceClone() {
   const { toast } = useToast();
