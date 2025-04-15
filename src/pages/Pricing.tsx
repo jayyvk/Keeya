@@ -8,12 +8,13 @@ import CommonHeader from "@/components/CommonHeader";
 const Pricing: React.FC = () => {
   return (
     <SidebarProvider>
-      <div className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex">
+      <div className="min-h-screen w-full flex bg-gradient-to-b from-voicevault-softpurple via-white to-white">
         <DashboardSidebar />
-        
         <div className="flex-1 overflow-x-hidden">
-          <CommonHeader title="Pricing Plans" />
-          <PricingCards />
+          <CommonHeader />
+          <div className="max-w-7xl mx-auto px-4">
+            <PricingCards />
+          </div>
         </div>
       </div>
     </SidebarProvider>
