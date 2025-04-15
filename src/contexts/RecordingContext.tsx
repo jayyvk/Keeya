@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useState, useRef, ReactNode, useEffect } from "react";
+
+import React, { createContext, useContext, ReactNode } from "react";
 import { Recording, RecordingStatus } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { generateUniqueFilename } from "@/utils/randomWord";
+import { useRecordingState } from "@/hooks/use-recording-state";
+import { useRecordingsStorage } from "@/hooks/use-recordings-storage";
 
 interface RecordingContextType {
   recordings: Recording[];
@@ -23,448 +23,44 @@ interface RecordingContextType {
 const RecordingContext = createContext<RecordingContextType | undefined>(undefined);
 
 export function RecordingProvider({ children }: { children: ReactNode }) {
-  const [recordings, setRecordings] = useState<Recording[]>([]);
-  const [currentRecording, setCurrentRecording] = useState<Blob | null>(null);
-  const [recordingStatus, setRecordingStatus] = useState<RecordingStatus>("inactive");
-  const [recordingTime, setRecordingTime] = useState(0);
-  
   const { user } = useAuth();
-  const { toast } = useToast();
-  
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const streamRef = useRef<MediaStream | null>(null);
-  const timerRef = useRef<number | null>(null);
+  const {
+    recordingStatus,
+    recordingTime,
+    currentRecording,
+    startRecording,
+    stopRecording,
+    pauseRecording,
+    resumeRecording,
+    discardRecording
+  } = useRecordingState();
 
-  useEffect(() => {
-    const fetchRecordings = async () => {
-      if (!user) {
-        setRecordings([]);
-        return;
-      }
-      
-      try {
-        const { data, error } = await supabase
-          .from('voice_memories')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
-          
-        if (error) {
-          console.error("Error fetching recordings:", error);
-          return;
-        }
-        
-        if (data) {
-          const formattedRecordings: Recording[] = data.map(item => ({
-            id: item.id,
-            title: item.title,
-            createdAt: new Date(item.created_at),
-            duration: Number(item.duration),
-            audioUrl: item.file_url,
-            tags: item.tags || []
-          }));
-          
-          setRecordings(formattedRecordings);
-        }
-      } catch (error) {
-        console.error("Failed to fetch recordings:", error);
-      }
-    };
-    
-    fetchRecordings();
-  }, [user]);
-
-  const convertToMp3 = async (audioBlob: Blob): Promise<Blob> => {
-    console.log(`Converting audio, original size: ${audioBlob.size} bytes, type: ${audioBlob.type}`);
-    
-    if (audioBlob.size === 0) {
-      throw new Error("Audio blob is empty");
-    }
-    
-    return new Blob([audioBlob], { type: 'audio/mp3' });
-  };
-
-  const startRecording = async () => {
-    try {
-      audioChunksRef.current = [];
-      setRecordingTime(0);
-      
-      console.log("Requesting microphone access...");
-      
-      if (!navigator.mediaDevices || !window.MediaRecorder) {
-        toast({
-          variant: "destructive",
-          title: "Browser not supported",
-          description: "Your browser doesn't support recording. Please try a modern browser like Chrome or Firefox."
-        });
-        return;
-      }
-      
-      let stream;
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({ 
-          audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true
-          } 
-        });
-        console.log("Microphone access granted");
-      } catch (error: any) {
-        console.error("Microphone access error:", error);
-        
-        if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
-          toast({
-            variant: "destructive",
-            title: "Microphone access denied",
-            description: "Please allow microphone access in your browser settings and try again."
-          });
-        } else if (error.name === "NotFoundError" || error.name === "DeviceNotFoundError") {
-          toast({
-            variant: "destructive",
-            title: "No microphone found",
-            description: "Please connect a microphone and try again."
-          });
-        } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
-          toast({
-            variant: "destructive",
-            title: "Microphone in use",
-            description: "Your microphone is currently being used by another application."
-          });
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Recording Error",
-            description: `Could not access microphone: ${error.message || "Unknown error"}`
-          });
-        }
-        
-        return;
-      }
-      
-      streamRef.current = stream;
-      
-      if (stream.getAudioTracks().length === 0) {
-        toast({
-          variant: "destructive",
-          title: "Recording Error",
-          description: "No audio track was detected in your microphone."
-        });
-        return;
-      }
-      
-      console.log(`Got ${stream.getAudioTracks().length} audio tracks`);
-      
-      const mimeTypes = [
-        'audio/mp3',
-        'audio/webm;codecs=opus',
-        'audio/webm',
-        'audio/ogg;codecs=opus',
-        'audio/wav',
-        'audio/aac'
-      ];
-      
-      let selectedMimeType = '';
-      for (const mimeType of mimeTypes) {
-        if (MediaRecorder.isTypeSupported(mimeType)) {
-          selectedMimeType = mimeType;
-          console.log(`Using supported format: ${mimeType}`);
-          break;
-        }
-      }
-      
-      if (!selectedMimeType) {
-        console.warn("None of the preferred MIME types are supported, using default");
-        selectedMimeType = '';
-      }
-      
-      const mediaRecorder = new MediaRecorder(stream, { 
-        mimeType: selectedMimeType,
-        audioBitsPerSecond: 128000
-      });
-      
-      mediaRecorderRef.current = mediaRecorder;
-      
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          console.log(`Received audio chunk: ${event.data.size} bytes`);
-          audioChunksRef.current.push(event.data);
-        }
-      };
-      
-      mediaRecorder.onstop = async () => {
-        console.log("MediaRecorder stopped, processing recording...");
-        
-        if (audioChunksRef.current.length === 0) {
-          console.error("No audio data captured during recording");
-          toast({
-            variant: "destructive",
-            title: "Recording Error",
-            description: "No audio was captured. Please try again."
-          });
-          return;
-        }
-        
-        const rawAudioBlob = new Blob(audioChunksRef.current, { type: mediaRecorder.mimeType || 'audio/webm' });
-        console.log(`Raw recording complete. Type: ${mediaRecorder.mimeType}, Size: ${rawAudioBlob.size} bytes`);
-        
-        if (rawAudioBlob.size === 0) {
-          console.error("Audio blob has zero size");
-          toast({
-            variant: "destructive",
-            title: "Recording Error",
-            description: "Recording failed to capture any audio. Please try again."
-          });
-          return;
-        }
-        
-        try {
-          const processedBlob = await convertToMp3(rawAudioBlob);
-          setCurrentRecording(processedBlob);
-          console.log(`Recording processed. Final size: ${processedBlob.size} bytes`);
-        } catch (error) {
-          console.error("Error processing recording:", error);
-          setCurrentRecording(rawAudioBlob);
-        }
-        
-        if (streamRef.current) {
-          streamRef.current.getTracks().forEach(track => {
-            console.log(`Stopping track: ${track.kind}, ${track.label}`);
-            track.stop();
-          });
-        }
-        
-        if (timerRef.current) {
-          clearInterval(timerRef.current);
-          timerRef.current = null;
-        }
-      };
-      
-      mediaRecorder.onerror = (event) => {
-        console.error("MediaRecorder error:", event);
-        toast({
-          variant: "destructive",
-          title: "Recording Error",
-          description: "An error occurred during recording. Please try again."
-        });
-      };
-      
-      mediaRecorder.start(500); 
-      setRecordingStatus("recording");
-      console.log("Recording started");
-      
-      timerRef.current = window.setInterval(() => {
-        setRecordingTime(prev => prev + 1);
-      }, 1000);
-    } catch (error) {
-      console.error("Error starting recording:", error);
-      toast({
-        variant: "destructive",
-        title: "Recording Error",
-        description: "An unexpected error occurred. Please try again."
-      });
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && (recordingStatus === "recording" || recordingStatus === "paused")) {
-      try {
-        mediaRecorderRef.current.stop();
-        setRecordingStatus("reviewing");
-        console.log("Recording stopped successfully");
-      } catch (error) {
-        console.error("Error stopping recording:", error);
-        if (streamRef.current) {
-          streamRef.current.getTracks().forEach(track => track.stop());
-        }
-        if (timerRef.current) {
-          clearInterval(timerRef.current);
-          timerRef.current = null;
-        }
-        setRecordingStatus("inactive");
-      }
-    }
-  };
-
-  const pauseRecording = () => {
-    if (mediaRecorderRef.current && recordingStatus === "recording") {
-      mediaRecorderRef.current.pause();
-      setRecordingStatus("paused");
-      
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    }
-  };
-
-  const resumeRecording = () => {
-    if (mediaRecorderRef.current && recordingStatus === "paused") {
-      mediaRecorderRef.current.resume();
-      setRecordingStatus("recording");
-      
-      if (timerRef.current) {
-        timerRef.current = window.setInterval(() => {
-          setRecordingTime(prev => prev + 1);
-        }, 1000);
-      }
-    }
-  };
+  const {
+    recordings,
+    saveRecording: saveToStorage,
+    deleteRecording: deleteFromStorage,
+    getRecording
+  } = useRecordingsStorage(user?.id);
 
   const saveRecording = async (title: string, tags: string[]) => {
-    if (!currentRecording || !user) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "No recording to save or user not logged in"
-      });
-      return;
-    }
+    if (!currentRecording || !user) return;
     
-    try {
-      console.log("Starting to save recording...");
-      
-      const fileName = generateUniqueFilename();
-      const file = new File([currentRecording], fileName, { type: 'audio/mp3' });
-      console.log(`Created file: ${fileName}, size: ${file.size} bytes, type: ${file.type}`);
-      
-      const filePath = `${user.id}/${fileName}`;
-      console.log(`Uploading to path: ${filePath}`);
-      
-      const { data: uploadData, error: uploadError } = await supabase
-        .storage
-        .from('voice_memories')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          contentType: 'audio/mp3'
-        });
-      
-      if (uploadError) {
-        console.error("Upload error:", uploadError);
-        throw new Error(`Storage upload failed: ${uploadError.message}`);
-      }
-      
-      console.log("Upload successful:", uploadData);
-      
-      const { data: { publicUrl } } = supabase
-        .storage
-        .from('voice_memories')
-        .getPublicUrl(filePath);
-      
-      console.log("Generated public URL:", publicUrl);
-      
-      const { data, error } = await supabase
-        .from('voice_memories')
-        .insert({
-          title,
-          user_id: user.id,
-          duration: recordingTime,
-          file_url: publicUrl,
-          tags,
-          file_type: 'audio/mp3'
-        })
-        .select()
-        .single();
-      
-      if (error) {
-        console.error("Database error:", error);
-        throw new Error(`Database insert failed: ${error.message}`);
-      }
-      
-      const newRecording: Recording = {
-        id: data.id,
-        title,
-        createdAt: new Date(data.created_at),
-        duration: recordingTime,
-        audioUrl: publicUrl,
-        tags
-      };
-      
-      setRecordings(prev => [newRecording, ...prev]);
-      console.log("Recording saved successfully:", newRecording);
-      
-      setCurrentRecording(null);
-      setRecordingStatus("inactive");
-      setRecordingTime(0);
-      
-      toast({
-        title: "Success",
-        description: "Your voice memory has been saved"
-      });
-    } catch (error: any) {
-      console.error("Error saving recording:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: `Failed to save your recording: ${error.message}`
-      });
+    const success = await saveToStorage(
+      user.id,
+      currentRecording,
+      title,
+      tags,
+      recordingTime
+    );
+    
+    if (success) {
+      discardRecording();
     }
   };
 
   const deleteRecording = async (id: string) => {
     if (!user) return false;
-    
-    try {
-      const recordingToDelete = recordings.find(r => r.id === id);
-      if (!recordingToDelete) {
-        throw new Error("Recording not found");
-      }
-      
-      const urlParts = recordingToDelete.audioUrl.split('/');
-      const fileName = urlParts[urlParts.length - 1];
-      const filePath = `${user.id}/${fileName}`;
-      
-      console.log(`Deleting recording: ${id}, file path: ${filePath}`);
-      
-      const { error: dbError } = await supabase
-        .from('voice_memories')
-        .delete()
-        .eq('id', id);
-      
-      if (dbError) {
-        console.error("Database delete error:", dbError);
-        throw dbError;
-      }
-      
-      const { error: storageError } = await supabase
-        .storage
-        .from('voice_memories')
-        .remove([filePath]);
-      
-      if (storageError) {
-        console.warn("Failed to delete file from storage:", storageError);
-      } else {
-        console.log("File deleted from storage successfully");
-      }
-      
-      setRecordings(prev => prev.filter(recording => recording.id !== id));
-      
-      toast({
-        title: "Deleted",
-        description: "Voice memory has been deleted"
-      });
-      
-      return true;
-    } catch (error) {
-      console.error("Error deleting recording:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete recording"
-      });
-      return false;
-    }
-  };
-
-  const discardRecording = () => {
-    setCurrentRecording(null);
-    setRecordingStatus("inactive");
-    setRecordingTime(0);
-  };
-
-  const getRecording = (id: string) => {
-    return recordings.find(recording => recording.id === id);
+    return deleteFromStorage(id, user.id);
   };
 
   return (
