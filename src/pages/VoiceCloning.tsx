@@ -20,6 +20,10 @@ const VoiceCloningInner: React.FC = () => {
     setShowCreditsOverlay 
   } = useMonetization();
 
+  const toggleCreditsOverlay = () => {
+    setShowCreditsOverlay(!showCreditsOverlay);
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex">
@@ -32,7 +36,7 @@ const VoiceCloningInner: React.FC = () => {
             <CreditDisplay 
               credits={credits}
               onManageSubscription={handleManageSubscription}
-              onAddCredits={handleAddCredits}
+              onAddCredits={toggleCreditsOverlay}
             />
           </div>
 
