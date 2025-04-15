@@ -1,5 +1,5 @@
 
-import { Home, User, PackageSearch, AlertCircle, Mic2 } from "lucide-react";
+import { Home, User, PackageSearch, AlertCircle, Mic2, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -30,6 +30,11 @@ const menuItems = [
     title: "Clone Voice",
     icon: Mic2,
     url: "/voice-cloning",
+  },
+  {
+    title: "Buy Credits",
+    icon: CreditCard,
+    url: "/pricing",
   },
   {
     title: "Marketplace",
