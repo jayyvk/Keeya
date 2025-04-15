@@ -1,3 +1,4 @@
+
 import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 import { ArrowLeft, Home } from "lucide-react";
@@ -15,7 +16,7 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <PageTransition className="min-h-screen flex items-center justify-center bg-gradient-to-b from-voicevault-softpurple to-white cloud-background">
+    <PageTransition className="min-h-screen flex items-center justify-center bg-gradient-to-b from-voicevault-softpurple to-white">
       <div className="text-center bg-white p-8 rounded-xl shadow-lg max-w-md">
         <h1 className="text-5xl font-bold mb-4 text-voicevault-tertiary">404</h1>
         <p className="text-xl text-gray-600 mb-8">

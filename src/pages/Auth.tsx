@@ -25,7 +25,7 @@ const Auth = () => {
   }, [isAuthenticated, navigate, user]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-b from-voicevault-softpurple to-white cloud-background">
+    <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-b from-voicevault-softpurple to-white">
       <Card className="w-full max-w-md shadow-xl animate-fade-in">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-voicevault-tertiary">

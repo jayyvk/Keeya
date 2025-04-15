@@ -12,7 +12,7 @@ const Pricing: React.FC = () => {
     <SidebarProvider>
       <MonetizationProvider>
         <motion.div 
-          className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex cloud-background"
+          className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

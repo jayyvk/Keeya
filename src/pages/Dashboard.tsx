@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -58,10 +59,11 @@ const Dashboard: React.FC = () => {
   return (
     <SidebarProvider>
       <MonetizationProvider>
-        <div className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex cloud-background">
+        <div className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex">
           <DashboardSidebar />
           
           <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Header */}
             <div className="bg-gradient-to-b from-voicevault-softpurple to-transparent">
               <div className="flex justify-between items-center px-6 py-4">
                 <CommonHeader />
@@ -73,6 +75,7 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
 
+            {/* Main Content */}
             <div className="flex-1 flex flex-col justify-center items-center overflow-hidden">
               <main className="container mx-auto px-6 max-w-md flex-1 flex flex-col justify-center items-center">
                 {recordingStatus === "reviewing" && currentRecording ? (
@@ -117,6 +120,7 @@ const Dashboard: React.FC = () => {
                 )}
               </main>
               
+              {/* Audio Vault */}
               <div className="flex-shrink-0 overflow-hidden">
                 <AudioVault recordings={recordings} />
               </div>
