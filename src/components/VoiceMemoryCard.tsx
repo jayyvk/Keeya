@@ -3,6 +3,7 @@ import { Play, Pause, Clock, Calendar, Tag, Trash2, SkipBack, SkipForward } from
 import { Recording } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRecording } from "@/contexts/RecordingContext";
 import { generateRandomWord } from "@/utils/randomWord";
@@ -34,6 +35,7 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
   const [deleteWord, setDeleteWord] = useState("");
   const [audioLoaded, setAudioLoaded] = useState(false);
   const [audioError, setAudioError] = useState<string | null>(null);
+  const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
@@ -48,16 +50,32 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
 
   useEffect(() => {
     console.log(`Setting up audio for: ${recording.title} (${recording.id})`);
-    console.log(`Audio URL: ${recording.audioUrl}`);
     
     const audioElement = new Audio();
     audioElement.crossOrigin = "anonymous";
     audioElement.preload = "metadata";
     
+    const updateDuration = () => {
+      if (recording.duration === 0 && audioElement.duration) {
+        console.log(`Updating duration for ${recording.title}: ${audioElement.duration}s`);
+        supabase
+          .from('voice_memories')
+          .update({ duration: audioElement.duration })
+          .eq('id', recording.id)
+          .then(() => {
+            console.log('Duration updated in database');
+          })
+          .catch(err => {
+            console.error('Error updating duration:', err);
+          });
+      }
+    };
+    
     audioElement.addEventListener('loadeddata', handleAudioLoaded);
     audioElement.addEventListener('canplaythrough', () => {
       console.log(`Audio can now play through: ${recording.title}`);
       setAudioLoaded(true);
+      updateDuration();
     });
     audioElement.addEventListener('error', handleAudioError);
     audioElement.addEventListener('timeupdate', updateProgress);
@@ -280,6 +298,30 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
         </div>
         
         <div className="mt-3">
+          <div className="flex items-center mb-2">
+            <ToggleGroup 
+              type="single" 
+              value={playbackSpeed.toString()}
+              onValueChange={(value) => {
+                if (value) {
+                  setPlaybackSpeed(parseFloat(value));
+                }
+              }}
+              className="bg-white/10 rounded-lg p-1 mr-2"
+            >
+              {[0.5, 1, 1.5, 2].map((speed) => (
+                <ToggleGroupItem 
+                  key={speed} 
+                  value={speed.toString()}
+                  aria-label={`${speed}x speed`}
+                  className="px-2 py-1 text-xs data-[state=on]:bg-white/20 text-white"
+                >
+                  {speed}x
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
+          </div>
+          
           <Slider
             value={[currentTime]}
             min={0}
