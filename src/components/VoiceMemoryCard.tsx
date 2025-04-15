@@ -65,7 +65,7 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
           .then(() => {
             console.log('Duration updated in database');
           })
-          .catch(err => {
+          .catch((err) => {
             console.error('Error updating duration:', err);
           });
       }
@@ -106,6 +106,13 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
       audioRef.current = null;
     };
   }, [recording.id, recording.title, recording.audioUrl]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      console.log(`Changing playback speed to ${playbackSpeed}x for: ${recording.title}`);
+      audioRef.current.playbackRate = playbackSpeed;
+    }
+  }, [playbackSpeed, recording.title]);
 
   const handleAudioLoaded = () => {
     console.log(`Audio loaded successfully for: ${recording.title}`);
@@ -262,6 +269,14 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
     }
   };
 
+  const handleSpeedChange = (value: string) => {
+    if (value) {
+      const newSpeed = parseFloat(value);
+      setPlaybackSpeed(newSpeed);
+      console.log(`Speed changed to ${newSpeed}x for: ${recording.title}`);
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden border border-voicevault-softpurple transition-all hover:shadow-lg hover:border-voicevault-primary">
       <div className="bg-gradient-to-r from-voicevault-softpurple to-voicevault-softpink p-4">
@@ -302,11 +317,7 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
             <ToggleGroup 
               type="single" 
               value={playbackSpeed.toString()}
-              onValueChange={(value) => {
-                if (value) {
-                  setPlaybackSpeed(parseFloat(value));
-                }
-              }}
+              onValueChange={handleSpeedChange}
               className="bg-white/10 rounded-lg p-1 mr-2"
             >
               {[0.5, 1, 1.5, 2].map((speed) => (

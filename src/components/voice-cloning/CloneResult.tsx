@@ -37,7 +37,6 @@ const CloneResult: React.FC<CloneResultProps> = ({
     console.log(`Initializing audio for CloneResult: ${audioUrl}`);
     const audio = new Audio();
     
-    // Set important properties before loading
     audio.crossOrigin = "anonymous"; 
     audio.preload = "metadata";
     
@@ -62,7 +61,6 @@ const CloneResult: React.FC<CloneResultProps> = ({
       setAudioLoaded(false);
       setAudioError("Error loading audio. The file may be corrupted or in an unsupported format.");
       
-      // Check URL validity
       fetch(audioUrl, { method: 'HEAD' })
         .then(response => {
           console.log(`URL check: ${response.status} ${response.statusText}`);
@@ -76,7 +74,6 @@ const CloneResult: React.FC<CloneResultProps> = ({
         });
     };
     
-    // Add event listeners
     audio.addEventListener("loadedmetadata", handleLoadedMetadata);
     audio.addEventListener("timeupdate", handleTimeUpdate);
     audio.addEventListener("ended", handleEnded);
@@ -86,7 +83,6 @@ const CloneResult: React.FC<CloneResultProps> = ({
       setAudioLoaded(true);
     });
     
-    // Set the source last
     audio.src = audioUrl;
     audio.playbackRate = playbackSpeed;
     
@@ -117,6 +113,7 @@ const CloneResult: React.FC<CloneResultProps> = ({
 
   useEffect(() => {
     if (audioRef.current) {
+      console.log(`Setting playback rate to ${playbackSpeed}x in CloneResult`);
       audioRef.current.playbackRate = playbackSpeed;
     }
   }, [playbackSpeed]);
@@ -133,7 +130,6 @@ const CloneResult: React.FC<CloneResultProps> = ({
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      // Try to reload if there was an error
       if (audioError) {
         console.log("Reloading audio after error");
         audioRef.current.load();
@@ -230,7 +226,9 @@ const CloneResult: React.FC<CloneResultProps> = ({
 
   const handleSpeedChange = (value: string) => {
     if (value) {
-      setPlaybackSpeed(parseFloat(value));
+      const newSpeed = parseFloat(value);
+      setPlaybackSpeed(newSpeed);
+      console.log(`Speed changed to ${newSpeed}x in CloneResult`);
     }
   };
 
