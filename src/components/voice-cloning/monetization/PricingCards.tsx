@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -142,11 +141,6 @@ export function PricingCards() {
             </Button>
           </CardFooter>
         </Card>
-      </div>
-
-      <div className="text-center mt-6">
-        <p className="text-sm text-gray-500">Credits roll over each month for active subscriptions</p>
-        <p className="text-sm text-gray-400 mt-2">Use test card 4242 4242 4242 4242 with any future expiry date and CVC</p>
       </div>
     </div>
   );
