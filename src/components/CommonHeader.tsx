@@ -18,7 +18,7 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
           VoiceVault
         </h1>
       </div>
-      {title && <h2 className="text-xl font-semibold text-gray-900">{title}</h2>}
+      {title}
     </div>;
 };
 export default CommonHeader;
