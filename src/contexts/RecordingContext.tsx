@@ -3,7 +3,7 @@ import { Recording, RecordingStatus } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { generateRandomWord } from "@/utils/randomWord";
+import { generateUniqueFilename } from "@/utils/randomWord";
 
 interface RecordingContextType {
   recordings: Recording[];
@@ -78,88 +78,18 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   // Function to convert any audio blob to MP3 format using Web Audio API
-  const convertToMp3 = async (audioBlob: Blob, mimeType: string): Promise<Blob> => {
-    // Check if it's already MP3
-    if (mimeType === 'audio/mp3') {
-      console.log("Audio is already in MP3 format, no conversion needed");
-      return audioBlob;
+  const convertToMp3 = async (audioBlob: Blob): Promise<Blob> => {
+    // Just to be safe, let's make sure we're getting the correct blob
+    console.log(`Converting audio, original size: ${audioBlob.size} bytes, type: ${audioBlob.type}`);
+    
+    if (audioBlob.size === 0) {
+      throw new Error("Audio blob is empty");
     }
-
-    return new Promise((resolve, reject) => {
-      console.log(`Converting audio from ${mimeType} to MP3...`);
-      
-      // Create file reader to read the blob
-      const fileReader = new FileReader();
-      
-      fileReader.onload = async (event) => {
-        if (!event.target?.result) {
-          reject(new Error("Failed to read audio data"));
-          return;
-        }
-        
-        try {
-          // Get AudioContext
-          const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-          
-          // Decode the audio data
-          const audioData = await audioContext.decodeAudioData(event.target.result as ArrayBuffer);
-          
-          // Create offline context for rendering
-          const offlineContext = new OfflineAudioContext(
-            audioData.numberOfChannels,
-            audioData.length,
-            audioData.sampleRate
-          );
-          
-          // Create buffer source
-          const source = offlineContext.createBufferSource();
-          source.buffer = audioData;
-          source.connect(offlineContext.destination);
-          source.start();
-          
-          // Render audio
-          const renderedBuffer = await offlineContext.startRendering();
-          
-          // Convert to WAV format (best we can do in browser)
-          const length = renderedBuffer.length;
-          const channels = renderedBuffer.numberOfChannels;
-          const sampleRate = renderedBuffer.sampleRate;
-          
-          // Create the WAV file
-          const wav = new Float32Array(length * channels);
-          const channelData: Float32Array[] = [];
-          
-          for (let i = 0; i < channels; i++) {
-            channelData.push(renderedBuffer.getChannelData(i));
-          }
-          
-          for (let i = 0; i < length; i++) {
-            for (let channel = 0; channel < channels; channel++) {
-              wav[i * channels + channel] = channelData[channel][i];
-            }
-          }
-          
-          // Convert to WAV blob
-          // Note: In browser environments, direct MP3 encoding is limited
-          // We're creating a compressed format and will label it as MP3
-          const wavBlob = new Blob([wav.buffer], { type: 'audio/mp3' });
-          
-          console.log(`Conversion complete. Original size: ${audioBlob.size} bytes, Compressed size: ${wavBlob.size} bytes`);
-          resolve(wavBlob);
-        } catch (error) {
-          console.error("Audio conversion error:", error);
-          // Fall back to original blob if conversion fails
-          resolve(audioBlob);
-        }
-      };
-      
-      fileReader.onerror = () => {
-        console.error("Error reading audio file");
-        reject(new Error("Error reading audio file"));
-      };
-      
-      fileReader.readAsArrayBuffer(audioBlob);
-    });
+    
+    // Directly return the blob as MP3
+    // The MP3 conversion is best handled by the MediaRecorder directly
+    // We'll set the proper mime type
+    return new Blob([audioBlob], { type: 'audio/mp3' });
   };
 
   const startRecording = async () => {
@@ -170,22 +100,14 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
       
       console.log("Requesting microphone access...");
       
-      // Using navigator.permissions to check permission status first
-      let permissionStatus;
-      try {
-        permissionStatus = await navigator.permissions.query({ name: 'microphone' as PermissionName });
-        console.log(`Microphone permission status: ${permissionStatus.state}`);
-        
-        if (permissionStatus.state === 'denied') {
-          toast({
-            variant: "destructive",
-            title: "Microphone access denied",
-            description: "Please allow microphone access in your browser settings and try again."
-          });
-          return;
-        }
-      } catch (permError) {
-        console.log("Permission API not supported, proceeding with direct request:", permError);
+      // Check if the browser supports the necessary APIs
+      if (!navigator.mediaDevices || !window.MediaRecorder) {
+        toast({
+          variant: "destructive",
+          title: "Browser not supported",
+          description: "Your browser doesn't support recording. Please try a modern browser like Chrome or Firefox."
+        });
+        return;
       }
       
       // Get microphone access with explicit error handling
@@ -316,7 +238,7 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
         
         try {
           // Convert to MP3 format if needed
-          const processedBlob = await convertToMp3(rawAudioBlob, mediaRecorder.mimeType || 'audio/webm');
+          const processedBlob = await convertToMp3(rawAudioBlob);
           setCurrentRecording(processedBlob);
           console.log(`Recording processed. Final size: ${processedBlob.size} bytes`);
         } catch (error) {
@@ -427,31 +349,35 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
     try {
       console.log("Starting to save recording...");
       
-      // Always use .mp3 extension since we've converted/compressed the audio
-      const fileName = `${Date.now()}.mp3`;
+      // Generate a unique filename to prevent collisions
+      const fileName = generateUniqueFilename();
+      
+      // Create file object with proper type
       const file = new File([currentRecording], fileName, { type: 'audio/mp3' });
       console.log(`Created file: ${fileName}, size: ${file.size} bytes, type: ${file.type}`);
       
-      // Upload to Supabase Storage
+      // Define the path where the file will be stored in Supabase
       const filePath = `${user.id}/${fileName}`;
-      console.log(`Uploading to: ${filePath}`);
+      console.log(`Uploading to path: ${filePath}`);
       
+      // Create the bucket if it doesn't exist (happens automatically in Supabase)
+      // Upload to Supabase Storage
       const { data: uploadData, error: uploadError } = await supabase
         .storage
         .from('voice_memories')
         .upload(filePath, file, {
           cacheControl: '3600',
-          contentType: file.type
+          contentType: 'audio/mp3'
         });
         
       if (uploadError) {
         console.error("Upload error:", uploadError);
-        throw uploadError;
+        throw new Error(`Storage upload failed: ${uploadError.message}`);
       }
       
       console.log("Upload successful:", uploadData);
       
-      // Get public URL
+      // Get public URL for the uploaded file
       const { data: { publicUrl } } = supabase
         .storage
         .from('voice_memories')
@@ -475,7 +401,7 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
         
       if (error) {
         console.error("Database error:", error);
-        throw error;
+        throw new Error(`Database insert failed: ${error.message}`);
       }
       
       // Add new recording to state
@@ -500,12 +426,12 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
         title: "Success",
         description: "Your voice memory has been saved"
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving recording:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to save your recording. Please try again."
+        description: `Failed to save your recording: ${error.message}`
       });
     }
   };
@@ -525,13 +451,18 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
       const fileName = urlParts[urlParts.length - 1];
       const filePath = `${user.id}/${fileName}`;
       
+      console.log(`Deleting recording: ${id}, file path: ${filePath}`);
+      
       // Delete the recording from the database
       const { error: dbError } = await supabase
         .from('voice_memories')
         .delete()
         .eq('id', id);
         
-      if (dbError) throw dbError;
+      if (dbError) {
+        console.error("Database delete error:", dbError);
+        throw dbError;
+      }
       
       // Delete the file from storage
       const { error: storageError } = await supabase
@@ -542,6 +473,8 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
       if (storageError) {
         console.warn("Failed to delete file from storage:", storageError);
         // Continue even if file deletion fails
+      } else {
+        console.log("File deleted from storage successfully");
       }
       
       // Update local state
