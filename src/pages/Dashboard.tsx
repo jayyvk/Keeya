@@ -63,9 +63,7 @@ const Dashboard: React.FC = () => {
             <div className="flex justify-between items-center px-6 py-4">
               <CommonHeader />
               <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-600 py-0 mx-[12px] text-left">
-                  Hello, {user?.name || 'there'}
-                </span>
+                
                 <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-500 hover:text-red-500">
                   <LogOut size={16} />
                 </Button>
