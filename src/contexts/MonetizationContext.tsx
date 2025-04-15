@@ -52,6 +52,11 @@ export function MonetizationProvider({ children }: { children: ReactNode }) {
 
       if (error) {
         console.error("Error fetching user credits:", error);
+        toast({
+          title: "Error refreshing credits",
+          description: "Please try again later.",
+          variant: "destructive"
+        });
         return;
       }
 
@@ -68,6 +73,11 @@ export function MonetizationProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       console.error("Error in refreshCredits:", error);
+      toast({
+        title: "Error refreshing credits",
+        description: "Please try again later.",
+        variant: "destructive"
+      });
     }
   };
 

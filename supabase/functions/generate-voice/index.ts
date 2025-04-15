@@ -46,12 +46,13 @@ serve(async (req) => {
       userId
     })
 
-    // First, check if user has enough credits
+    // Initialize Supabase client
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     )
 
+    // First, check if user has enough credits
     const { data: creditData, error: creditError } = await supabase
       .from('user_credits')
       .select('credits_balance')
@@ -91,25 +92,31 @@ serve(async (req) => {
 
     console.log("Voice generation completed:", output)
 
-    // Use the correct RPC function to deduct credits
-    const { data: updateData, error: updateError } = await supabase.rpc('decrement_user_credits', {
-      p_user_id: userId,
-      p_credits: 1
-    })
+    if (!output) {
+      throw new Error("Failed to generate voice output")
+    }
 
-    if (updateError) {
-      console.error("Error deducting credits:", updateError)
-      // Return error if credit deduction fails
+    // Use the database function to deduct credits
+    const { data: decrementResult, error: decrementError } = await supabase.rpc(
+      'decrement_user_credits',
+      {
+        p_user_id: userId,
+        p_credits: 1
+      }
+    )
+
+    if (decrementError) {
+      console.error("Error deducting credits:", decrementError)
       return new Response(JSON.stringify({ 
-        error: "Failed to deduct credits: " + updateError.message 
+        error: "Failed to deduct credits: " + decrementError.message 
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
       })
-    } else {
-      console.log("Credit deducted successfully")
     }
 
+    console.log("Credit deduction result:", decrementResult)
+    
     return new Response(JSON.stringify({ output }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,

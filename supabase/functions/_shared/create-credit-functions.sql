@@ -32,6 +32,19 @@ BEGIN
         updated_at = now()
     WHERE user_id = p_user_id;
     
+    -- Log the transaction in credit_adjustments
+    INSERT INTO public.credit_adjustments (
+        user_id, 
+        credits_added, 
+        adjusted_by, 
+        reason
+    ) VALUES (
+        p_user_id, 
+        -p_credits, 
+        p_user_id, 
+        'Voice generation'
+    );
+    
     RETURN TRUE;
 EXCEPTION
     WHEN OTHERS THEN
