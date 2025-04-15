@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useMonetization } from "@/contexts/MonetizationContext";
@@ -25,12 +24,16 @@ const VoiceCloneContent: React.FC = () => {
     isCloning,
     clonedAudioUrl,
     totalSelectedDuration,
+    activeTab,
+    setActiveTab,
     setIsCloning,
     setClonedAudioUrl,
     handleSourceSelect,
     handleTextChange,
     handleEnhanceText,
-    setTotalSelectedDuration
+    handleCreateVoiceMemory,
+    setTotalSelectedDuration,
+    ConfirmationDialog
   } = useVoiceClone();
 
   React.useEffect(() => {
@@ -38,54 +41,7 @@ const VoiceCloneContent: React.FC = () => {
     setTotalSelectedDuration(total);
   }, [selectedSources, setTotalSelectedDuration]);
 
-  const handleCreateVoiceMemory = async () => {
-    if (selectedSources.length === 0) {
-      toast({
-        title: "No audio selected",
-        description: "Please select at least one recording as a voice source.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!inputText.trim() && !enhancedText.trim()) {
-      toast({
-        title: "No text provided",
-        description: "Please enter what you'd like this voice to say.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (credits.available <= 0 && !credits.subscription) {
-      setShowCreditsOverlay(true);
-      return;
-    }
-
-    setIsCloning(true);
-
-    try {
-      setTimeout(() => {
-        setClonedAudioUrl("https://file-examples.com/storage/fe3a8ff9004de0da6fa8225/2017/11/file_example_MP3_700KB.mp3");
-        setIsCloning(false);
-
-        toast({
-          title: "Voice cloned successfully",
-          description: "Your voice memory has been created.",
-        });
-      }, 3000);
-    } catch (error) {
-      console.error("Error cloning voice:", error);
-      toast({
-        title: "Cloning failed",
-        description: "Unable to clone voice. Please try again.",
-        variant: "destructive",
-      });
-      setIsCloning(false);
-    }
-  };
-
-  const textToUse = enhancedText || inputText;
+  const textToUse = activeTab === "enhanced" ? enhancedText : inputText;
   const isReadyToClone = selectedSources.length > 0 && textToUse.trim().length > 0;
 
   return (
@@ -127,6 +83,8 @@ const VoiceCloneContent: React.FC = () => {
               onTextChange={handleTextChange}
               onEnhance={handleEnhanceText}
               isEnhancing={isEnhancing}
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
             />
           </section>
           
@@ -136,6 +94,8 @@ const VoiceCloneContent: React.FC = () => {
             onClick={handleCreateVoiceMemory}
             isMobile={isMobile}
           />
+          
+          <ConfirmationDialog />
         </>
       ) : (
         <CloneResult 

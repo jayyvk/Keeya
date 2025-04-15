@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -20,6 +19,8 @@ interface TextEnhancerProps {
   onTextChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onEnhance: () => void;
   isEnhancing: boolean;
+  activeTab: "input" | "enhanced";
+  onTabChange: (value: "input" | "enhanced") => void;
 }
 
 const TextEnhancer: React.FC<TextEnhancerProps> = ({
@@ -27,9 +28,11 @@ const TextEnhancer: React.FC<TextEnhancerProps> = ({
   enhancedText,
   onTextChange,
   onEnhance,
-  isEnhancing
+  isEnhancing,
+  activeTab,
+  onTabChange
 }) => {
-  const [activeTab, setActiveTab] = useState("input");
+  const [activeTabInternal, setActiveTabInternal] = useState("input");
   
   const examples = [
     { icon: <Heart size={12} />, text: "I love you and I'll always be with you" },
@@ -52,13 +55,13 @@ const TextEnhancer: React.FC<TextEnhancerProps> = ({
   // Switch to enhanced tab when enhancement is complete
   React.useEffect(() => {
     if (enhancedText && !isEnhancing) {
-      setActiveTab("enhanced");
+      setActiveTabInternal("enhanced");
     }
   }, [enhancedText, isEnhancing]);
   
   return (
     <div>
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs value={activeTab} onValueChange={onTabChange as (value: string) => void} className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="input">Original</TabsTrigger>
           <TabsTrigger value="enhanced" disabled={!enhancedText && !isEnhancing}>
@@ -121,7 +124,7 @@ const TextEnhancer: React.FC<TextEnhancerProps> = ({
           <div className="flex justify-between">
             <Button 
               variant="outline" 
-              onClick={() => setActiveTab("input")}
+              onClick={() => setActiveTabInternal("input")}
               className="text-voicevault-tertiary"
             >
               Edit Original
