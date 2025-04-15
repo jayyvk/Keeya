@@ -12,7 +12,6 @@ import VoiceCloneIntro from "./VoiceCloneIntro";
 import CreateVoiceMemoryButton from "./CreateVoiceMemoryButton";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
-import CreditDisplay from "./monetization/CreditDisplay";
 
 const VoiceCloneContent: React.FC = () => {
   const { recordings } = useRecording();
@@ -155,11 +154,6 @@ const VoiceCloneContent: React.FC = () => {
     <main className="mx-auto p-4 md:p-6 max-w-4xl">
       <div className="flex justify-between items-center mb-6">
         <VoiceCloneIntro />
-        <CreditDisplay 
-          credits={credits}
-          onManageSubscription={handleManageSubscription}
-          onAddCredits={handleAddCredits}
-        />
       </div>
       
       {!clonedAudioUrl ? (
