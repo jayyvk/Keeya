@@ -12,7 +12,7 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
     navigate("/dashboard");
   };
   return <div className="flex justify-between items-center w-full px-0 py-0">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 py-[16px] px-[5px]">
         <SidebarTrigger />
         <h1 className="text-xl font-bold text-voicevault-tertiary cursor-pointer hover:text-voicevault-primary transition-colors" onClick={handleHeaderClick}>
           VoiceVault
