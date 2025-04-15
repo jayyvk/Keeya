@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { SignupForm } from "@/components/auth/SignupForm";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -19,8 +18,8 @@ const Auth = () => {
     console.log("Auth page - Authentication status:", { isAuthenticated, user });
     
     if (isAuthenticated && user) {
-      // Only show the welcome toast once, and only if the user is authenticated
-      toast.success(`Welcome, ${user.name || 'there'}!`);
+      // Only show the welcome toast
+      toast(`Welcome, ${user.name || 'there'}!`);
       navigate("/dashboard", { replace: true });
     }
   }, [isAuthenticated, navigate, user]);
