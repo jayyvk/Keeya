@@ -3,62 +3,35 @@ import React from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import VoiceCloneContent from "@/components/voice-cloning/VoiceCloneContent";
-import CreditDisplay from "@/components/voice-cloning/monetization/CreditDisplay";
-import { MonetizationProvider, useMonetization } from "@/contexts/MonetizationContext";
-import { PricingCards } from "@/components/voice-cloning/monetization/PricingCards";
 import CommonHeader from "@/components/CommonHeader";
+import { motion } from "framer-motion";
 
-const VoiceCloningInner: React.FC = () => {
-  const { 
-    credits, 
-    isNewUser, 
-    showCreditsOverlay,
-    isProcessingPayment,
-    handlePurchase, 
-    handleManageSubscription,
-    handleAddCredits,
-    setShowCreditsOverlay 
-  } = useMonetization();
-
-  const toggleCreditsOverlay = () => {
-    setShowCreditsOverlay(!showCreditsOverlay);
-  };
-
+const VoiceCloning: React.FC = () => {
   return (
     <SidebarProvider>
-      <div className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex">
+      <motion.div 
+        className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+      >
         <DashboardSidebar />
         
         <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex justify-between items-center px-4 py-4 border-b bg-white">
-            <CommonHeader />
-            
-            <CreditDisplay 
-              credits={credits}
-              onManageSubscription={handleManageSubscription}
-              onAddCredits={toggleCreditsOverlay}
-            />
+          <div className="bg-gradient-to-b from-voicevault-softpurple to-transparent">
+            <div className="flex justify-between items-center px-6 py-4">
+              <CommonHeader />
+            </div>
           </div>
 
           <div className="flex-1 overflow-y-auto">
-            {showCreditsOverlay ? (
-              <div className="container mx-auto px-4 py-6">
-                <PricingCards />
-              </div>
-            ) : (
-              <VoiceCloneContent />
-            )}
+            <VoiceCloneContent />
           </div>
         </div>
-      </div>
+      </motion.div>
     </SidebarProvider>
   );
 };
-
-const VoiceCloning: React.FC = () => (
-  <MonetizationProvider>
-    <VoiceCloningInner />
-  </MonetizationProvider>
-);
 
 export default VoiceCloning;

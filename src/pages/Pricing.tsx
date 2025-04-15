@@ -4,15 +4,24 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { PricingCards } from "@/components/voice-cloning/monetization/PricingCards";
 import CommonHeader from "@/components/CommonHeader";
+import { motion } from "framer-motion";
 
 const Pricing: React.FC = () => {
   return (
     <SidebarProvider>
-      <div className="min-h-screen w-full flex bg-gradient-to-b from-voicevault-softpurple via-white to-white">
+      <motion.div 
+        className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+      >
         <DashboardSidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="bg-gradient-to-b from-voicevault-softpurple to-transparent">
-            <CommonHeader />
+            <div className="flex justify-between items-center px-6 py-4">
+              <CommonHeader />
+            </div>
           </div>
           <div className="flex-1 overflow-y-auto">
             <div className="container mx-auto px-4 py-6">
@@ -20,10 +29,9 @@ const Pricing: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </SidebarProvider>
   );
 };
 
 export default Pricing;
-
