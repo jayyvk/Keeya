@@ -23,15 +23,25 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
   const [volume, setVolume] = useState(1);
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
+  const [audioLoaded, setAudioLoaded] = useState(false);
+  const [audioError, setAudioError] = useState<string | null>(null);
+  
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
   
   useEffect(() => {
-    const audio = new Audio(audioUrl);
+    console.log(`Initializing audio for CloneResult: ${audioUrl}`);
+    const audio = new Audio();
+    
+    // Set important properties before loading
+    audio.crossOrigin = "anonymous"; 
     audio.preload = "metadata";
     
     const handleLoadedMetadata = () => {
+      console.log(`Metadata loaded. Duration: ${audio.duration}s`);
       setDuration(audio.duration);
+      setAudioLoaded(true);
+      setAudioError(null);
     };
     
     const handleTimeUpdate = () => {
@@ -43,40 +53,109 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
       setCurrentTime(0);
     };
     
+    const handleError = (e: Event) => {
+      console.error("Audio error in CloneResult:", e);
+      setAudioLoaded(false);
+      setAudioError("Error loading audio. The file may be corrupted or in an unsupported format.");
+      
+      // Check URL validity
+      fetch(audioUrl, { method: 'HEAD' })
+        .then(response => {
+          console.log(`URL check: ${response.status} ${response.statusText}`);
+          if (!response.ok) {
+            setAudioError(`Audio file not accessible (${response.status})`);
+          }
+        })
+        .catch(err => {
+          console.error("URL fetch error:", err);
+          setAudioError(`Cannot access audio file: ${err.message}`);
+        });
+    };
+    
     audio.addEventListener("loadedmetadata", handleLoadedMetadata);
     audio.addEventListener("timeupdate", handleTimeUpdate);
     audio.addEventListener("ended", handleEnded);
+    audio.addEventListener("error", handleError);
+    audio.addEventListener("canplaythrough", () => {
+      console.log("Audio can play through without buffering");
+      setAudioLoaded(true);
+    });
+    
+    // Set the source last
+    audio.src = audioUrl;
+    
+    try {
+      audio.load();
+      console.log("Audio load initiated");
+    } catch (err) {
+      console.error("Error loading audio:", err);
+    }
     
     audioRef.current = audio;
     
     return () => {
-      audio.pause();
+      console.log("Cleaning up audio element");
+      if (!audio.paused) {
+        audio.pause();
+      }
+      
       audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
       audio.removeEventListener("timeupdate", handleTimeUpdate);
       audio.removeEventListener("ended", handleEnded);
+      audio.removeEventListener("error", handleError);
+      audio.removeEventListener("canplaythrough", () => {});
+      
+      audioRef.current = null;
     };
   }, [audioUrl]);
   
   const togglePlayback = () => {
-    if (!audioRef.current) return;
+    if (!audioRef.current) {
+      console.error("No audio element available");
+      return;
+    }
+    
+    console.log(`Toggle playback. Current state: ${isPlaying ? 'Playing' : 'Paused'}`);
     
     if (isPlaying) {
       audioRef.current.pause();
+      setIsPlaying(false);
     } else {
-      audioRef.current.play();
+      // Try to reload if there was an error
+      if (audioError) {
+        console.log("Reloading audio after error");
+        audioRef.current.load();
+      }
+      
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log("Audio playback started successfully");
+            setIsPlaying(true);
+          })
+          .catch(error => {
+            console.error("Playback error:", error);
+            toast({
+              variant: "destructive",
+              title: "Playback Error",
+              description: "Unable to play this audio. It may be in an unsupported format for your browser."
+            });
+          });
+      }
     }
-    
-    setIsPlaying(!isPlaying);
   };
   
   const handleSliderChange = (value: number[]) => {
     if (!audioRef.current) return;
+    
     audioRef.current.currentTime = value[0];
     setCurrentTime(value[0]);
   };
   
   const toggleMute = () => {
     if (!audioRef.current) return;
+    
     const newMuteState = !isMuted;
     audioRef.current.muted = newMuteState;
     setIsMuted(newMuteState);
@@ -84,6 +163,7 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
   
   const handleVolumeChange = (value: number[]) => {
     if (!audioRef.current) return;
+    
     const newVolume = value[0];
     audioRef.current.volume = newVolume;
     setVolume(newVolume);
@@ -155,6 +235,12 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
               AI-Generated
             </Badge>
           </div>
+          
+          {audioError && (
+            <div className="text-white bg-red-500/20 p-2 rounded mb-4 text-sm">
+              {audioError}
+            </div>
+          )}
           
           <AudioControls
             isPlaying={isPlaying}

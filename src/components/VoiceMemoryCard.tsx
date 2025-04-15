@@ -37,100 +37,106 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
   const { toast } = useToast();
   const { deleteRecording } = useRecording();
 
-  // Directly create an audio element that will be visible for debugging
+  // Create an audio element for this recording
   useEffect(() => {
-    // Create a new audio element for each recording
+    console.log(`Setting up audio for: ${recording.title} (${recording.id})`);
+    console.log(`Audio URL: ${recording.audioUrl}`);
+    
+    // Create a new audio element
     const audioElement = new Audio();
-    audioElement.crossOrigin = "anonymous"; // Important for CORS issues
-    audioElement.src = recording.audioUrl;
-    audioElement.preload = "auto"; // Ensure audio preloads
     
-    // Add debug attributes
-    audioElement.id = `audio-${recording.id}`;
-    audioElement.controls = false; // We're using custom controls
+    // Add important attributes
+    audioElement.crossOrigin = "anonymous";
+    audioElement.preload = "metadata";
     
-    // Set up event listeners
+    // Setup event handlers before setting source
     audioElement.addEventListener('loadeddata', handleAudioLoaded);
+    audioElement.addEventListener('canplaythrough', () => {
+      console.log(`Audio can now play through: ${recording.title}`);
+      setAudioLoaded(true);
+    });
     audioElement.addEventListener('error', handleAudioError);
     audioElement.addEventListener('timeupdate', updateProgress);
     audioElement.addEventListener('ended', handleAudioEnd);
-    audioElement.addEventListener('canplaythrough', () => {
-      console.log(`Audio can play through: ${recording.audioUrl}`);
-      setAudioLoaded(true);
-    });
     
-    // Save reference
+    // Save reference and set source last
     audioRef.current = audioElement;
+    audioElement.src = recording.audioUrl;
     
-    // Load the audio
-    audioElement.load();
+    // Try to load the audio
+    try {
+      audioElement.load();
+      console.log(`Audio load initiated for: ${recording.title}`);
+    } catch (err) {
+      console.error("Error loading audio:", err);
+    }
     
-    console.log(`Created audio element for ${recording.title} with URL: ${recording.audioUrl}`);
-    
-    // Clean up
+    // Cleanup on unmount
     return () => {
+      console.log(`Cleaning up audio for: ${recording.title}`);
       audioElement.removeEventListener('loadeddata', handleAudioLoaded);
+      audioElement.removeEventListener('canplaythrough', () => {});
       audioElement.removeEventListener('error', handleAudioError);
       audioElement.removeEventListener('timeupdate', updateProgress);
       audioElement.removeEventListener('ended', handleAudioEnd);
-      audioElement.removeEventListener('canplaythrough', () => {});
       
-      // Pause and reset audio if unmounting while playing
       if (!audioElement.paused) {
         audioElement.pause();
       }
       
-      // Release the audio element
       audioRef.current = null;
     };
-  }, [recording.audioUrl, recording.id, recording.title]);
+  }, [recording.id, recording.title, recording.audioUrl]);
 
   const handleAudioLoaded = () => {
+    console.log(`Audio loaded successfully for: ${recording.title}`);
     setAudioLoaded(true);
     setAudioError(null);
-    console.log(`Audio loaded successfully: ${recording.audioUrl}`);
+    
+    if (audioRef.current) {
+      console.log(`Audio duration: ${audioRef.current.duration}s`);
+    }
   };
 
   const handleAudioError = (e: Event) => {
-    console.error("Audio error event:", e);
+    console.error(`Audio error for ${recording.title}:`, e);
     const target = e.target as HTMLAudioElement;
     setAudioLoaded(false);
     
-    // Get more detailed error information
+    // Get detailed error information
     let errorMessage = "Unknown error";
     if (target && target.error) {
       switch(target.error.code) {
         case MediaError.MEDIA_ERR_ABORTED:
-          errorMessage = "Fetching process aborted";
+          errorMessage = "Playback aborted";
           break;
         case MediaError.MEDIA_ERR_NETWORK:
           errorMessage = "Network error";
           break;
         case MediaError.MEDIA_ERR_DECODE:
-          errorMessage = "Decoding error";
+          errorMessage = "Format not supported";
           break;
         case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
-          errorMessage = "Audio format not supported";
+          errorMessage = "Audio format not supported by browser";
           break;
         default:
           errorMessage = `Error code: ${target.error.code}`;
       }
     }
     
-    setAudioError(`Error loading audio: ${errorMessage}`);
-    console.error(`Audio load error for ${recording.audioUrl}:`, errorMessage);
+    setAudioError(`Error: ${errorMessage}`);
     
-    // Try to fetch directly to check URL validity
+    // Check URL validity
     fetch(recording.audioUrl, { method: 'HEAD' })
       .then(response => {
-        console.log(`URL check response: ${response.status} ${response.statusText}`);
+        console.log(`URL check for ${recording.title}: ${response.status} ${response.statusText}`);
         if (!response.ok) {
-          setAudioError(`URL check failed: ${response.status} ${response.statusText}`);
+          setAudioError(`File not accessible (${response.status})`);
         }
       })
       .catch(err => {
-        console.error("URL fetch error:", err);
-        setAudioError(`URL fetch error: ${err.message}`);
+        console.error(`URL fetch error for ${recording.title}:`, err);
+        setAudioError(`Cannot access file: ${err.message}`);
       });
   };
 
@@ -161,7 +167,7 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
 
   const togglePlayback = () => {
     if (!audioRef.current) {
-      console.error("No audio element available");
+      console.error("No audio element available for playback");
       toast({
         variant: "destructive",
         title: "Playback Error",
@@ -170,37 +176,33 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
       return;
     }
 
-    console.log("Toggle playback. Current state:", isPlaying);
+    console.log(`Toggle playback for ${recording.title}. Current state: ${isPlaying ? 'Playing' : 'Paused'}`);
     
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
-      console.log("Paused audio");
+      console.log(`Paused ${recording.title}`);
     } else {
-      // Try to load the audio again if there was an error
       if (audioError) {
-        console.log("Reloading audio after error");
+        console.log(`Attempting to reload audio after error: ${recording.title}`);
         audioRef.current.load();
       }
       
-      // Add more debug logging
-      console.log("Attempting to play audio:", recording.audioUrl);
-      console.log("Audio element readyState:", audioRef.current.readyState);
-      console.log("Audio element duration:", audioRef.current.duration);
-      
+      console.log(`Audio readyState: ${audioRef.current.readyState}, Duration: ${audioRef.current.duration}`);
       const playPromise = audioRef.current.play();
+      
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
+            console.log(`Successfully started playback for: ${recording.title}`);
             setIsPlaying(true);
-            console.log("Audio playback started successfully");
           })
           .catch(error => {
-            console.error("Playback error:", error);
+            console.error(`Playback error for ${recording.title}:`, error);
             toast({
               variant: "destructive",
               title: "Playback Error",
-              description: "There was an error playing this recording. Please try again."
+              description: "There was an error playing this recording. The file format may not be supported by your browser."
             });
           });
       }
@@ -208,6 +210,7 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
   };
 
   const handleAudioEnd = () => {
+    console.log(`Playback ended for: ${recording.title}`);
     setIsPlaying(false);
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
@@ -257,7 +260,7 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
           </h3>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => skipBackward()}
+              onClick={skipBackward}
               className="rounded-full p-2 bg-white text-voicevault-primary hover:bg-voicevault-softgray transition-colors"
               aria-label="Skip backward"
               disabled={!audioLoaded}
@@ -266,13 +269,14 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
             </button>
             <button
               onClick={togglePlayback}
-              className="rounded-full p-2 bg-white text-voicevault-primary hover:bg-voicevault-softgray transition-colors"
+              className={`rounded-full p-2 ${!audioLoaded && !audioError ? 'bg-gray-200 text-gray-400' : 'bg-white text-voicevault-primary hover:bg-voicevault-softgray'} transition-colors`}
               aria-label={isPlaying ? "Pause" : "Play"}
+              disabled={!audioLoaded && !audioError}
             >
               {isPlaying ? <Pause size={20} /> : <Play size={20} />}
             </button>
             <button
-              onClick={() => skipForward()}
+              onClick={skipForward}
               className="rounded-full p-2 bg-white text-voicevault-primary hover:bg-voicevault-softgray transition-colors"
               aria-label="Skip forward"
               disabled={!audioLoaded}
@@ -289,11 +293,12 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
             max={recording.duration || 0}
             step={0.1}
             onValueChange={handleSliderChange}
+            disabled={!audioLoaded}
           />
         </div>
 
         {audioError && (
-          <div className="text-red-500 text-xs mt-2">
+          <div className="text-red-500 text-xs mt-2 p-1 bg-red-50 rounded">
             {audioError}
           </div>
         )}
