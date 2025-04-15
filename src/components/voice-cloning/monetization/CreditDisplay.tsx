@@ -1,18 +1,24 @@
+
 import React from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Coins, CreditCard, Info } from "lucide-react";
 import { Credits } from "@/types";
+import { useNavigate } from "react-router-dom";
+
 interface CreditDisplayProps {
   credits: Credits;
   onManageSubscription: () => void;
   onAddCredits: () => void;
 }
+
 const CreditDisplay: React.FC<CreditDisplayProps> = ({
   credits,
   onManageSubscription,
   onAddCredits
 }) => {
+  const navigate = useNavigate();
+  
   // Format subscription end date
   const formatDate = (date: Date | null) => {
     if (!date) return "";
@@ -30,7 +36,14 @@ const CreditDisplay: React.FC<CreditDisplayProps> = ({
         return null;
     }
   };
+  
   const subscriptionLabel = getSubscriptionLabel();
+  
+  const handleAddCredits = () => {
+    // Close the popover and navigate to the pricing page
+    navigate("/pricing");
+  };
+  
   return <div className="flex items-center gap-2">
       <Popover>
         <PopoverTrigger asChild>
@@ -70,7 +83,7 @@ const CreditDisplay: React.FC<CreditDisplayProps> = ({
                 </Button>
               </div>}
             
-            {!subscriptionLabel && <Button size="sm" className="w-full" onClick={onAddCredits}>
+            {!subscriptionLabel && <Button size="sm" className="w-full" onClick={handleAddCredits}>
                 <CreditCard className="mr-2 h-4 w-4" />
                 Add credits
               </Button>}
@@ -79,4 +92,5 @@ const CreditDisplay: React.FC<CreditDisplayProps> = ({
       </Popover>
     </div>;
 };
+
 export default CreditDisplay;

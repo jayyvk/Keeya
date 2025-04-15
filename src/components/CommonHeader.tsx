@@ -17,11 +17,14 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
   const {
     credits,
     handleManageSubscription,
-    handleAddCredits
   } = useMonetization();
 
   const handleHeaderClick = () => {
     navigate("/dashboard");
+  };
+
+  const handleAddCredits = () => {
+    navigate("/pricing");
   };
 
   const showCredits = location.pathname === "/voice-cloning";
