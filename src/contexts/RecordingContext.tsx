@@ -1,9 +1,11 @@
 
-import React, { createContext, useContext, useState, useRef, ReactNode, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Recording, RecordingStatus } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { formatRecording } from "@/utils/recordingUtils";
+import { useRecordingState } from "@/hooks/useRecordingState";
 
 interface RecordingContextType {
   recordings: Recording[];
@@ -24,20 +26,19 @@ const RecordingContext = createContext<RecordingContextType | undefined>(undefin
 
 export function RecordingProvider({ children }: { children: ReactNode }) {
   const [recordings, setRecordings] = useState<Recording[]>([]);
-  const [currentRecording, setCurrentRecording] = useState<Blob | null>(null);
-  const [recordingStatus, setRecordingStatus] = useState<RecordingStatus>("inactive");
-  const [recordingTime, setRecordingTime] = useState(0);
-  
   const { user } = useAuth();
   const { toast } = useToast();
-  
-  // Refs for managing MediaRecorder
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const streamRef = useRef<MediaStream | null>(null);
-  const timerRef = useRef<number | null>(null);
+  const {
+    currentRecording,
+    recordingStatus,
+    recordingTime,
+    startRecording,
+    stopRecording,
+    pauseRecording,
+    resumeRecording,
+    discardRecording
+  } = useRecordingState();
 
-  // Fetch user recordings from Supabase
   useEffect(() => {
     const fetchRecordings = async () => {
       if (!user) {
@@ -52,21 +53,10 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
           
-        if (error) {
-          console.error("Error fetching recordings:", error);
-          return;
-        }
+        if (error) throw error;
         
         if (data) {
-          const formattedRecordings: Recording[] = data.map(item => ({
-            id: item.id,
-            title: item.title,
-            createdAt: new Date(item.created_at),
-            duration: Number(item.duration),
-            audioUrl: item.file_url,
-            tags: item.tags || []
-          }));
-          
+          const formattedRecordings = data.map(formatRecording);
           setRecordings(formattedRecordings);
         }
       } catch (error) {
@@ -76,94 +66,6 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
     
     fetchRecordings();
   }, [user]);
-
-  const startRecording = async () => {
-    try {
-      // Reset state
-      audioChunksRef.current = [];
-      setRecordingTime(0);
-      
-      // Get microphone access
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
-      
-      // Create MediaRecorder
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      
-      // Set up event handlers
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-      
-      mediaRecorder.onstop = () => {
-        // Combine audio chunks into a single blob
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-        setCurrentRecording(audioBlob);
-        
-        // Stop the recording stream
-        if (streamRef.current) {
-          streamRef.current.getTracks().forEach(track => track.stop());
-        }
-        
-        // Stop the timer
-        if (timerRef.current) {
-          clearInterval(timerRef.current);
-          timerRef.current = null;
-        }
-      };
-      
-      // Start recording
-      mediaRecorder.start();
-      setRecordingStatus("recording");
-      
-      // Start timer
-      timerRef.current = window.setInterval(() => {
-        setRecordingTime(prev => prev + 1);
-      }, 1000);
-    } catch (error) {
-      console.error("Error starting recording:", error);
-      toast({
-        variant: "destructive",
-        title: "Recording Error",
-        description: "Could not access microphone. Please check permissions."
-      });
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && (recordingStatus === "recording" || recordingStatus === "paused")) {
-      mediaRecorderRef.current.stop();
-      setRecordingStatus("reviewing");
-    }
-  };
-
-  const pauseRecording = () => {
-    if (mediaRecorderRef.current && recordingStatus === "recording") {
-      mediaRecorderRef.current.pause();
-      setRecordingStatus("paused");
-      
-      // Pause the timer
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    }
-  };
-
-  const resumeRecording = () => {
-    if (mediaRecorderRef.current && recordingStatus === "paused") {
-      mediaRecorderRef.current.resume();
-      setRecordingStatus("recording");
-      
-      // Resume the timer
-      timerRef.current = window.setInterval(() => {
-        setRecordingTime(prev => prev + 1);
-      }, 1000);
-    }
-  };
 
   const saveRecording = async (title: string, tags: string[]) => {
     if (!currentRecording || !user) {
@@ -176,27 +78,21 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
     }
     
     try {
-      // Convert blob to file
       const file = new File([currentRecording], `${Date.now()}.wav`, { type: 'audio/wav' });
-      
-      // Upload to Supabase Storage
       const filePath = `${user.id}/${Date.now()}.wav`;
-      const { data: uploadData, error: uploadError } = await supabase
+      
+      const { error: uploadError } = await supabase
         .storage
         .from('voice_memories')
         .upload(filePath, file);
         
-      if (uploadError) {
-        throw uploadError;
-      }
+      if (uploadError) throw uploadError;
       
-      // Get public URL
       const { data: { publicUrl } } = supabase
         .storage
         .from('voice_memories')
         .getPublicUrl(filePath);
       
-      // Save metadata to database
       const { data, error } = await supabase
         .from('voice_memories')
         .insert({
@@ -209,26 +105,12 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
         .select()
         .single();
         
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
       
-      // Add new recording to state
-      const newRecording: Recording = {
-        id: data.id,
-        title,
-        createdAt: new Date(data.created_at),
-        duration: recordingTime,
-        audioUrl: publicUrl,
-        tags
-      };
-      
+      const newRecording = formatRecording(data);
       setRecordings(prev => [newRecording, ...prev]);
       
-      // Reset current recording state
-      setCurrentRecording(null);
-      setRecordingStatus("inactive");
-      setRecordingTime(0);
+      discardRecording();
       
       toast({
         title: "Success",
@@ -248,18 +130,15 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
     if (!user) return;
     
     try {
-      // Find the recording to delete
       const recordingToDelete = recordings.find(r => r.id === id);
       if (!recordingToDelete) {
         throw new Error("Recording not found");
       }
       
-      // Extract the file path from the URL
       const urlParts = recordingToDelete.audioUrl.split('/');
       const fileName = urlParts[urlParts.length - 1];
       const filePath = `${user.id}/${fileName}`;
       
-      // Delete the recording from the database
       const { error: dbError } = await supabase
         .from('voice_memories')
         .delete()
@@ -267,7 +146,6 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
         
       if (dbError) throw dbError;
       
-      // Delete the file from storage
       const { error: storageError } = await supabase
         .storage
         .from('voice_memories')
@@ -275,10 +153,8 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
       
       if (storageError) {
         console.warn("Failed to delete file from storage:", storageError);
-        // Continue even if file deletion fails
       }
       
-      // Update local state
       setRecordings(prev => prev.filter(recording => recording.id !== id));
       
       toast({
@@ -293,13 +169,6 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
         description: "Failed to delete recording"
       });
     }
-  };
-
-  const discardRecording = () => {
-    // Reset state
-    setCurrentRecording(null);
-    setRecordingStatus("inactive");
-    setRecordingTime(0);
   };
 
   const getRecording = (id: string) => {
