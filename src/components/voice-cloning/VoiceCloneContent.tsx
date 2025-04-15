@@ -6,7 +6,6 @@ import VoiceCloneIntro from "./VoiceCloneIntro";
 import VoiceGenerationForm from "./VoiceGenerationForm";
 import CloneResult from "./CloneResult";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { MonetizationProvider } from "@/contexts/MonetizationContext";
 
 const VoiceCloneContent: React.FC = () => {
   const { recordings } = useRecording();
@@ -19,25 +18,23 @@ const VoiceCloneContent: React.FC = () => {
   } = useVoiceGeneration();
   
   return (
-    <MonetizationProvider>
-      <main className="mx-auto p-4 md:p-6 max-w-4xl">
-        <VoiceCloneIntro />
-        
-        {!generatedAudioUrl ? (
-          <VoiceGenerationForm 
-            onGenerate={generateVoice}
-            isProcessing={isProcessing}
-          />
-        ) : (
-          <CloneResult 
-            audioUrl={generatedAudioUrl}
-            text={""}
-            onBack={() => setGeneratedAudioUrl(null)}
-            isMobile={isMobile}
-          />
-        )}
-      </main>
-    </MonetizationProvider>
+    <main className="mx-auto p-4 md:p-6 max-w-4xl">
+      <VoiceCloneIntro />
+      
+      {!generatedAudioUrl ? (
+        <VoiceGenerationForm 
+          onGenerate={generateVoice}
+          isProcessing={isProcessing}
+        />
+      ) : (
+        <CloneResult 
+          audioUrl={generatedAudioUrl}
+          text={""}
+          onBack={() => setGeneratedAudioUrl(null)}
+          isMobile={isMobile}
+        />
+      )}
+    </main>
   );
 };
 
