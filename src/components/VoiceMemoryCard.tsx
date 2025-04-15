@@ -242,7 +242,7 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (deleteConfirmation !== deleteWord) {
       toast({
         variant: "destructive",
@@ -253,12 +253,19 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
     }
 
     try {
-      const result = await deleteRecording(recording.id);
-      setIsDeleting(false);
-      setDeleteConfirmation("");
-      toast({
-        title: "Success",
-        description: "Voice memory deleted successfully",
+      deleteRecording(recording.id).then(() => {
+        setIsDeleting(false);
+        setDeleteConfirmation("");
+        toast({
+          title: "Success",
+          description: "Voice memory deleted successfully",
+        });
+      }).catch((error) => {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to delete the recording. Please try again.",
+        });
       });
     } catch (error) {
       toast({
