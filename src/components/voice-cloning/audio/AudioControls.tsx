@@ -1,6 +1,5 @@
-
-import React, { useEffect } from "react";
-import { Play, Pause, VolumeX, Volume2, FastForward, Rewind } from "lucide-react";
+import React from "react";
+import { Play, Pause, VolumeX, Volume2 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
