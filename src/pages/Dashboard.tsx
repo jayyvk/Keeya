@@ -11,7 +11,7 @@ import AudioVault from "@/components/AudioVault";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 import CommonHeader from "@/components/CommonHeader";
 import { MonetizationProvider } from "@/contexts/MonetizationContext";
 
@@ -38,17 +38,15 @@ const Dashboard: React.FC = () => {
     try {
       await logout();
       navigate("/auth");
-      toast({
-        title: "Logged out successfully",
+      toast("Logged out successfully", {
         description: "See you next time!"
       });
     } catch (error) {
       console.error("Error during logout:", error);
       navigate("/auth");
-      toast({
-        variant: "destructive",
-        title: "Error during logout",
-        description: "You've been signed out anyway"
+      toast("Error during logout", {
+        description: "You've been signed out anyway",
+        style: { backgroundColor: 'red', color: 'white' }
       });
     }
   };
