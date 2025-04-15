@@ -1,44 +1,47 @@
-import { useState } from "react";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useAuthForm } from "@/hooks/useAuthForm";
 import { Loader2 } from "lucide-react";
+import { signupSchema } from "@/lib/validations/auth";
+import { z } from "zod";
 import { TermsModal } from "./TermsModal";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
-interface SignupFormProps {
-  step: number;
-  setStep: (step: number) => void;
-}
+type SignupFormInputs = z.infer<typeof signupSchema>;
 
-export const SignupForm = ({ step, setStep }: SignupFormProps) => {
+export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: number) => void }) => {
+  const { register: registerUser } = useAuth();
   const {
-    isLoading,
-    error,
-    email,
-    setEmail,
-    password,
-    setPassword,
-    name,
-    setName,
+    register,
     handleSubmit,
-  } = useAuthForm({ isLogin: false });
+    formState: { errors, isSubmitting },
+    getValues,
+  } = useForm<SignupFormInputs>({
+    resolver: zodResolver(signupSchema)
+  });
 
-  const [purpose, setPurpose] = useState("");
-  const [recordingFrequency, setRecordingFrequency] = useState("");
-  const [agreeToTerms, setAgreeToTerms] = useState(false);
-  const [showTermsModal, setShowTermsModal] = useState(false);
-  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
-  const [modalType, setModalType] = useState<'terms' | 'privacy'>('terms');
+  const [purpose, setPurpose] = React.useState("");
+  const [recordingFrequency, setRecordingFrequency] = React.useState("");
+  const [agreeToTerms, setAgreeToTerms] = React.useState(false);
+  const [showTermsModal, setShowTermsModal] = React.useState(false);
+  const [modalType, setModalType] = React.useState<'terms' | 'privacy'>('terms');
 
   const nextStep = () => {
-    if (step === 1 && !email) {
+    const currentStepData = getValues();
+    
+    if (step === 1 && (!currentStepData.email || errors.email)) {
       return;
     }
-    if (step === 2 && !name) {
+    
+    if (step === 2 && (!currentStepData.name || errors.name || !agreeToTerms)) {
       return;
     }
+    
     setStep(step + 1);
   };
 
@@ -54,30 +57,46 @@ export const SignupForm = ({ step, setStep }: SignupFormProps) => {
     setShowTermsModal(true);
   };
 
+  const onSubmit = async (data: SignupFormInputs) => {
+    try {
+      await registerUser(data.name, data.email, data.password);
+    } catch (err: any) {
+      toast.error(err.message || "Registration failed", {
+        description: "Please try again or contact support."
+      });
+    }
+  };
+
   const renderStepContent = () => {
     switch (step) {
       case 1:
         return (
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Email</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
+                id="email"
                 type="email"
                 placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isLoading}
+                {...register("email")}
+                disabled={isSubmitting}
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm">{errors.email.message}</p>
+              )}
             </div>
             <div className="space-y-2">
-              <Label>Password</Label>
+              <Label htmlFor="password">Password</Label>
               <Input
+                id="password"
                 type="password"
                 placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
+                {...register("password")}
+                disabled={isSubmitting}
               />
+              {errors.password && (
+                <p className="text-red-500 text-sm">{errors.password.message}</p>
+              )}
             </div>
           </div>
         );
@@ -85,28 +104,45 @@ export const SignupForm = ({ step, setStep }: SignupFormProps) => {
         return (
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Full Name</Label>
+              <Label htmlFor="name">Full Name</Label>
               <Input
+                id="name"
                 placeholder="John Doe"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                disabled={isLoading}
+                {...register("name")}
+                disabled={isSubmitting}
               />
+              {errors.name && (
+                <p className="text-red-500 text-sm">{errors.name.message}</p>
+              )}
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox 
                 id="terms" 
                 checked={agreeToTerms}
                 onCheckedChange={(checked) => setAgreeToTerms(checked as boolean)}
-                disabled={isLoading}
+                disabled={isSubmitting}
               />
               <Label htmlFor="terms" className="text-sm">
                 I am over 18 and agree to the{" "}
-                <button onClick={handleTermsClick} className="text-voicevault-primary hover:underline">
+                <button 
+                  type="button"
+                  onClick={() => {
+                    setModalType('terms');
+                    setShowTermsModal(true);
+                  }} 
+                  className="text-voicevault-primary hover:underline"
+                >
                   Terms
                 </button>{" "}
                 and{" "}
-                <button onClick={handlePrivacyClick} className="text-voicevault-primary hover:underline">
+                <button 
+                  type="button"
+                  onClick={() => {
+                    setModalType('privacy');
+                    setShowTermsModal(true);
+                  }} 
+                  className="text-voicevault-primary hover:underline"
+                >
                   Privacy Policy
                 </button>
               </Label>
@@ -125,7 +161,7 @@ export const SignupForm = ({ step, setStep }: SignupFormProps) => {
                     variant={purpose === option ? "default" : "outline"}
                     onClick={() => setPurpose(option)}
                     className="w-full"
-                    disabled={isLoading}
+                    disabled={isSubmitting}
                   >
                     {option}
                   </Button>
@@ -141,7 +177,7 @@ export const SignupForm = ({ step, setStep }: SignupFormProps) => {
                     variant={recordingFrequency === option ? "default" : "outline"}
                     onClick={() => setRecordingFrequency(option)}
                     className="w-full"
-                    disabled={isLoading}
+                    disabled={isSubmitting}
                   >
                     {option}
                   </Button>
@@ -156,22 +192,23 @@ export const SignupForm = ({ step, setStep }: SignupFormProps) => {
   return (
     <div className="space-y-4">
       {renderStepContent()}
-      {error && <p className="text-red-500 text-sm">{error}</p>}
       {step < 3 ? (
         <Button 
+          type="button"
           onClick={nextStep}
           className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
-          disabled={isLoading}
+          disabled={isSubmitting}
         >
           Continue
         </Button>
       ) : (
         <Button 
-          onClick={handleSubmit}
-          disabled={isLoading || !purpose || !recordingFrequency}
+          type="submit"
+          onClick={handleSubmit(onSubmit)}
+          disabled={isSubmitting || !purpose || !recordingFrequency}
           className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
         >
-          {isLoading ? (
+          {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Creating Account...
