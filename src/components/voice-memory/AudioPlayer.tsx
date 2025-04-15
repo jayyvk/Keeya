@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState } from "react";
 import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
@@ -29,16 +28,16 @@ const AudioPlayer = ({ title, audioUrl, duration, recordingId }: AudioPlayerProp
     
     const updateDuration = () => {
       if (duration === 0 && audioElement.duration) {
-        supabase
-          .from('voice_memories')
-          .update({ duration: audioElement.duration })
-          .eq('id', recordingId)
-          .then(() => {
-            console.log('Duration updated in database');
-          })
-          .catch((err) => {
-            console.error('Error updating duration:', err);
-          });
+        Promise.resolve(
+          supabase
+            .from('voice_memories')
+            .update({ duration: audioElement.duration })
+            .eq('id', recordingId)
+        ).then(() => {
+          console.log('Duration updated in database');
+        }).catch((err) => {
+          console.error('Error updating duration:', err);
+        });
       }
     };
     
