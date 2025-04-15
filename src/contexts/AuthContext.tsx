@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { User } from "@/types";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AuthContextType {
   user: User | null;
@@ -15,27 +16,47 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   
-  // Mock functions for now - will be replaced with Supabase
   const login = async (email: string, password: string) => {
-    // Mock login
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    
+    if (error) throw error;
+    
     setUser({
-      id: "1",
-      name: "Demo User",
-      email: email
+      id: data.user.id,
+      name: data.user.user_metadata.name || "",
+      email: data.user.email || "",
     });
   };
 
   const logout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
     setUser(null);
   };
 
   const register = async (name: string, email: string, password: string) => {
-    // Mock register
-    setUser({
-      id: "1",
-      name: name,
-      email: email
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
+        },
+      },
     });
+    
+    if (error) throw error;
+    
+    if (data.user) {
+      setUser({
+        id: data.user.id,
+        name: name,
+        email: data.user.email || "",
+      });
+    }
   };
 
   return (

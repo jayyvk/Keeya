@@ -10,6 +10,9 @@ import AudioWaveform from "@/components/AudioWaveform";
 import RecordingReview from "@/components/RecordingReview";
 import AudioVault from "@/components/AudioVault";
 import { useNavigate } from "react-router-dom";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { useToast } from "@/components/ui/use-toast";
 
 const Dashboard: React.FC = () => {
   const { 
@@ -27,72 +30,92 @@ const Dashboard: React.FC = () => {
   
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   
   const handleLogout = async () => {
-    await logout();
-    navigate("/");
+    try {
+      await logout();
+      navigate("/auth");
+      toast({
+        title: "Logged out successfully",
+        description: "See you next time!",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error logging out",
+        description: "Please try again",
+      });
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-voicevault-softpurple via-white to-white">
-      {/* Header */}
-      <header className="bg-white shadow-sm p-4 flex justify-between items-center">
-        <div className="flex items-center">
-          <h1 className="text-xl font-bold text-voicevault-tertiary">VoiceVault</h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-600">
-            Hello, {user?.name}
-          </span>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleLogout}
-            className="text-gray-500 hover:text-red-500"
-          >
-            <LogOut size={16} />
-          </Button>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto p-6 pt-10 max-w-md">
-        {recordingStatus === "reviewing" && currentRecording ? (
-          <RecordingReview
-            recordingBlob={currentRecording}
-            duration={recordingTime}
-            onSave={saveRecording}
-            onDiscard={discardRecording}
-          />
-        ) : (
-          <div className="flex flex-col items-center justify-center">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-semibold text-voicevault-tertiary mb-2">
-                Record a Voice Memory
-              </h2>
-              <p className="text-gray-600 max-w-xs mx-auto">
-                Tap the microphone to start recording your precious voice memories
-              </p>
+    <SidebarProvider>
+      <div className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex">
+        <DashboardSidebar />
+        
+        <div className="flex-1">
+          {/* Header */}
+          <header className="bg-white shadow-sm p-4 flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <SidebarTrigger />
+              <h1 className="text-xl font-bold text-voicevault-tertiary">VoiceVault</h1>
             </div>
-            
-            <RecordingTimer status={recordingStatus} time={recordingTime} />
-            
-            <AudioWaveform status={recordingStatus} />
-            
-            <RecordButton
-              status={recordingStatus}
-              onStart={startRecording}
-              onStop={stopRecording}
-              onPause={pauseRecording}
-              onResume={resumeRecording}
-            />
-          </div>
-        )}
-      </main>
-      
-      {/* Audio Vault */}
-      <AudioVault recordings={recordings} />
-    </div>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-600">
+                Hello, {user?.email}
+              </span>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleLogout}
+                className="text-gray-500 hover:text-red-500"
+              >
+                <LogOut size={16} />
+              </Button>
+            </div>
+          </header>
+
+          {/* Main Content */}
+          <main className="container mx-auto p-6 pt-10 max-w-md">
+            {recordingStatus === "reviewing" && currentRecording ? (
+              <RecordingReview
+                recordingBlob={currentRecording}
+                duration={recordingTime}
+                onSave={saveRecording}
+                onDiscard={discardRecording}
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center">
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-semibold text-voicevault-tertiary mb-2">
+                    Record a Voice Memory
+                  </h2>
+                  <p className="text-gray-600 max-w-xs mx-auto">
+                    Tap the microphone to start recording your precious voice memories
+                  </p>
+                </div>
+                
+                <RecordingTimer status={recordingStatus} time={recordingTime} />
+                
+                <AudioWaveform status={recordingStatus} />
+                
+                <RecordButton
+                  status={recordingStatus}
+                  onStart={startRecording}
+                  onStop={stopRecording}
+                  onPause={pauseRecording}
+                  onResume={resumeRecording}
+                />
+              </div>
+            )}
+          </main>
+          
+          {/* Audio Vault */}
+          <AudioVault recordings={recordings} />
+        </div>
+      </div>
+    </SidebarProvider>
   );
 };
 
