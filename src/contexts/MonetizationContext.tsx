@@ -42,6 +42,8 @@ export function MonetizationProvider({ children }: { children: ReactNode }) {
     if (!user) return;
     
     try {
+      console.log("Refreshing credits for user:", user.id);
+      
       const { data, error } = await supabase
         .from('user_credits')
         .select('credits_balance')
@@ -54,13 +56,46 @@ export function MonetizationProvider({ children }: { children: ReactNode }) {
       }
 
       if (data) {
+        console.log("Updated credits:", data.credits_balance);
         setCredits(prev => ({
           ...prev,
           available: data.credits_balance
         }));
+      } else {
+        console.log("No credit data found for user");
+        // Create a new credit record for this user
+        await createUserCreditRecord();
       }
     } catch (error) {
       console.error("Error in refreshCredits:", error);
+    }
+  };
+
+  const createUserCreditRecord = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('user_credits')
+        .insert({
+          user_id: user?.id,
+          credits_balance: 2, // Start with 2 free credits
+        })
+        .select()
+        .single();
+      
+      if (error) {
+        console.error("Error creating user credits:", error);
+        return;
+      }
+      
+      if (data) {
+        setCredits(prev => ({
+          ...prev,
+          available: data.credits_balance
+        }));
+        console.log("Created new credit record with balance:", data.credits_balance);
+      }
+    } catch (error) {
+      console.error("Error in createUserCreditRecord:", error);
     }
   };
 

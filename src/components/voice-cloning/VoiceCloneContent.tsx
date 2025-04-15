@@ -13,12 +13,13 @@ import VoiceCloneIntro from "./VoiceCloneIntro";
 import CreateVoiceMemoryButton from "./CreateVoiceMemoryButton";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import CreditDisplay from "./monetization/CreditDisplay";
 
 const VoiceCloneContent: React.FC = () => {
   const { recordings } = useRecording();
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const { credits, refreshCredits } = useMonetization();
+  const { credits, refreshCredits, handleAddCredits, handleManageSubscription } = useMonetization();
   const { user } = useAuth();
   
   const {
@@ -135,7 +136,9 @@ const VoiceCloneContent: React.FC = () => {
           title: "Voice cloned successfully",
           description: "Your voice memory has been saved to your vault.",
         });
-        refreshCredits();
+        
+        // Force refresh credits to show updated balance
+        await refreshCredits();
       } else {
         throw new Error("No output returned from the API");
       }
@@ -153,7 +156,14 @@ const VoiceCloneContent: React.FC = () => {
 
   return (
     <main className="mx-auto p-4 md:p-6 max-w-4xl">
-      <VoiceCloneIntro />
+      <div className="flex justify-between items-center mb-6">
+        <VoiceCloneIntro />
+        <CreditDisplay 
+          credits={credits}
+          onManageSubscription={handleManageSubscription}
+          onAddCredits={handleAddCredits}
+        />
+      </div>
       
       {!clonedAudioUrl ? (
         <>

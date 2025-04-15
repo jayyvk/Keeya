@@ -6,6 +6,8 @@ import VoiceCloneContent from "@/components/voice-cloning/VoiceCloneContent";
 import CommonHeader from "@/components/CommonHeader";
 import { motion } from "framer-motion";
 import { MonetizationProvider } from "@/contexts/MonetizationContext";
+import CreditDisplay from "@/components/voice-cloning/monetization/CreditDisplay";
+import { useMonetization } from "@/contexts/MonetizationContext";
 
 const VoiceCloning: React.FC = () => {
   return (

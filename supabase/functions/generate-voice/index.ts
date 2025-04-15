@@ -91,7 +91,7 @@ serve(async (req) => {
 
     console.log("Voice generation completed:", output)
 
-    // Deduct a credit from the user's account - use an RPC function to ensure atomicity
+    // Use the correct RPC function to deduct credits
     const { data: updateData, error: updateError } = await supabase.rpc('decrement_user_credits', {
       p_user_id: userId,
       p_credits: 1
@@ -99,7 +99,13 @@ serve(async (req) => {
 
     if (updateError) {
       console.error("Error deducting credits:", updateError)
-      // We'll still return the generated audio, but log the error
+      // Return error if credit deduction fails
+      return new Response(JSON.stringify({ 
+        error: "Failed to deduct credits: " + updateError.message 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      })
     } else {
       console.log("Credit deducted successfully")
     }
