@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import AudioControls from "./audio/AudioControls";
 import ActionButtons from "./audio/ActionButtons";
+import { downloadAndStoreAudioFile } from "@/utils/audioStorage";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CloneResultProps {
   audioUrl: string;
@@ -32,6 +35,7 @@ const CloneResult: React.FC<CloneResultProps> = ({
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const formatTime = (time: number) => {
     if (!time || isNaN(time)) return "0:00";
@@ -191,15 +195,36 @@ const CloneResult: React.FC<CloneResultProps> = ({
   };
 
   const handleSaveToVault = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to save to vault",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSaving(true);
     try {
-      setTimeout(() => {
-        toast({
-          title: "Saved to Vault",
-          description: "Your voice memory has been saved to your vault.",
+      const storedAudioUrl = await downloadAndStoreAudioFile(audioUrl, user.id);
+      
+      const { error: saveError } = await supabase
+        .from('voice_memories')
+        .insert({
+          user_id: user.id,
+          title: `Generated Voice - ${new Date().toLocaleDateString()}`,
+          file_url: storedAudioUrl,
+          duration: duration || 0,
+          file_type: 'audio/mpeg',
+          tags: ['generated', 'voice-clone']
         });
-        setIsSaving(false);
-      }, 1500);
+
+      if (saveError) throw saveError;
+
+      toast({
+        title: "Saved to Vault",
+        description: "Your voice memory has been saved to your vault.",
+      });
     } catch (error) {
       console.error("Error saving to vault:", error);
       toast({
@@ -207,6 +232,7 @@ const CloneResult: React.FC<CloneResultProps> = ({
         description: "Unable to save to vault. Please try again.",
         variant: "destructive",
       });
+    } finally {
       setIsSaving(false);
     }
   };
