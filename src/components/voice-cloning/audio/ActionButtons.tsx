@@ -9,6 +9,8 @@ interface ActionButtonsProps {
   onSave: () => void;
   onShare: () => void;
   isMobile?: boolean;
+  // Add credit-related props
+  hasPremiumFeatures?: boolean;
 }
 
 const ActionButtons: React.FC<ActionButtonsProps> = ({
@@ -17,11 +19,15 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   onSave,
   onShare,
   isMobile = false,
+  hasPremiumFeatures = false,
 }) => {
+  // This button text now changes based on premium status
+  const saveButtonText = hasPremiumFeatures ? "Save to Family Vault" : "Save to Vault";
+
   return (
     <div className={`${isMobile ? 'flex flex-col' : 'flex'} gap-4`}>
       <Button 
-        className={`${isMobile ? 'w-full mb-2' : 'flex-1'}`}
+        className={`${isMobile ? 'w-full mb-2' : 'flex-1'} ${hasPremiumFeatures ? 'bg-voicevault-primary hover:bg-voicevault-primary/90' : ''}`}
         onClick={onSave}
         disabled={isSaving}
       >
@@ -33,7 +39,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         ) : (
           <>
             <Save className="mr-2 h-4 w-4" />
-            Save to Vault
+            {saveButtonText}
           </>
         )}
       </Button>

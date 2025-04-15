@@ -6,13 +6,15 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Recording } from "@/types";
+import { Credits, Recording, SubscriptionTier, PaymentType } from "@/types";
 import AudioSourceSelector from "@/components/voice-cloning/AudioSourceSelector";
 import TextEnhancer from "@/components/voice-cloning/TextEnhancer";
 import CloneResult from "@/components/voice-cloning/CloneResult";
 import VoiceCloneHeader from "@/components/voice-cloning/VoiceCloneHeader";
 import VoiceCloneIntro from "@/components/voice-cloning/VoiceCloneIntro";
 import CreateVoiceMemoryButton from "@/components/voice-cloning/CreateVoiceMemoryButton";
+import CreditsOverlay from "@/components/voice-cloning/monetization/CreditsOverlay";
+import CreditDisplay from "@/components/voice-cloning/monetization/CreditDisplay";
 
 const VoiceCloning: React.FC = () => {
   const { recordings } = useRecording();
@@ -28,10 +30,35 @@ const VoiceCloning: React.FC = () => {
   const [clonedAudioUrl, setClonedAudioUrl] = useState<string | null>(null);
   const [totalSelectedDuration, setTotalSelectedDuration] = useState(0);
   
+  // Monetization related states
+  const [showCreditsOverlay, setShowCreditsOverlay] = useState(false);
+  const [credits, setCredits] = useState<Credits>({
+    available: 1, // Start with 1 free credit for new users
+    subscription: null,
+    subscriptionEndsAt: null
+  });
+  const [isNewUser, setIsNewUser] = useState(true);
+  
   useEffect(() => {
     const total = selectedSources.reduce((sum, recording) => sum + recording.duration, 0);
     setTotalSelectedDuration(total);
-  }, [selectedSources]);
+    
+    // Simulating fetch of user credits data
+    // In a real implementation, you would fetch this from your database
+    if (user) {
+      // This is just for demo - in real implementation fetch from database
+      setTimeout(() => {
+        setCredits({
+          available: 1,
+          subscription: null,
+          subscriptionEndsAt: null
+        });
+        
+        // Check if user is a new user based on some logic
+        setIsNewUser(true);
+      }, 500);
+    }
+  }, [selectedSources, user]);
   
   const handleSourceSelect = (recording: Recording) => {
     if (selectedSources.some(r => r.id === recording.id)) {
@@ -99,12 +126,26 @@ const VoiceCloning: React.FC = () => {
       return;
     }
     
+    // Check if user has credits
+    if (credits.available <= 0 && !credits.subscription) {
+      setShowCreditsOverlay(true);
+      return;
+    }
+    
     setIsCloning(true);
     
     try {
       setTimeout(() => {
         setClonedAudioUrl("https://file-examples.com/storage/fe3a8ff9004de0da6fa8225/2017/11/file_example_MP3_700KB.mp3");
         setIsCloning(false);
+        
+        // Deduct a credit if not on subscription
+        if (!credits.subscription) {
+          setCredits(prev => ({
+            ...prev,
+            available: Math.max(0, prev.available - 1)
+          }));
+        }
         
         toast({
           title: "Voice cloned successfully",
@@ -122,6 +163,52 @@ const VoiceCloning: React.FC = () => {
     }
   };
 
+  const handlePurchase = (type: PaymentType) => {
+    // In a real implementation, this would redirect to Stripe or process the payment
+    toast({
+      title: type === 'subscription' ? "Subscription started" : "Credits purchased",
+      description: type === 'subscription' ? 
+        "You now have unlimited voice generations!" : 
+        "Credit has been added to your account."
+    });
+    
+    // Update credits based on purchase type
+    if (type === 'subscription') {
+      const nextMonth = new Date();
+      nextMonth.setMonth(nextMonth.getMonth() + 1);
+      
+      setCredits({
+        available: 9999, // Practically unlimited
+        subscription: 'basic',
+        subscriptionEndsAt: nextMonth
+      });
+    } else {
+      setCredits(prev => ({
+        ...prev,
+        available: prev.available + (isNewUser ? 1 : 1) // Give 1 free credit to new users, or 1 for purchase
+      }));
+    }
+    
+    setShowCreditsOverlay(false);
+    
+    // If this was a new user getting their free credit, mark them as not new anymore
+    if (isNewUser) {
+      setIsNewUser(false);
+    }
+  };
+
+  const handleManageSubscription = () => {
+    // This would redirect to a subscription management page
+    toast({
+      title: "Subscription management",
+      description: "You would be redirected to manage your subscription."
+    });
+  };
+
+  const handleAddCredits = () => {
+    setShowCreditsOverlay(true);
+  };
+
   const textToUse = enhancedText || inputText;
   const isReadyToClone = selectedSources.length > 0 && textToUse.trim().length > 0;
   
@@ -131,7 +218,16 @@ const VoiceCloning: React.FC = () => {
         <DashboardSidebar />
         
         <div className="flex-1 overflow-x-hidden">
-          <VoiceCloneHeader userName={user?.name} />
+          <div className="flex justify-between items-center px-4 py-4 border-b bg-white">
+            <VoiceCloneHeader userName={user?.name} />
+            
+            {/* Add Credit Display */}
+            <CreditDisplay 
+              credits={credits}
+              onManageSubscription={handleManageSubscription}
+              onAddCredits={handleAddCredits}
+            />
+          </div>
 
           <main className="mx-auto p-4 md:p-6 max-w-4xl">
             <VoiceCloneIntro />
@@ -186,6 +282,16 @@ const VoiceCloning: React.FC = () => {
           </main>
         </div>
       </div>
+      
+      {/* Credits Overlay */}
+      <CreditsOverlay 
+        isOpen={showCreditsOverlay}
+        onClose={() => setShowCreditsOverlay(false)}
+        onPurchase={handlePurchase}
+        selectedVoiceName={selectedSources[0]?.title || "this person"}
+        isNewUser={isNewUser}
+        credits={credits}
+      />
     </SidebarProvider>
   );
 };

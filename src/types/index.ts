@@ -15,3 +15,13 @@ export interface User {
 }
 
 export type RecordingStatus = 'inactive' | 'recording' | 'paused' | 'reviewing';
+
+export interface Credits {
+  available: number;
+  subscription: SubscriptionTier | null;
+  subscriptionEndsAt: Date | null;
+}
+
+export type SubscriptionTier = 'none' | 'basic' | 'premium';
+
+export type PaymentType = 'one-time' | 'subscription';
