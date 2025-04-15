@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -29,7 +28,6 @@ const VoiceCloning: React.FC = () => {
   const [clonedAudioUrl, setClonedAudioUrl] = useState<string | null>(null);
   const [totalSelectedDuration, setTotalSelectedDuration] = useState(0);
   
-  // Calculate total duration of selected recordings
   useEffect(() => {
     const total = selectedSources.reduce((sum, recording) => sum + recording.duration, 0);
     setTotalSelectedDuration(total);
@@ -45,7 +43,6 @@ const VoiceCloning: React.FC = () => {
   
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputText(e.target.value);
-    // Reset enhanced text when input changes
     if (enhancedText) setEnhancedText("");
   };
   
@@ -62,8 +59,6 @@ const VoiceCloning: React.FC = () => {
     setIsEnhancing(true);
     
     try {
-      // Mock API call for now - would connect to OpenAI in production
-      // This would be replaced with an actual API call
       setTimeout(() => {
         const enhanced = `${inputText}\n\nEnhanced with more warmth and personality. This voice message sounds natural and captures the essence of the original voice, with improved clarity and emotion.`;
         setEnhancedText(enhanced);
@@ -107,10 +102,7 @@ const VoiceCloning: React.FC = () => {
     setIsCloning(true);
     
     try {
-      // Mock API call for now - would connect to OpenVoice API in production
-      // This would be replaced with an actual API call
       setTimeout(() => {
-        // Mock result - in production this would be a real URL from the API
         setClonedAudioUrl("https://file-examples.com/storage/fe3a8ff9004de0da6fa8225/2017/11/file_example_MP3_700KB.mp3");
         setIsCloning(false);
         
@@ -130,6 +122,10 @@ const VoiceCloning: React.FC = () => {
     }
   };
   
+  const handleHeaderClick = () => {
+    navigate("/dashboard");
+  };
+
   const textToUse = enhancedText || inputText;
   const isReadyToClone = selectedSources.length > 0 && textToUse.trim().length > 0;
   
@@ -139,11 +135,15 @@ const VoiceCloning: React.FC = () => {
         <DashboardSidebar />
         
         <div className="flex-1">
-          {/* Header */}
           <header className="bg-white shadow-sm p-4 flex justify-between items-center">
             <div className="flex items-center gap-4">
               <SidebarTrigger />
-              <h1 className="text-xl font-bold text-voicevault-tertiary">VoiceVault</h1>
+              <h1 
+                className="text-xl font-bold text-voicevault-tertiary cursor-pointer hover:text-voicevault-primary transition-colors" 
+                onClick={handleHeaderClick}
+              >
+                VoiceVault
+              </h1>
             </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-600">
@@ -152,7 +152,6 @@ const VoiceCloning: React.FC = () => {
             </div>
           </header>
 
-          {/* Main Content */}
           <main className="container mx-auto p-6 max-w-4xl">
             <div className="mb-8">
               <h2 className="text-2xl font-semibold text-voicevault-tertiary mb-2 font-playfair">
@@ -165,7 +164,6 @@ const VoiceCloning: React.FC = () => {
             
             {!clonedAudioUrl ? (
               <>
-                {/* Audio Source Selection */}
                 <section className="mb-8">
                   <h3 className="text-xl font-playfair text-voicevault-tertiary mb-4">Select Voice Source</h3>
                   <AudioSourceSelector 
@@ -181,7 +179,6 @@ const VoiceCloning: React.FC = () => {
                   </div>
                 </section>
                 
-                {/* Text Input Area */}
                 <section className="mb-8">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-xl font-playfair text-voicevault-tertiary">What would you like this voice to say?</h3>
@@ -200,7 +197,6 @@ const VoiceCloning: React.FC = () => {
                   </Card>
                 </section>
                 
-                {/* Clone Voice Action */}
                 <section className="flex justify-center mb-8">
                   <Button 
                     size="lg"
@@ -220,7 +216,6 @@ const VoiceCloning: React.FC = () => {
                 </section>
               </>
             ) : (
-              /* Result Playback */
               <CloneResult 
                 audioUrl={clonedAudioUrl}
                 text={textToUse}

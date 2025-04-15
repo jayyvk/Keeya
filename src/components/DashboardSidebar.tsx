@@ -1,5 +1,5 @@
 
-import { User, PackageSearch, AlertCircle, Mic2 } from "lucide-react";
+import { Home, User, PackageSearch, AlertCircle, Mic2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -17,6 +17,11 @@ import {
 
 const menuItems = [
   {
+    title: "Home",
+    icon: Home,
+    url: "/dashboard",
+  },
+  {
     title: "Profile",
     icon: User,
     url: "#profile",
@@ -24,7 +29,7 @@ const menuItems = [
   {
     title: "Clone Voice",
     icon: Mic2,
-    url: "#clone-voice",
+    url: "/voice-cloning",
   },
   {
     title: "Marketplace",
@@ -42,6 +47,12 @@ export function DashboardSidebar() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  const handleMenuItemClick = (url: string) => {
+    if (url.startsWith('/')) {
+      navigate(url);
+    }
+  };
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -51,7 +62,11 @@ export function DashboardSidebar() {
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild tooltip={item.title}>
+                  <SidebarMenuButton 
+                    asChild 
+                    tooltip={item.title} 
+                    onClick={() => handleMenuItemClick(item.url)}
+                  >
                     <a href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
