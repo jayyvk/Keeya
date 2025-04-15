@@ -12,7 +12,7 @@ import AudioVault from "@/components/AudioVault";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const Dashboard: React.FC = () => {
   const { 
@@ -63,7 +63,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-600">
-                Hello, {user?.email}
+                Hello, {user?.name || 'there'}
               </span>
               <Button 
                 variant="ghost" 
