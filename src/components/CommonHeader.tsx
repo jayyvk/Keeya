@@ -3,9 +3,11 @@ import React from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router-dom";
 
-interface VoiceCloneHeaderProps {}
+interface CommonHeaderProps {
+  title?: string;
+}
 
-const VoiceCloneHeader: React.FC<VoiceCloneHeaderProps> = () => {
+const CommonHeader: React.FC<CommonHeaderProps> = ({ title }) => {
   const navigate = useNavigate();
 
   const handleHeaderClick = () => {
@@ -13,7 +15,7 @@ const VoiceCloneHeader: React.FC<VoiceCloneHeaderProps> = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm p-4 flex justify-between items-center">
+    <div className="flex justify-between items-center px-4 py-4 border-b bg-white w-full">
       <div className="flex items-center gap-4">
         <SidebarTrigger />
         <h1 
@@ -23,8 +25,9 @@ const VoiceCloneHeader: React.FC<VoiceCloneHeaderProps> = () => {
           VoiceVault
         </h1>
       </div>
-    </header>
+      {title && <h2 className="text-xl font-semibold text-gray-900">{title}</h2>}
+    </div>
   );
 };
 
-export default VoiceCloneHeader;
+export default CommonHeader;

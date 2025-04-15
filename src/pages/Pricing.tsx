@@ -3,6 +3,7 @@ import React from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { PricingCards } from "@/components/voice-cloning/monetization/PricingCards";
+import CommonHeader from "@/components/CommonHeader";
 
 const Pricing: React.FC = () => {
   return (
@@ -11,10 +12,7 @@ const Pricing: React.FC = () => {
         <DashboardSidebar />
         
         <div className="flex-1 overflow-x-hidden">
-          <div className="flex justify-between items-center px-4 py-4 border-b bg-white">
-            <h1 className="text-2xl font-semibold text-gray-900">Buy Voice Credits</h1>
-          </div>
-
+          <CommonHeader title="Buy Voice Credits" />
           <PricingCards />
         </div>
       </div>

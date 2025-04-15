@@ -1,12 +1,13 @@
+
 import React from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
-import VoiceCloneHeader from "@/components/voice-cloning/VoiceCloneHeader";
 import VoiceCloneContent from "@/components/voice-cloning/VoiceCloneContent";
 import CreditDisplay from "@/components/voice-cloning/monetization/CreditDisplay";
 import CreditsOverlay from "@/components/voice-cloning/monetization/CreditsOverlay";
 import { MonetizationProvider, useMonetization } from "@/contexts/MonetizationContext";
 import { PricingCards } from "@/components/voice-cloning/monetization/PricingCards";
+import CommonHeader from "@/components/CommonHeader";
 
 const VoiceCloningInner: React.FC = () => {
   const { 
@@ -27,7 +28,7 @@ const VoiceCloningInner: React.FC = () => {
         
         <div className="flex-1 overflow-x-hidden">
           <div className="flex justify-between items-center px-4 py-4 border-b bg-white">
-            <VoiceCloneHeader />
+            <CommonHeader />
             
             <CreditDisplay 
               credits={credits}

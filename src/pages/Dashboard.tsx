@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,9 +9,10 @@ import AudioWaveform from "@/components/AudioWaveform";
 import RecordingReview from "@/components/RecordingReview";
 import AudioVault from "@/components/AudioVault";
 import { useNavigate } from "react-router-dom";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { useToast } from "@/hooks/use-toast";
+import CommonHeader from "@/components/CommonHeader";
 
 const Dashboard: React.FC = () => {
   const { 
@@ -61,10 +61,7 @@ const Dashboard: React.FC = () => {
         <div className="flex-1">
           {/* Header */}
           <header className="bg-white shadow-sm p-4 flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <SidebarTrigger />
-              <h1 className="text-xl font-bold text-voicevault-tertiary">VoiceVault</h1>
-            </div>
+            <CommonHeader />
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-600">
                 Hello, {user?.name || 'there'}
