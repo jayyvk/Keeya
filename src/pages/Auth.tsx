@@ -1,17 +1,17 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "@/components/ui/sonner";
 
 const Auth: React.FC = () => {
   const navigate = useNavigate();
-  const { login, register } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -21,21 +21,41 @@ const Auth: React.FC = () => {
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate("/dashboard");
+      }
+    };
+
+    checkSession();
+  }, [navigate]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
     
     if (!loginEmail || !loginPassword) {
       setError("Please fill in all fields");
+      setIsLoading(false);
       return;
     }
     
     try {
-      setIsLoading(true);
-      await login(loginEmail, loginPassword);
+      const { error } = await supabase.auth.signInWithPassword({
+        email: loginEmail,
+        password: loginPassword,
+      });
+      
+      if (error) throw error;
+      
+      toast.success("Logged in successfully!");
       navigate("/dashboard");
-    } catch (err) {
-      setError("Invalid email or password");
+    } catch (err: any) {
+      setError(err.message || "Login failed");
+      toast.error(err.message || "Login failed");
     } finally {
       setIsLoading(false);
     }
@@ -44,23 +64,38 @@ const Auth: React.FC = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
     
     if (!registerName || !registerEmail || !registerPassword) {
       setError("Please fill in all fields");
+      setIsLoading(false);
       return;
     }
     
     if (!agreeToTerms) {
       setError("You must agree to the terms and privacy policy");
+      setIsLoading(false);
       return;
     }
     
     try {
-      setIsLoading(true);
-      await register(registerName, registerEmail, registerPassword);
+      const { error } = await supabase.auth.signUp({
+        email: registerEmail,
+        password: registerPassword,
+        options: {
+          data: {
+            name: registerName
+          }
+        }
+      });
+      
+      if (error) throw error;
+      
+      toast.success("Account created successfully! Please check your email to verify.");
       navigate("/dashboard");
-    } catch (err) {
-      setError("Registration failed. Please try again.");
+    } catch (err: any) {
+      setError(err.message || "Registration failed");
+      toast.error(err.message || "Registration failed");
     } finally {
       setIsLoading(false);
     }
