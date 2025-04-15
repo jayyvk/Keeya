@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,7 +14,6 @@ import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { toast } from "sonner";
 import CommonHeader from "@/components/CommonHeader";
 import { MonetizationProvider } from "@/contexts/MonetizationContext";
-
 const Dashboard: React.FC = () => {
   const {
     recordings,
@@ -34,7 +32,6 @@ const Dashboard: React.FC = () => {
     logout
   } = useAuth();
   const navigate = useNavigate();
-  
   const handleLogout = async () => {
     try {
       await logout();
@@ -47,17 +44,17 @@ const Dashboard: React.FC = () => {
       navigate("/auth");
       toast("Error during logout", {
         description: "You've been signed out anyway",
-        style: { backgroundColor: 'red', color: 'white' }
+        style: {
+          backgroundColor: 'red',
+          color: 'white'
+        }
       });
     }
   };
-  
   const goToVoiceCloning = () => {
     navigate("/voice-cloning");
   };
-  
-  return (
-    <SidebarProvider>
+  return <SidebarProvider>
       <MonetizationProvider>
         <div className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex">
           <DashboardSidebar />
@@ -68,7 +65,7 @@ const Dashboard: React.FC = () => {
               <div className="flex justify-between items-center px-6 py-4">
                 <CommonHeader />
                 <div className="flex items-center gap-4">
-                  <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-500 hover:text-red-500">
+                  <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-500 hover: background-red-500">
                     <LogOut size={16} />
                   </Button>
                 </div>
@@ -78,15 +75,7 @@ const Dashboard: React.FC = () => {
             {/* Main Content */}
             <div className="flex-1 flex flex-col justify-center items-center overflow-hidden">
               <main className="container mx-auto px-6 max-w-md flex-1 flex flex-col justify-center items-center">
-                {recordingStatus === "reviewing" && currentRecording ? (
-                  <RecordingReview 
-                    recordingBlob={currentRecording} 
-                    duration={recordingTime} 
-                    onSave={saveRecording} 
-                    onDiscard={discardRecording} 
-                  />
-                ) : (
-                  <div className="flex flex-col items-center justify-center text-center space-y-6">
+                {recordingStatus === "reviewing" && currentRecording ? <RecordingReview recordingBlob={currentRecording} duration={recordingTime} onSave={saveRecording} onDiscard={discardRecording} /> : <div className="flex flex-col items-center justify-center text-center space-y-6">
                     <div>
                       <h2 className="text-2xl font-semibold text-voicevault-tertiary mb-2">
                         Record a Voice Memory
@@ -100,24 +89,13 @@ const Dashboard: React.FC = () => {
                     
                     <AudioWaveform status={recordingStatus} />
                     
-                    <RecordButton 
-                      status={recordingStatus} 
-                      onStart={startRecording} 
-                      onStop={stopRecording} 
-                      onPause={pauseRecording} 
-                      onResume={resumeRecording} 
-                    />
+                    <RecordButton status={recordingStatus} onStart={startRecording} onStop={stopRecording} onPause={pauseRecording} onResume={resumeRecording} />
                     
-                    <Button 
-                      variant="outline" 
-                      onClick={goToVoiceCloning} 
-                      className="bg-voicevault-softgray/30 border-voicevault-softpurple hover:bg-voicevault-softgray/50"
-                    >
+                    <Button variant="outline" onClick={goToVoiceCloning} className="bg-voicevault-softgray/30 border-voicevault-softpurple hover:bg-voicevault-softgray/50">
                       <Wand2 className="mr-2 h-4 w-4 text-voicevault-primary" />
                       Voice Cloning Studio
                     </Button>
-                  </div>
-                )}
+                  </div>}
               </main>
               
               {/* Audio Vault */}
@@ -128,8 +106,6 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </MonetizationProvider>
-    </SidebarProvider>
-  );
+    </SidebarProvider>;
 };
-
 export default Dashboard;
