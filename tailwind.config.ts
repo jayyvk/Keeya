@@ -12,7 +12,10 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: '2rem',
+      padding: {
+        DEFAULT: '20px',
+        md: '32px'
+      },
       screens: {
         '2xl': '1400px'
       }
@@ -25,24 +28,26 @@ export default {
       fontSize: {
         'header-lg': ['32px', '1.2'],
         'header': ['24px', '1.3'],
+        'subheader': ['20px', '1.4'],
         'body': ['16px', '1.5'],
+        'small': ['14px', '1.4']
       },
       borderRadius: {
         'large': '24px',
         'medium': '16px',
-        lg: '24px',
-        md: '16px',
-        sm: '8px'
+        'small': '12px',
+        'pill': '9999px',
       },
       spacing: {
         'section': '24px',
         'element': '16px',
+        'compact': '8px',
       },
       height: {
         'button': '48px',
       },
       boxShadow: {
-        'soft': '0 4px 20px rgba(0, 0, 0, 0.05)',
+        'soft': '0 4px 8px rgba(0, 0, 0, 0.04)',
         'card': '0 8px 30px rgba(0, 0, 0, 0.08)',
       },
       colors: {
@@ -119,6 +124,9 @@ export default {
           purple: '#F2E5FF',
           peach: '#FFE8E0',
         },
+      },
+      backgroundImage: {
+        'soft-gradient': 'linear-gradient(180deg, #F6F6FF 0%, #F1EEFB 100%)',
       },
       keyframes: {
         'accordion-down': {
