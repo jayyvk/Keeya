@@ -31,6 +31,7 @@ const Auth: React.FC = () => {
   // Redirect if user is already authenticated
   useEffect(() => {
     if (isAuthenticated) {
+      console.log("User is authenticated, redirecting to dashboard");
       navigate("/dashboard");
     }
   }, [isAuthenticated, navigate]);
@@ -46,11 +47,13 @@ const Auth: React.FC = () => {
     }
 
     try {
-      // Use the register function from AuthContext
+      console.log("Attempting to register with:", { name, email });
       await register(name, email, password);
       toast.success("Account created successfully!");
+      console.log("Registration successful, redirecting to dashboard");
       navigate("/dashboard");
     } catch (err: any) {
+      console.error("Registration error:", err);
       setError(err.message || "Registration failed");
       toast.error(err.message || "Registration failed");
     } finally {
@@ -69,11 +72,13 @@ const Auth: React.FC = () => {
     }
 
     try {
-      // Use the login function from AuthContext
+      console.log("Attempting to login with:", { email });
       await login(email, password);
       toast.success("Logged in successfully!");
+      console.log("Login successful, redirecting to dashboard");
       navigate("/dashboard");
     } catch (err: any) {
+      console.error("Login error:", err);
       setError(err.message || "Login failed");
       toast.error(err.message || "Login failed");
     } finally {

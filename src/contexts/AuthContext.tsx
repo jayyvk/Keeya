@@ -17,9 +17,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   
   useEffect(() => {
+    console.log("AuthProvider initialized");
+    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log("Auth state changed:", event, session ? "session exists" : "no session");
+        
         if (session?.user) {
           // Fetch the user's profile
           const { data: profile } = await supabase
@@ -33,14 +37,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             name: profile?.display_name || session.user.user_metadata.name || "",
             email: session.user.email || "",
           });
+          console.log("User set after auth state change");
         } else {
           setUser(null);
+          console.log("User set to null after auth state change");
         }
       }
     );
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Initial session check:", session ? "session exists" : "no session");
+      
       if (session?.user) {
         // Fetch the user's profile
         supabase
@@ -54,6 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               name: profile?.display_name || session.user.user_metadata.name || "",
               email: session.user.email || "",
             });
+            console.log("User set after initial session check");
           });
       }
     });
@@ -62,14 +71,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
+    console.log("Login attempt with:", email);
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
     
-    if (error) throw error;
+    if (error) {
+      console.error("Login error:", error.message);
+      throw error;
+    }
     
     if (data.user) {
+      console.log("Login successful for user:", data.user.id);
       const { data: profile } = await supabase
         .from('profiles')
         .select('*')
@@ -85,12 +99,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
+    console.log("Logout attempt");
     const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    if (error) {
+      console.error("Logout error:", error.message);
+      throw error;
+    }
     setUser(null);
+    console.log("Logout successful");
   };
 
   const register = async (name: string, email: string, password: string) => {
+    console.log("Register attempt with:", { name, email });
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -101,18 +121,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
     });
     
-    if (error) throw error;
+    if (error) {
+      console.error("Registration error:", error.message);
+      throw error;
+    }
     
     if (data.user) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', data.user.id)
-        .single();
-
+      console.log("Registration successful for user:", data.user.id);
+      // No need to fetch profile here as it might not be created yet
       setUser({
         id: data.user.id,
-        name: profile?.display_name || name,
+        name: name,
         email: data.user.email || "",
       });
     }
