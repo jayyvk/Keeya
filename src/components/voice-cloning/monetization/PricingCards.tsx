@@ -8,7 +8,12 @@ import { useMonetization } from "@/contexts/MonetizationContext";
 import { PaymentType } from "@/types";
 
 export function PricingCards() {
-  const { credits, handlePurchase } = useMonetization();
+  const { credits, handlePurchase, isProcessingPayment } = useMonetization();
+
+  const onPurchaseClick = (planType: PaymentType) => {
+    console.log(`Initiating purchase for plan: ${planType}`);
+    handlePurchase(planType);
+  };
 
   return (
     <div className="w-full max-w-7xl mx-auto">
@@ -39,10 +44,11 @@ export function PricingCards() {
             <Button 
               className="w-full text-sm" 
               variant="outline"
-              onClick={() => handlePurchase('starter')}
+              onClick={() => onPurchaseClick('starter')}
+              disabled={isProcessingPayment}
             >
               <Star className="w-4 h-4 mr-2" />
-              Get Started
+              {isProcessingPayment ? 'Processing...' : 'Get Started'}
             </Button>
           </CardFooter>
         </Card>
@@ -66,10 +72,11 @@ export function PricingCards() {
           <CardFooter>
             <Button 
               className="w-full text-sm"
-              onClick={() => handlePurchase('pro')}
+              onClick={() => onPurchaseClick('pro')}
+              disabled={isProcessingPayment}
             >
               <CreditCard className="w-4 h-4 mr-2" />
-              Subscribe Monthly
+              {isProcessingPayment ? 'Processing...' : 'Subscribe Monthly'}
             </Button>
           </CardFooter>
         </Card>
@@ -88,10 +95,11 @@ export function PricingCards() {
             <Button 
               className="w-full text-sm"
               variant="outline"
-              onClick={() => handlePurchase('family')}
+              onClick={() => onPurchaseClick('family')}
+              disabled={isProcessingPayment}
             >
               <Users className="w-4 h-4 mr-2" />
-              Subscribe Monthly
+              {isProcessingPayment ? 'Processing...' : 'Subscribe Monthly'}
             </Button>
           </CardFooter>
         </Card>

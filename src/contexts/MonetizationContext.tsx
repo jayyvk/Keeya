@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Credits, PaymentType } from "@/types";
 import { useToast } from "@/hooks/use-toast";
@@ -117,17 +118,25 @@ export function MonetizationProvider({ children }: { children: ReactNode }) {
     }
 
     setIsProcessingPayment(true);
+    console.log("Starting payment process for plan:", type);
     
     try {
       const response = await supabase.functions.invoke('create-checkout', {
         body: { planId: type }
       });
 
-      if (response.error) throw response.error;
+      console.log("Checkout response:", response);
+      
+      if (response.error) {
+        console.error("Checkout error:", response.error);
+        throw response.error;
+      }
       
       if (response.data?.url) {
+        console.log("Redirecting to checkout URL:", response.data.url);
         window.location.href = response.data.url;
       } else {
+        console.error("Missing checkout URL in response:", response.data);
         throw new Error("No checkout URL returned");
       }
     } catch (error) {

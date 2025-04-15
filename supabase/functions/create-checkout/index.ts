@@ -20,17 +20,33 @@ const PLANS = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { planId } = await req.json();
-    const plan = PLANS[planId as keyof typeof PLANS];
+    console.log("Starting create-checkout function");
     
-    if (!plan) {
-      throw new Error("Invalid plan selected");
+    // Parse the request body
+    const bodyText = await req.text();
+    let body;
+    try {
+      body = JSON.parse(bodyText);
+    } catch (e) {
+      console.error("Error parsing request body:", e, "Body:", bodyText);
+      throw new Error(`Invalid request body: ${bodyText}`);
     }
+    
+    const { planId } = body;
+    console.log("Plan selected:", planId);
+    
+    const plan = PLANS[planId as keyof typeof PLANS];
+    if (!plan) {
+      console.error("Invalid plan selected:", planId);
+      throw new Error(`Invalid plan selected: ${planId}`);
+    }
+    console.log("Plan details:", plan);
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -38,15 +54,28 @@ serve(async (req) => {
     );
 
     const authHeader = req.headers.get("Authorization");
-    const token = authHeader?.replace("Bearer ", "");
+    if (!authHeader) {
+      console.error("No authorization header provided");
+      throw new Error("No authorization header provided");
+    }
     
-    if (!token) throw new Error("No authorization token provided");
+    const token = authHeader.replace("Bearer ", "");
+    console.log("Authenticating user with token");
     
     const { data: { user }, error: userError } = await supabase.auth.getUser(token);
-    if (userError || !user) throw new Error("Unauthorized");
+    if (userError || !user) {
+      console.error("Authentication error:", userError);
+      throw new Error("Unauthorized");
+    }
+    console.log("User authenticated:", user.id);
 
     // Determine if this is a subscription or one-time payment
     const isSubscription = planId !== 'starter';
+    console.log("Payment type:", isSubscription ? "subscription" : "one-time");
+    
+    // Get the origin for success and cancel URLs
+    const origin = req.headers.get("origin") || "http://localhost:3000";
+    console.log("Origin:", origin);
     
     const sessionConfig = {
       payment_method_types: ["card"],
@@ -65,8 +94,8 @@ serve(async (req) => {
         },
       ],
       mode: isSubscription ? "subscription" : "payment",
-      success_url: `${req.headers.get("origin")}/voice-cloning?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/voice-cloning?canceled=true`,
+      success_url: `${origin}/voice-cloning?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/voice-cloning?canceled=true`,
       metadata: {
         userId: user.id,
         credits: plan.credits,
@@ -74,14 +103,19 @@ serve(async (req) => {
       },
     };
 
+    console.log("Creating checkout session with config:", JSON.stringify(sessionConfig, null, 2));
     const session = await stripe.checkout.sessions.create(sessionConfig);
+    console.log("Checkout session created:", session.id, "URL:", session.url);
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("Error in create-checkout function:", errorMessage);
+    
+    return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 400,
     });
