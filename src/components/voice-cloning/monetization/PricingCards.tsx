@@ -10,7 +10,7 @@ export function PricingCards() {
   const { credits, handlePayment } = useCredits();
 
   return (
-    <div className="w-full py-8 px-4 sm:px-6 lg:px-8">
+    <div className="w-full max-w-7xl mx-auto">
       <div className="text-center mb-8">
         <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-2">
           Choose Your Plan
@@ -25,9 +25,9 @@ export function PricingCards() {
         )}
       </div>
 
-      <div className="grid gap-4 sm:gap-6 md:grid-cols-3 max-w-5xl mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         {/* Trial Plan */}
-        <Card className="relative bg-white border-2 hover:border-voicevault-primary/20 transition-all">
+        <Card className="relative bg-white border-2 hover:border-voicevault-primary/20 transition-all h-full">
           <CardHeader className="space-y-1">
             <h3 className="text-xl sm:text-2xl font-semibold">Trial</h3>
             <p className="text-sm text-gray-500">One-time purchase to try it out</p>
@@ -49,7 +49,7 @@ export function PricingCards() {
         </Card>
 
         {/* Basic Plan */}
-        <Card className="relative bg-white border-2 border-voicevault-primary">
+        <Card className="relative bg-white border-2 border-voicevault-primary h-full">
           <Badge 
             className="absolute -top-2 right-4 bg-voicevault-primary"
             variant="default"
@@ -76,7 +76,7 @@ export function PricingCards() {
         </Card>
 
         {/* Premium Plan */}
-        <Card className="relative bg-white border-2 hover:border-voicevault-primary/20 transition-all">
+        <Card className="relative bg-white border-2 hover:border-voicevault-primary/20 transition-all h-full">
           <CardHeader className="space-y-1">
             <h3 className="text-xl sm:text-2xl font-semibold">Premium</h3>
             <p className="text-sm text-gray-500">For power users</p>

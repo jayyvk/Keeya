@@ -10,10 +10,12 @@ const Pricing: React.FC = () => {
     <SidebarProvider>
       <div className="min-h-screen w-full flex bg-gradient-to-b from-voicevault-softpurple via-white to-white">
         <DashboardSidebar />
-        <div className="flex-1 overflow-x-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden">
           <CommonHeader />
-          <div className="max-w-7xl mx-auto px-4">
-            <PricingCards />
+          <div className="flex-1 overflow-y-auto">
+            <div className="container mx-auto px-4 py-6">
+              <PricingCards />
+            </div>
           </div>
         </div>
       </div>
