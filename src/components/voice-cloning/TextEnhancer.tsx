@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -45,7 +44,6 @@ const TextEnhancer: React.FC<TextEnhancerProps> = ({
   ];
   
   const handleExampleClick = (example: string) => {
-    // Create a synthetic event to simulate onChange
     const event = {
       target: { value: example },
       preventDefault: () => {},
@@ -54,7 +52,6 @@ const TextEnhancer: React.FC<TextEnhancerProps> = ({
     onTextChange(event);
   };
   
-  // Switch to enhanced tab when enhancement is complete
   React.useEffect(() => {
     if (enhancedText && !isEnhancing) {
       onTabChange("enhanced");
