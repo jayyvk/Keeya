@@ -127,14 +127,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error("Logout error:", error.message);
         throw error;
       }
-      // Force user state to null regardless of session state
       setUser(null);
       console.log("Logout successful");
     } catch (error: any) {
       console.error("Logout error:", error.message);
-      // Force user state to null even if there was an error with Supabase
       setUser(null);
-      // Even with an error, we'll clear the local state
       console.log("User state cleared despite logout error");
     }
   };
@@ -158,7 +155,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     if (data.user) {
       console.log("Registration successful for user:", data.user.id);
-      // No need to fetch profile here as it might not be created yet
       const userData = {
         id: data.user.id,
         name: name,

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,6 +15,7 @@ import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { toast } from "sonner";
 import CommonHeader from "@/components/CommonHeader";
 import { MonetizationProvider } from "@/contexts/MonetizationContext";
+
 const Dashboard: React.FC = () => {
   const {
     recordings,
@@ -27,11 +29,10 @@ const Dashboard: React.FC = () => {
     saveRecording,
     discardRecording
   } = useRecording();
-  const {
-    user,
-    logout
-  } = useAuth();
+  
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
+  
   const handleLogout = async () => {
     try {
       await logout();
@@ -51,9 +52,11 @@ const Dashboard: React.FC = () => {
       });
     }
   };
+  
   const goToVoiceCloning = () => {
     navigate("/voice-cloning");
   };
+  
   return <SidebarProvider>
       <MonetizationProvider>
         <div className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex">
@@ -65,7 +68,7 @@ const Dashboard: React.FC = () => {
               <div className="flex justify-between items-center px-6 py-4">
                 <CommonHeader />
                 <div className="flex items-center gap-4">
-                  <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-500 hover: background-red-500">
+                  <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-500 hover:bg-red-100">
                     <LogOut size={16} />
                   </Button>
                 </div>
@@ -108,4 +111,5 @@ const Dashboard: React.FC = () => {
       </MonetizationProvider>
     </SidebarProvider>;
 };
+
 export default Dashboard;
