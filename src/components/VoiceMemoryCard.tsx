@@ -280,8 +280,8 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
   const formatTime = (time: number) => {
     if (!time || isNaN(time)) return "0:00";
     const minutes = Math.floor(time / 60);
-    const seconds = Number((time % 60).toFixed(2));
-    return `${minutes}:${seconds.toLocaleString('en-US', {minimumIntegerDigits: 2, minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
   return (
