@@ -1,10 +1,8 @@
-
 import { Home, Mic2, CreditCard, PackageSearch, AlertCircle, UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarFooter } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-
 const menuItems = [{
   title: "Home",
   icon: Home,
@@ -26,38 +24,30 @@ const menuItems = [{
   icon: AlertCircle,
   url: "#about"
 }];
-
 export function DashboardSidebar() {
   const navigate = useNavigate();
-  const { user } = useAuth();
-
+  const {
+    user
+  } = useAuth();
   const handleMenuItemClick = (url: string) => {
     if (url.startsWith('/')) {
       navigate(url);
     }
   };
-
-  return (
-    <Sidebar>
+  return <Sidebar>
       <SidebarContent>
         <SidebarGroup>
+          
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map(item => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild 
-                    tooltip={item.title} 
-                    onClick={() => handleMenuItemClick(item.url)} 
-                    className="text-gray-500 hover:text-voicevault-primary hover:bg-voicevault-softgray/50"
-                  >
-                    <a href={item.url} className="text-base md:text-lg">
-                      <item.icon className="text-gray-500 hover:text-voicevault-primary h-5 w-5 md:h-6 md:w-6" />
+              {menuItems.map(item => <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild tooltip={item.title} onClick={() => handleMenuItemClick(item.url)} className="text-gray-600 hover:text-voicevault-primary hover:bg-voicevault-softgray/50">
+                    <a href={item.url}>
+                      <item.icon className="text-voicevault-primary" />
                       <span className="font-medium">{item.title}</span>
                     </a>
                   </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+                </SidebarMenuItem>)}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -76,6 +66,5 @@ export function DashboardSidebar() {
           </div>
         </div>
       </SidebarFooter>
-    </Sidebar>
-  );
+    </Sidebar>;
 }

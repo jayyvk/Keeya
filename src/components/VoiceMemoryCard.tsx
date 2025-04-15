@@ -245,20 +245,36 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-white to-soft-lavender-50 rounded-large shadow-card overflow-hidden border border-soft-lavender-100 transition-all hover:shadow-lg">
-      <div className="bg-gradient-to-r from-pastel-purple to-pastel-blue p-6">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden border border-voicevault-softpurple transition-all hover:shadow-lg hover:border-voicevault-primary">
+      <div className="bg-gradient-to-r from-voicevault-softpurple to-voicevault-softpink p-4">
         <div className="flex justify-between items-center">
-          <h3 className="font-medium text-header text-dark-gray-700 truncate max-w-[80%]">
+          <h3 className="font-semibold text-lg text-voicevault-tertiary truncate">
             {recording.title}
           </h3>
-          
-          <div className="flex items-center gap-element">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={skipBackward}
+              className="rounded-full p-2 bg-white text-voicevault-primary hover:bg-voicevault-softgray transition-colors"
+              aria-label="Skip backward"
+              disabled={!audioLoaded}
+            >
+              <SkipBack size={16} />
+            </button>
             <button
               onClick={togglePlayback}
-              className="rounded-full p-3 bg-white/90 text-voicevault-primary hover:bg-white transition-colors"
+              className={`rounded-full p-2 ${!audioLoaded && !audioError ? 'bg-gray-200 text-gray-400' : 'bg-white text-voicevault-primary hover:bg-voicevault-softgray'} transition-colors`}
               aria-label={isPlaying ? "Pause" : "Play"}
+              disabled={!audioLoaded && !audioError}
             >
               {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+            </button>
+            <button
+              onClick={skipForward}
+              className="rounded-full p-2 bg-white text-voicevault-primary hover:bg-voicevault-softgray transition-colors"
+              aria-label="Skip forward"
+              disabled={!audioLoaded}
+            >
+              <SkipForward size={16} />
             </button>
           </div>
         </div>

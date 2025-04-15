@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,7 +13,6 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { useToast } from "@/hooks/use-toast";
 import CommonHeader from "@/components/CommonHeader";
-
 const Dashboard: React.FC = () => {
   const {
     recordings,
@@ -36,7 +34,6 @@ const Dashboard: React.FC = () => {
   const {
     toast
   } = useToast();
-
   const handleLogout = async () => {
     try {
       await logout();
@@ -53,84 +50,58 @@ const Dashboard: React.FC = () => {
       });
     }
   };
-
   const goToVoiceCloning = () => {
     navigate("/voice-cloning");
   };
-
-  return (
-    <SidebarProvider>
-      <div className="min-h-screen w-full bg-soft-gradient flex">
+  return <SidebarProvider>
+      <div className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex">
         <DashboardSidebar />
         
-        <div className="flex-1 flex flex-col min-h-screen w-full">
+        <div className="flex-1">
           {/* Header */}
-          <div className="bg-gradient-to-b from-voicevault-softpurple to-transparent w-full">
-            <div className="container flex justify-between items-center py-4">
+          <div className="bg-gradient-to-b from-voicevault-softpurple to-transparent">
+            <div className="flex justify-between items-center px-6 py-4">
               <CommonHeader />
-              <div className="flex items-center gap-compact">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={handleLogout} 
-                  className="text-gray-500 hover:text-red-500"
-                >
-                  <LogOut size={20} />
+              <div className="flex items-center gap-4">
+                
+                <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-500 hover:text-red-500">
+                  <LogOut size={16} />
                 </Button>
               </div>
             </div>
           </div>
 
           {/* Main Content */}
-          <main className="container flex-1 flex flex-col items-center justify-center py-section mx-auto">
-            {recordingStatus === "reviewing" && currentRecording ? (
-              <RecordingReview 
-                recordingBlob={currentRecording} 
-                duration={recordingTime} 
-                onSave={saveRecording} 
-                onDiscard={discardRecording} 
-              />
-            ) : (
-              <div className="w-full flex flex-col items-center justify-center">
-                <div className="text-center mb-8 px-4">
-                  <h2 className="text-2xl md:text-3xl font-semibold text-voicevault-tertiary mb-4">
+          <main className="container mx-auto p-6 pt-10 max-w-md">
+            {recordingStatus === "reviewing" && currentRecording ? <RecordingReview recordingBlob={currentRecording} duration={recordingTime} onSave={saveRecording} onDiscard={discardRecording} /> : <div className="flex flex-col items-center justify-center">
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-semibold text-voicevault-tertiary mb-2">
                     Record a Voice Memory
                   </h2>
-                  <p className="text-gray-600 text-lg max-w-md mx-auto">
+                  <p className="text-gray-600 max-w-xs mx-auto">
                     Tap the microphone to start recording your precious voice memories
                   </p>
                 </div>
                 
                 <RecordingTimer status={recordingStatus} time={recordingTime} />
-                <AudioWaveform status={recordingStatus} />
-                <RecordButton 
-                  status={recordingStatus} 
-                  onStart={startRecording} 
-                  onStop={stopRecording} 
-                  onPause={pauseRecording} 
-                  onResume={resumeRecording} 
-                />
                 
-                <div className="mt-12 text-center px-4">
-                  <Button 
-                    variant="outline" 
-                    onClick={goToVoiceCloning}
-                    className="w-full md:w-auto bg-white/50 border-voicevault-softpurple hover:bg-voicevault-softgray/50 text-base"
-                  >
-                    <Wand2 className="mr-2 h-5 w-5 text-voicevault-primary" />
+                <AudioWaveform status={recordingStatus} />
+                
+                <RecordButton status={recordingStatus} onStart={startRecording} onStop={stopRecording} onPause={pauseRecording} onResume={resumeRecording} />
+                
+                <div className="mt-12 text-center">
+                  <Button variant="outline" onClick={goToVoiceCloning} className="bg-voicevault-softgray/30 border-voicevault-softpurple hover:bg-voicevault-softgray/50">
+                    <Wand2 className="mr-2 h-4 w-4 text-voicevault-primary" />
                     Voice Cloning Studio
                   </Button>
                 </div>
-              </div>
-            )}
+              </div>}
           </main>
           
           {/* Audio Vault */}
           <AudioVault recordings={recordings} />
         </div>
       </div>
-    </SidebarProvider>
-  );
+    </SidebarProvider>;
 };
-
 export default Dashboard;

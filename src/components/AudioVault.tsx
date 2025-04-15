@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useCallback } from "react";
 import { Recording } from "@/types";
 import VoiceMemoryCard from "./VoiceMemoryCard";
@@ -59,13 +60,13 @@ const AudioVault: React.FC<AudioVaultProps> = ({ recordings }) => {
   return (
     <div 
       ref={vaultRef}
-      className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-large shadow-lg transition-transform duration-300 transform ${
+      className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-xl shadow-lg transition-transform duration-300 transform ${
         isOpen ? 'translate-y-0' : 'translate-y-[calc(100%-60px)]'
       } max-h-[80vh] overflow-hidden z-10`}
     >
       {/* Vault Header / Pull Tab */}
       <div 
-        className="px-4 py-3 bg-gradient-to-r from-voicevault-primary to-voicevault-secondary cursor-pointer flex items-center justify-between"
+        className="px-4 py-3 bg-voicevault-primary cursor-pointer flex items-center justify-between"
         onClick={toggleVault}
       >
         <h2 className="text-white font-medium">Your Voice Memories</h2>
@@ -126,13 +127,7 @@ const AudioVault: React.FC<AudioVaultProps> = ({ recordings }) => {
       </div>
       
       {/* Recordings List */}
-      <div 
-        className="overflow-y-auto p-4 space-y-4 scrollbar-hide" 
-        style={{ 
-          maxHeight: "calc(80vh - 150px)",
-          WebkitOverflowScrolling: 'touch',
-        }}
-      >
+      <div className="overflow-y-auto p-4 space-y-4" style={{ maxHeight: "calc(80vh - 150px)" }}>
         {filteredRecordings.length > 0 ? (
           filteredRecordings.map(recording => (
             <VoiceMemoryCard key={recording.id} recording={recording} />
