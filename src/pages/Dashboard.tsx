@@ -65,7 +65,7 @@ const Dashboard: React.FC = () => {
         <div className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex">
           <DashboardSidebar />
           
-          <div className="flex-1">
+          <div className="flex-1 flex flex-col overflow-hidden">
             {/* Header */}
             <div className="bg-gradient-to-b from-voicevault-softpurple to-transparent">
               <div className="flex justify-between items-center px-6 py-4">
@@ -79,53 +79,57 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Main Content */}
-            <main className="container mx-auto p-6 pt-10 max-w-md">
-              {recordingStatus === "reviewing" && currentRecording ? (
-                <RecordingReview 
-                  recordingBlob={currentRecording} 
-                  duration={recordingTime} 
-                  onSave={saveRecording} 
-                  onDiscard={discardRecording} 
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center">
-                  <div className="text-center mb-8">
-                    <h2 className="text-2xl font-semibold text-voicevault-tertiary mb-2">
-                      Record a Voice Memory
-                    </h2>
-                    <p className="text-gray-600 max-w-xs mx-auto">
-                      Tap the microphone to start recording your precious voice memories
-                    </p>
-                  </div>
-                  
-                  <RecordingTimer status={recordingStatus} time={recordingTime} />
-                  
-                  <AudioWaveform status={recordingStatus} />
-                  
-                  <RecordButton 
-                    status={recordingStatus} 
-                    onStart={startRecording} 
-                    onStop={stopRecording} 
-                    onPause={pauseRecording} 
-                    onResume={resumeRecording} 
+            <div className="flex-1 flex flex-col overflow-hidden">
+              <main className="container mx-auto p-6 pt-10 max-w-md flex-1 flex flex-col">
+                {recordingStatus === "reviewing" && currentRecording ? (
+                  <RecordingReview 
+                    recordingBlob={currentRecording} 
+                    duration={recordingTime} 
+                    onSave={saveRecording} 
+                    onDiscard={discardRecording} 
                   />
-                  
-                  <div className="mt-12 text-center">
-                    <Button 
-                      variant="outline" 
-                      onClick={goToVoiceCloning} 
-                      className="bg-voicevault-softgray/30 border-voicevault-softpurple hover:bg-voicevault-softgray/50"
-                    >
-                      <Wand2 className="mr-2 h-4 w-4 text-voicevault-primary" />
-                      Voice Cloning Studio
-                    </Button>
+                ) : (
+                  <div className="flex-1 flex flex-col items-center justify-center">
+                    <div className="text-center mb-8">
+                      <h2 className="text-2xl font-semibold text-voicevault-tertiary mb-2">
+                        Record a Voice Memory
+                      </h2>
+                      <p className="text-gray-600 max-w-xs mx-auto">
+                        Tap the microphone to start recording your precious voice memories
+                      </p>
+                    </div>
+                    
+                    <RecordingTimer status={recordingStatus} time={recordingTime} />
+                    
+                    <AudioWaveform status={recordingStatus} />
+                    
+                    <RecordButton 
+                      status={recordingStatus} 
+                      onStart={startRecording} 
+                      onStop={stopRecording} 
+                      onPause={pauseRecording} 
+                      onResume={resumeRecording} 
+                    />
+                    
+                    <div className="mt-12 text-center">
+                      <Button 
+                        variant="outline" 
+                        onClick={goToVoiceCloning} 
+                        className="bg-voicevault-softgray/30 border-voicevault-softpurple hover:bg-voicevault-softgray/50"
+                      >
+                        <Wand2 className="mr-2 h-4 w-4 text-voicevault-primary" />
+                        Voice Cloning Studio
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              )}
-            </main>
-            
-            {/* Audio Vault */}
-            <AudioVault recordings={recordings} />
+                )}
+              </main>
+              
+              {/* Audio Vault */}
+              <div className="flex-shrink-0 overflow-hidden">
+                <AudioVault recordings={recordings} />
+              </div>
+            </div>
           </div>
         </div>
       </MonetizationProvider>
@@ -134,3 +138,4 @@ const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
+

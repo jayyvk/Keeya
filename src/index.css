@@ -145,22 +145,13 @@
   }
 }
 
-/* Custom scrollbar for the app */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Custom scrollbar styling */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
 }
 
-::-webkit-scrollbar-track {
-  background: theme('colors.voicevault.softgray');
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: theme('colors.voicevault.light');
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: theme('colors.voicevault.primary');
+/* WebKit browsers */
+*::-webkit-scrollbar {
+  display: none;
 }
