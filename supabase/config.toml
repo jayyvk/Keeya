@@ -1,1 +1,43 @@
+
 project_id = "zqhruotbmlyubyxwaaez"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[inbucket]
+enabled = true
+port = 54324
+
+[storage]
+enabled = true
+
+[auth]
+enabled = true
+
+[realtime]
+enabled = true
+
+[[functions]]
+name = "enhance-text"
+verify_jwt = true
+
+[[functions]]
+name = "create-checkout"
+verify_jwt = true
+
+[[functions]]
+name = "update-credits"
+verify_jwt = true
+
+[[functions]]
+name = "generate-voice"
+verify_jwt = true
