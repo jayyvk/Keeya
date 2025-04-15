@@ -45,16 +45,13 @@ serve(async (req) => {
       userId
     })
 
-    // Call the OpenVoice API on Replicate with an updated model version
-    // Using the updated and valid model version for OpenVoice
+    // Call the XTTS-v2 API on Replicate with the correct model version
     const output = await replicate.run(
-      "lucataco/openvoice-24:77b436f65a3b2865b3cece65c32c9d6f10ffe7d9f9a1d859c7b250cd8cf193aa",
+      "lucataco/xtts-v2:684bc3855b37866c0c65add2ff39c78f3dea3f4ff103a436465326e0f438d55e",
       {
         input: {
           text: text,
-          reference_audio: referenceAudioUrl,
-          language: language,
-          emotion: emotion
+          speaker: referenceAudioUrl
         }
       }
     )
