@@ -43,14 +43,14 @@ const CreditDisplay: React.FC<CreditDisplayProps> = ({
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex items-center gap-1 h-8 px-3 bg-white/80 hover:bg-white"
+            className="flex items-center gap-1 h-8 px-3 bg-white/80 hover:bg-white rounded-full shadow-sm"
           >
             <Coins className="h-4 w-4 text-voicevault-primary" />
             <span className="text-voicevault-tertiary">{credits.available}</span>
             <Info className="h-3 w-3 text-gray-400 ml-1" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-80">
+        <PopoverContent className="w-80 bg-white shadow-lg rounded-lg border border-purple-100">
           <div className="space-y-4">
             <div>
               <h4 className="font-medium text-sm">Your Voice Credits</h4>
@@ -92,7 +92,7 @@ const CreditDisplay: React.FC<CreditDisplayProps> = ({
             {!subscriptionLabel && (
               <Button 
                 size="sm" 
-                className="w-full"
+                className="w-full bg-voicevault-primary hover:bg-voicevault-primary/90"
                 onClick={onAddCredits}
               >
                 <CreditCard className="mr-2 h-4 w-4" />
