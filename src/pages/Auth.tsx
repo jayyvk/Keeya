@@ -6,19 +6,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/components/ui/sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Auth: React.FC = () => {
   const navigate = useNavigate();
+  const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [loginEmail, setLoginEmail] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
-  const [registerName, setRegisterName] = useState("");
-  const [registerEmail, setRegisterEmail] = useState("");
-  const [registerPassword, setRegisterPassword] = useState("");
+  
+  // Basic Auth Fields
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  
+  // Onboarding Fields
+  const [purpose, setPurpose] = useState("");
+  const [recordingFrequency, setRecordingFrequency] = useState("");
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+  
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -32,59 +38,26 @@ const Auth: React.FC = () => {
     checkSession();
   }, [navigate]);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+  const handleSignUp = async () => {
     setIsLoading(true);
-    
-    if (!loginEmail || !loginPassword) {
-      setError("Please fill in all fields");
-      setIsLoading(false);
-      return;
-    }
-    
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: loginEmail,
-        password: loginPassword,
-      });
-      
-      if (error) throw error;
-      
-      toast.success("Logged in successfully!");
-      navigate("/dashboard");
-    } catch (err: any) {
-      setError(err.message || "Login failed");
-      toast.error(err.message || "Login failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    setError("");
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
-    
-    if (!registerName || !registerEmail || !registerPassword) {
+    if (!email || !password || !name) {
       setError("Please fill in all fields");
       setIsLoading(false);
       return;
     }
-    
-    if (!agreeToTerms) {
-      setError("You must agree to the terms and privacy policy");
-      setIsLoading(false);
-      return;
-    }
-    
+
     try {
       const { error } = await supabase.auth.signUp({
-        email: registerEmail,
-        password: registerPassword,
+        email,
+        password,
         options: {
           data: {
-            name: registerName
+            name,
+            purpose,
+            recording_frequency: recordingFrequency,
+            terms_accepted: agreeToTerms
           }
         }
       });
@@ -101,99 +74,104 @@ const Auth: React.FC = () => {
     }
   };
 
+  const handleLogin = async () => {
+    setIsLoading(true);
+    setError("");
+
+    if (!email || !password) {
+      setError("Please fill in all fields");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) throw error;
+      
+      toast.success("Logged in successfully!");
+      navigate("/dashboard");
+    } catch (err: any) {
+      setError(err.message || "Login failed");
+      toast.error(err.message || "Login failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const nextStep = () => {
+    if (step === 1 && !email) {
+      setError("Please enter your email");
+      return;
+    }
+    if (step === 2 && !name) {
+      setError("Please enter your name");
+      return;
+    }
+    setError("");
+    setStep(prev => prev + 1);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-b from-voicevault-softpurple to-white">
       <Card className="w-full max-w-md shadow-xl animate-fade-in">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-voicevault-tertiary">Welcome to VoiceVault</CardTitle>
-          <CardDescription>Preserve the voices you love, forever.</CardDescription>
+          <CardTitle className="text-2xl font-bold text-voicevault-tertiary">
+            {step === 1 && "Welcome to VoiceVault"}
+            {step === 2 && "Tell us about yourself"}
+            {step === 3 && "How will you use VoiceVault?"}
+          </CardTitle>
+          <CardDescription>
+            {step === 1 && "Preserve the voices you love, forever."}
+            {step === 2 && "Help us personalize your experience"}
+            {step === 3 && "Understanding your goals helps us improve"}
+          </CardDescription>
         </CardHeader>
         
-        <Tabs defaultValue="login" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="register">Register</TabsTrigger>
-          </TabsList>
-          
-          {/* Login Tab */}
-          <TabsContent value="login">
-            <form onSubmit={handleLogin}>
-              <CardContent className="space-y-4 pt-4">
+        <AnimatePresence mode="wait">
+          <motion.div 
+            key={step}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            transition={{ duration: 0.3 }}
+          >
+            {step === 1 && (
+              <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label>Email</Label>
                   <Input
-                    id="email"
                     type="email"
                     placeholder="your@email.com"
-                    value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
-                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label>Password</Label>
                   <Input
-                    id="password"
                     type="password"
                     placeholder="••••••••"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
-                
-                {error && <p className="text-red-500 text-sm">{error}</p>}
               </CardContent>
-              
-              <CardFooter>
-                <Button 
-                  type="submit" 
-                  className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Logging in..." : "Login"}
-                </Button>
-              </CardFooter>
-            </form>
-          </TabsContent>
-          
-          {/* Register Tab */}
-          <TabsContent value="register">
-            <form onSubmit={handleRegister}>
-              <CardContent className="space-y-4 pt-4">
+            )}
+
+            {step === 2 && (
+              <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
+                  <Label>Full Name</Label>
                   <Input
-                    id="name"
                     placeholder="John Doe"
-                    value={registerName}
-                    onChange={(e) => setRegisterName(e.target.value)}
-                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="register-email">Email</Label>
-                  <Input
-                    id="register-email"
-                    type="email"
-                    placeholder="your@email.com"
-                    value={registerEmail}
-                    onChange={(e) => setRegisterEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="register-password">Password</Label>
-                  <Input
-                    id="register-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={registerPassword}
-                    onChange={(e) => setRegisterPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                
                 <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="terms" 
@@ -204,22 +182,81 @@ const Auth: React.FC = () => {
                     I am over 18 and agree to the <a href="#" className="text-voicevault-primary hover:underline">Terms</a> and <a href="#" className="text-voicevault-primary hover:underline">Privacy Policy</a>
                   </Label>
                 </div>
-                
-                {error && <p className="text-red-500 text-sm">{error}</p>}
               </CardContent>
-              
-              <CardFooter>
+            )}
+
+            {step === 3 && (
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>What's your main purpose?</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {["Personal Memories", "Family History", "Legacy", "Other"].map((option) => (
+                      <Button
+                        key={option}
+                        variant={purpose === option ? "default" : "outline"}
+                        onClick={() => setPurpose(option)}
+                        className="w-full"
+                      >
+                        {option}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>How often will you record?</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {["Daily", "Weekly", "Monthly", "Occasionally"].map((option) => (
+                      <Button
+                        key={option}
+                        variant={recordingFrequency === option ? "default" : "outline"}
+                        onClick={() => setRecordingFrequency(option)}
+                        className="w-full"
+                      >
+                        {option}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        {error && <p className="text-red-500 text-sm px-6">{error}</p>}
+        
+        <CardFooter className="flex flex-col space-y-2">
+          {step < 3 ? (
+            <Button 
+              onClick={nextStep} 
+              className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
+            >
+              Continue
+            </Button>
+          ) : (
+            <Button 
+              onClick={handleSignUp}
+              disabled={isLoading || !purpose || !recordingFrequency}
+              className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
+            >
+              {isLoading ? "Creating Account..." : "Create Account"}
+            </Button>
+          )}
+          
+          {step === 1 && (
+            <div className="text-center mt-4">
+              <span className="text-sm text-gray-600">
+                Already have an account? {" "}
                 <Button 
-                  type="submit" 
-                  className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
-                  disabled={isLoading}
+                  variant="link" 
+                  className="text-voicevault-primary"
+                  onClick={handleLogin}
                 >
-                  {isLoading ? "Creating Account..." : "Create Account"}
+                  Log In
                 </Button>
-              </CardFooter>
-            </form>
-          </TabsContent>
-        </Tabs>
+              </span>
+            </div>
+          )}
+        </CardFooter>
       </Card>
     </div>
   );

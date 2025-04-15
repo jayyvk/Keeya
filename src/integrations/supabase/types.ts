@@ -11,18 +11,30 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          age_verified: boolean | null
           created_at: string
+          display_name: string | null
           id: string
+          onboarding_completed: boolean | null
+          preferred_name: string | null
           terms_accepted: boolean | null
         }
         Insert: {
+          age_verified?: boolean | null
           created_at?: string
+          display_name?: string | null
           id: string
+          onboarding_completed?: boolean | null
+          preferred_name?: string | null
           terms_accepted?: boolean | null
         }
         Update: {
+          age_verified?: boolean | null
           created_at?: string
+          display_name?: string | null
           id?: string
+          onboarding_completed?: boolean | null
+          preferred_name?: string | null
           terms_accepted?: boolean | null
         }
         Relationships: []
