@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -61,30 +62,24 @@ const TextEnhancer: React.FC<TextEnhancerProps> = ({
   return <div>
       <Tabs value={activeTab} onValueChange={onTabChange as (value: string) => void} className="w-full">
         <div className="flex items-center justify-between mb-4">
-          <TabsList>
-            <TabsTrigger value="input">Original</TabsTrigger>
-            <TabsTrigger value="enhanced" disabled={!enhancedText && !isEnhancing}>
-              Enhanced
-              {isEnhancing && <Loader2 className="ml-2 h-3 w-3 animate-spin" />}
-            </TabsTrigger>
-          </TabsList>
-          
-          <Button 
-            onClick={onEnhance} 
-            disabled={!inputText.trim() || isEnhancing} 
-            variant="ghost" 
-            className="flex items-center gap-2 text-voicevault-tertiary hover:bg-transparent"
-          >
-            <Wand2 className="h-4 w-4 text-voicevault-primary" />
-            {isEnhancing ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Enhancing...
-              </>
-            ) : (
-              "Enhance with AI"
-            )}
-          </Button>
+          <div className="flex items-center">
+            <TabsList>
+              <TabsTrigger value="input">Original</TabsTrigger>
+              <TabsTrigger value="enhanced" disabled={!enhancedText && !isEnhancing}>
+                Enhanced
+                {isEnhancing && <Loader2 className="ml-2 h-3 w-3 animate-spin" />}
+              </TabsTrigger>
+            </TabsList>
+            
+            <button 
+              onClick={onEnhance} 
+              disabled={!inputText.trim() || isEnhancing} 
+              className="flex items-center ml-2 gap-1 text-voicevault-tertiary disabled:opacity-30"
+            >
+              <Wand2 className="h-4 w-4 text-voicevault-primary" />
+              {isEnhancing ? "Enhancing..." : "Enhance"}
+            </button>
+          </div>
         </div>
         
         <TabsContent value="input" className="space-y-4">

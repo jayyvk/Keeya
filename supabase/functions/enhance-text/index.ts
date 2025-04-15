@@ -30,7 +30,7 @@ serve(async (req) => {
       throw new Error('Text is required');
     }
 
-    const prompt = `Enhance this text to make it more natural, engaging, and conversational while keeping its core message. Aim for clarity, warmth, and a speaking-friendly tone that sounds authentic: ${text}`;
+    const prompt = `Improve this text to sound more natural and conversational. Keep it simple and authentic. Don't explain your changes, just provide the improved version: ${text}`;
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
@@ -53,7 +53,6 @@ serve(async (req) => {
     });
 
     const data = await response.json();
-    console.log('Gemini API response:', data);
 
     if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
       const enhancedText = data.candidates[0].content.parts[0].text;
