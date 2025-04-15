@@ -7,15 +7,15 @@
   /* Cloud and Sky Background Styles */
   .cloud-background {
     background: 
-      linear-gradient(135deg, hsla(260, 78%, 75%, 0.8), hsla(260, 78%, 70%, 0.7)),
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000' opacity='0.4'%3E%3Cpath fill='%23ffffff' d='M143.5,584.3c18.3,8.5,32.5,18.1,41.9,34.7c9.8,17.3,11.5,35.1,11.5,54.3c0,39.1-23.8,63.7-55.5,80.4c-5.8,3.1-6.9,6.5-6.9,12.7c0.1,101.5,0,203.1,0.2,304.6c0,8.5-2.4,10.3-10.8,10.3c-22.9-0.2-45.8-0.2-68.7,0c-7.8,0-9.6-2.4-9.6-9.8c0-101.8,0-203.7,0-305.5c0-5.8-0.7-9.1-7-11.5C4.5,739-7.3,715.4,4,683.9c8.1-22.4,24.5-34.9,46.9-40.5c6.9-1.7,7.6-4.5,7.6-10.3c-0.2-62.3-0.1-124.5-0.1-186.8c0-5.8,1.3-8.4,7.6-8.5c10.9-0.2,21.7-1.4,32.4-3.8c4.7-1,6.2-0.2,6,4.9c-0.2,9.9,0,19.9,0,29.8c0,53.9-0.1,107.8,0,161.7C104.4,567.8,126.4,576.4,143.5,584.3z'/%3E%3Cpath fill='%23ffffff' d='M885.4,584.3c17.2-8,39.4-16.5,39.2-54c-0.2-64.1,0-128.2-0.1-192.4c0-4.6,0.9-6.2,5.6-5.2c10.9,2.4,21.8,3.7,32.9,3.9c6,0.1,7.1,2.5,7.1,7.9c-0.1,62.3-0.1,124.5,0,186.8c0,5.4,0.8,8.4,7,9.9c26.3,6.7,44.7,22.1,50.7,48.8c5.5,24.5-5,42.9-27.3,56.3c-9.4,5.6-10.3,11.1-10.2,20.2c0.5,98.1,0.3,196.2,0.3,294.3c0,8.9-2.1,11.2-10.9,11.1c-22.6-0.2-45.1-0.3-67.7,0c-9.7,0.1-11.6-2.9-11.6-12c0.2-65.4,0-130.8,0.2-196.1c0-6.9-1.7-10.5-8.7-13.5c-31.1-13.1-49.1-45.4-45.1-80.8C851.5,611.9,862.5,595.2,885.4,584.3z'/%3E%3Cpath fill='%23ffffff' d='M481.9,771.5c32.3-14.1,64.8-27.9,97-42.3c8-3.6,13.2-8.1,13.1-17.9c-0.5-103.8-0.4-207.6-0.4-311.4c0-8-1.9-10.1-10.1-10c-24.1,0.2-48.2,0.2-72.3,0c-8.7-0.1-10.2,2.8-10.2,10.7c0.2,81.4,0,162.8,0.2,244.2c0,9.3-2.3,13.3-12.4,12.7c-16.3-0.9-32.9-0.9-49.2,0.1c-9.5,0.6-12-3.4-11.9-12.4c0.2-81.4,0.1-162.8,0.1-244.2c0-8.7-1.9-11.3-11-11.1c-24.1,0.3-48.2,0.3-72.3,0c-9-0.1-11,2.6-11,11.1c0.1,103.8,0.3,207.6-0.4,311.4c-0.1,9.4,4.7,14.2,12.5,17.6c32.2,14.1,64.5,28,96.6,42.4c4.6,2.1,8.8,5.1,13.2,7.8C465.2,785,474,780.8,481.9,771.5z'/%3E%3C/svg%3E"),
-      radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.7) 0%, transparent 45%),
-      radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.6) 0%, transparent 45%);
-    background-size: 100%, 1000px 1000px, 200% 200%, 250% 250%;
+      linear-gradient(135deg, hsla(270, 100%, 92%, 1), hsla(270, 100%, 88%, 0.9)),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='noise' x='0%25' y='0%25' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeBlend mode='screen'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4' fill='white'/%3E%3C/svg%3E"),
+      radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.8) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.7) 0%, transparent 50%);
+    background-size: 100%, 200px 200px, 200% 200%, 250% 250%;
     background-position: 0 0, center, 0 0, 0 0;
     position: relative;
     overflow: hidden;
-    animation: cloud-pan 180s linear infinite;
+    animation: cloud-pan 120s linear infinite;
   }
 
   .cloud-background::before,
@@ -27,18 +27,18 @@
     right: 0;
     bottom: 0;
     background-image: 
-      radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.6) 0%, transparent 40%),
-      radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.5) 0%, transparent 40%);
-    opacity: 0.5;
+      radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8) 0%, transparent 45%),
+      radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.7) 0%, transparent 45%);
+    opacity: 0.7;
     pointer-events: none;
-    animation: cloud-drift 30s ease-in-out infinite alternate;
+    animation: cloud-drift 25s ease-in-out infinite alternate;
   }
 
   .cloud-background::after {
     background-image: 
-      radial-gradient(circle at 70% 20%, rgba(255, 255, 255, 0.6) 0%, transparent 35%),
-      radial-gradient(circle at 30% 80%, rgba(255, 255, 255, 0.6) 0%, transparent 35%);
-    animation: cloud-drift 40s ease-in-out infinite alternate-reverse;
+      radial-gradient(circle at 70% 20%, rgba(255, 255, 255, 0.8) 0%, transparent 40%),
+      radial-gradient(circle at 30% 80%, rgba(255, 255, 255, 0.7) 0%, transparent 40%);
+    animation: cloud-drift 35s ease-in-out infinite alternate-reverse;
   }
 
   @keyframes cloud-drift {
@@ -46,7 +46,7 @@
       transform: scale(1) translateX(0) translateY(0);
     }
     100% {
-      transform: scale(1.1) translateX(20px) translateY(10px);
+      transform: scale(1.1) translateX(5%) translateY(2%);
     }
   }
   
@@ -55,10 +55,11 @@
       background-position: 0 0, 0 0, 0% 0%, 0% 0%;
     }
     50% {
-      background-position: 0 0, center, 100% 100%, 100% 0%;
+      background-position: 0 0, 100px 100px, 100% 100%, 100% 0%;
     }
     100% {
-      background-position: 0 0, 1000px 0, 0% 0%, 0% 100%;
+      background-position: 0 0, 200px 0, 0% 0%, 0% 100%;
     }
   }
 }
+
