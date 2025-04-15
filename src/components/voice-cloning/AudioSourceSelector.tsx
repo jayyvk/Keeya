@@ -1,3 +1,4 @@
+
 import React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Recording } from "@/types";
@@ -26,16 +27,19 @@ const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
   }, [recordings, searchQuery]);
 
   return (
-    <div>
-      <VoiceSourceSearch 
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
-      <ScrollArea className="w-full border rounded-lg bg-white p-2" style={{ maxHeight: "400px" }}>
-        <div className={`flex ${isMobile ? 'flex-wrap' : ''} gap-3 p-2 pb-4`}>
+    <div className="border rounded-lg bg-white overflow-hidden">
+      <div className="p-4 border-b">
+        <VoiceSourceSearch 
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
+      </div>
+
+      <ScrollArea className="h-[400px]">
+        <div className={`flex ${isMobile ? 'flex-wrap' : ''} gap-3 p-4`}>
           {/* Upload option */}
           <div 
-            className={`${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg border-2 border-dashed border-voicevault-softpurple bg-voicevault-softgray/30 flex flex-col items-center justify-center cursor-pointer hover:bg-voicevault-softgray/50 transition-colors mb-2`}
+            className={`${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg border-2 border-dashed border-voicevault-softpurple bg-voicevault-softgray/30 flex flex-col items-center justify-center cursor-pointer hover:bg-voicevault-softgray/50 transition-colors`}
             onClick={() => alert("Upload functionality would be implemented here")}
           >
             <Plus className="h-8 w-8 text-voicevault-primary mb-2" />
@@ -49,7 +53,7 @@ const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
               <div 
                 key={recording.id}
                 onClick={() => onSelectRecording(recording)}
-                className={`relative ${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg overflow-hidden cursor-pointer transition-all mb-2 ${
+                className={`relative ${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg overflow-hidden cursor-pointer transition-all ${
                   isSelected 
                     ? 'ring-2 ring-voicevault-primary shadow-lg' 
                     : 'hover:shadow-md'
