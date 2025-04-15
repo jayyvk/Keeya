@@ -1,10 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useMonetization } from "@/contexts/MonetizationContext";
 import { useVoiceClone } from "@/hooks/use-voice-clone";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
+import { AlertTriangle, Info } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { WaitlistModal } from "./WaitlistModal";
 import AudioSourceSelector from "./AudioSourceSelector";
 import TextEnhancer from "./TextEnhancer";
 import CloneResult from "./CloneResult";
@@ -12,6 +17,7 @@ import VoiceCloneIntro from "./VoiceCloneIntro";
 import CreateVoiceMemoryButton from "./CreateVoiceMemoryButton";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+
 const VoiceCloneContent: React.FC = () => {
   const {
     recordings
@@ -51,19 +57,25 @@ const VoiceCloneContent: React.FC = () => {
   } = useVoiceClone();
   const [isProcessing, setIsProcessing] = useState(false);
   const [generatedAudioUrl, setGeneratedAudioUrl] = useState<string | null>(null);
+  const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
+  const [selectedVoiceEngine, setSelectedVoiceEngine] = useState<'standard' | 'elevenlabs'>('standard');
+
   useEffect(() => {
     if (user) {
       refreshCredits();
     }
   }, [user, refreshCredits]);
+
   useEffect(() => {
     const total = selectedSources.reduce((sum, recording) => sum + recording.duration, 0);
     setTotalSelectedDuration(total);
   }, [selectedSources, setTotalSelectedDuration]);
+
   const textToUse = activeTab === "enhanced" ? enhancedText : inputText;
   const isReadyToClone = selectedSources.length > 0 && textToUse.trim().length > 0;
   const hasEnoughCredits = credits.available > 0;
   const hasEnoughAudio = totalSelectedDuration >= 30;
+
   const handleGenerateVoice = async () => {
     if (!user) {
       toast({
@@ -143,11 +155,71 @@ const VoiceCloneContent: React.FC = () => {
       setIsProcessing(false);
     }
   };
+
+  const handleElevenLabsClick = () => {
+    setIsWaitlistModalOpen(true);
+  };
+
   return <main className="mx-auto p-4 md:p-6 max-w-4xl">
-      <div className="flex justify-between items-center mb-6">
-        <VoiceCloneIntro />
+      <div 
+        className="bg-[#F6F6F6] border border-voicevault-softpurple/30 rounded-2xl p-4 mb-6 flex items-start space-x-3"
+      >
+        <AlertTriangle className="text-amber-500 mt-1 flex-shrink-0" size={24} />
+        <div>
+          <h3 className="font-bold text-base mb-2">⚠️ Voice Engine Notice</h3>
+          <p className="text-sm text-gray-700">
+            We're currently using our own lightweight voice engine to generate cloned voices. 
+            ElevenLabs integration is coming soon for ultra-realistic voice memories.
+          </p>
+          <p className="text-sm text-gray-500 mt-2">
+            Thanks for being part of the early access — your feedback helps us improve. 💛
+          </p>
+        </div>
       </div>
-      
+
+      <div className="bg-white border border-voicevault-softpurple/20 rounded-2xl p-4 mb-6">
+        <h3 className="font-bold text-base mb-4">🗣️ Choose Voice Engine:</h3>
+        <RadioGroup 
+          value={selectedVoiceEngine} 
+          onValueChange={(value: 'standard' | 'elevenlabs') => setSelectedVoiceEngine(value)}
+          className="space-y-3"
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="standard" id="standard" />
+            <Label htmlFor="standard" className="flex-1">
+              Standard (Fast, beta-level quality)
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2 opacity-50">
+            <RadioGroupItem 
+              value="elevenlabs" 
+              id="elevenlabs" 
+              disabled 
+              onClick={handleElevenLabsClick}
+            />
+            <Label htmlFor="elevenlabs" className="flex-1 flex items-center">
+              ElevenLabs (Coming Soon – ultra-realistic)
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Info className="ml-2 text-gray-500" size={16} />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    We're working to integrate ElevenLabs soon. 
+                    Join our waitlist to be first to try it!
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </Label>
+          </div>
+        </RadioGroup>
+      </div>
+
+      <WaitlistModal 
+        open={isWaitlistModalOpen} 
+        onOpenChange={setIsWaitlistModalOpen} 
+      />
+
       {!clonedAudioUrl ? <>
           <section className="mb-6 md:mb-8">
             
@@ -200,4 +272,5 @@ const VoiceCloneContent: React.FC = () => {
         </> : <CloneResult audioUrl={clonedAudioUrl} text={textToUse} onBack={() => setClonedAudioUrl(null)} isMobile={isMobile} />}
     </main>;
 };
+
 export default VoiceCloneContent;

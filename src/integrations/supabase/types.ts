@@ -36,6 +36,30 @@ export type Database = {
         }
         Relationships: []
       }
+      premium_waitlist: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          notified: boolean | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          notified?: boolean | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          notified?: boolean | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age_verified: boolean | null
