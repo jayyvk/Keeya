@@ -5,6 +5,7 @@ import { Recording } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRecording } from "@/contexts/RecordingContext";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -29,9 +30,11 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [password, setPassword] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleting2, setIsDeleting2] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { deleteRecording } = useRecording();
 
   useEffect(() => {
     if (audioRef.current) {
@@ -93,6 +96,7 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
 
   const handleDelete = async () => {
     try {
+      // Verify password
       const { error } = await supabase.auth.signInWithPassword({
         email: user?.email || "",
         password: password
@@ -108,18 +112,9 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
       }
 
       // Delete the recording
-      const { error: deleteError } = await supabase
-        .from('voice_memories')
-        .delete()
-        .eq('id', recording.id);
-
-      if (deleteError) throw deleteError;
-
-      toast({
-        title: "Recording deleted",
-        description: "Your voice memory has been permanently deleted"
-      });
+      await deleteRecording(recording.id);
       
+      // Reset state
       setIsDeleting(false);
       setPassword("");
       
@@ -176,7 +171,7 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
             value={[currentTime]}
             min={0}
             max={recording.duration}
-            step={1}
+            step={0.1}
             onValueChange={handleSliderChange}
           />
         </div>
