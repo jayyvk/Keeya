@@ -12,14 +12,23 @@ import VoiceCloneIntro from "./VoiceCloneIntro";
 import CreateVoiceMemoryButton from "./CreateVoiceMemoryButton";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
-
 const VoiceCloneContent: React.FC = () => {
-  const { recordings } = useRecording();
-  const { toast } = useToast();
+  const {
+    recordings
+  } = useRecording();
+  const {
+    toast
+  } = useToast();
   const isMobile = useIsMobile();
-  const { credits, refreshCredits, handleAddCredits, handleManageSubscription } = useMonetization();
-  const { user } = useAuth();
-  
+  const {
+    credits,
+    refreshCredits,
+    handleAddCredits,
+    handleManageSubscription
+  } = useMonetization();
+  const {
+    user
+  } = useAuth();
   const {
     selectedSources,
     inputText,
@@ -40,61 +49,52 @@ const VoiceCloneContent: React.FC = () => {
     setTotalSelectedDuration,
     ConfirmationDialog
   } = useVoiceClone();
-
   const [isProcessing, setIsProcessing] = useState(false);
   const [generatedAudioUrl, setGeneratedAudioUrl] = useState<string | null>(null);
-
   useEffect(() => {
     if (user) {
       refreshCredits();
     }
   }, [user, refreshCredits]);
-
   useEffect(() => {
     const total = selectedSources.reduce((sum, recording) => sum + recording.duration, 0);
     setTotalSelectedDuration(total);
   }, [selectedSources, setTotalSelectedDuration]);
-
   const textToUse = activeTab === "enhanced" ? enhancedText : inputText;
   const isReadyToClone = selectedSources.length > 0 && textToUse.trim().length > 0;
   const hasEnoughCredits = credits.available > 0;
   const hasEnoughAudio = totalSelectedDuration >= 30;
-
   const handleGenerateVoice = async () => {
     if (!user) {
       toast({
         title: "Authentication required",
         description: "You need to be logged in to generate a voice memory.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     if (!isReadyToClone || !hasEnoughCredits || !hasEnoughAudio) {
       if (!hasEnoughCredits) {
         toast({
           title: "Insufficient credits",
           description: "You need at least 1 credit to generate a voice memory.",
-          variant: "destructive",
+          variant: "destructive"
         });
       } else if (!hasEnoughAudio) {
         toast({
           title: "Insufficient audio",
           description: "You need at least 30 seconds of audio for voice cloning. 1 minute is recommended.",
-          variant: "default",
+          variant: "default"
         });
       }
       return;
     }
-
     setIsProcessing(true);
-
     try {
       const referenceAudio = selectedSources[0];
       if (!referenceAudio || !referenceAudio.audioUrl) {
         throw new Error("No reference audio selected");
       }
-
       const response = await supabase.functions.invoke('generate-voice', {
         body: {
           referenceAudioUrl: referenceAudio.audioUrl,
@@ -104,36 +104,30 @@ const VoiceCloneContent: React.FC = () => {
           userId: user.id
         }
       });
-
       if (response.error) {
         throw new Error(response.error.message || "Failed to generate voice");
       }
-
       if (response.data?.output) {
-        const { data: savedMemory, error: saveError } = await supabase
-          .from('voice_memories')
-          .insert({
-            user_id: user.id,
-            title: `Generated Voice - ${new Date().toLocaleDateString()}`,
-            file_url: response.data.output,
-            duration: 0,
-            file_type: 'audio/mpeg',
-            tags: ['generated', 'voice-clone']
-          })
-          .select()
-          .single();
-
+        const {
+          data: savedMemory,
+          error: saveError
+        } = await supabase.from('voice_memories').insert({
+          user_id: user.id,
+          title: `Generated Voice - ${new Date().toLocaleDateString()}`,
+          file_url: response.data.output,
+          duration: 0,
+          file_type: 'audio/mpeg',
+          tags: ['generated', 'voice-clone']
+        }).select().single();
         if (saveError) {
           console.error("Error saving voice memory:", saveError);
           throw new Error("Failed to save voice memory");
         }
-
         setClonedAudioUrl(response.data.output);
         toast({
           title: "Voice cloned successfully",
-          description: "Your voice memory has been saved to your vault.",
+          description: "Your voice memory has been saved to your vault."
         });
-        
         await refreshCredits();
       } else {
         throw new Error("No output returned from the API");
@@ -143,38 +137,26 @@ const VoiceCloneContent: React.FC = () => {
       toast({
         title: "Generation failed",
         description: error instanceof Error ? error.message : "Failed to generate voice. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsProcessing(false);
     }
   };
-
-  return (
-    <main className="mx-auto p-4 md:p-6 max-w-4xl">
+  return <main className="mx-auto p-4 md:p-6 max-w-4xl">
       <div className="flex justify-between items-center mb-6">
         <VoiceCloneIntro />
       </div>
       
-      {!clonedAudioUrl ? (
-        <>
+      {!clonedAudioUrl ? <>
           <section className="mb-6 md:mb-8">
-            <h3 className="text-lg md:text-xl font-playfair text-voicevault-tertiary mb-4">
-              Select Voice Source
-            </h3>
-            <AudioSourceSelector 
-              recordings={recordings} 
-              selectedRecordings={selectedSources}
-              onSelectRecording={handleSourceSelect}
-              isMobile={isMobile}
-            />
+            
+            <AudioSourceSelector recordings={recordings} selectedRecordings={selectedSources} onSelectRecording={handleSourceSelect} isMobile={isMobile} />
             <div className="mt-2 text-sm text-gray-500 flex items-center">
               <span>
                 {Math.floor(totalSelectedDuration / 60)}:{(totalSelectedDuration % 60).toString().padStart(2, '0')} selected
               </span>
-              {totalSelectedDuration < 60 && (
-                <span className="ml-2 text-amber-500">(1+ minutes recommended)</span>
-              )}
+              {totalSelectedDuration < 60 && <span className="ml-2 text-amber-500">(1+ minutes recommended)</span>}
             </div>
           </section>
           
@@ -185,67 +167,37 @@ const VoiceCloneContent: React.FC = () => {
               </h3>
             </div>
             
-            <TextEnhancer 
-              inputText={inputText}
-              enhancedText={enhancedText}
-              onTextChange={handleTextChange}
-              onEnhance={handleEnhanceText}
-              isEnhancing={isEnhancing}
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-            />
+            <TextEnhancer inputText={inputText} enhancedText={enhancedText} onTextChange={handleTextChange} onEnhance={handleEnhanceText} isEnhancing={isEnhancing} activeTab={activeTab} onTabChange={setActiveTab} />
           </section>
           
           <section className="flex justify-center mb-6 md:mb-8">
-            <button 
-              className={`inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full 
+            <button className={`inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full 
               ${isReadyToClone && hasEnoughCredits && hasEnoughAudio ? 'bg-primary hover:bg-primary/90' : 'bg-gray-300 cursor-not-allowed'} 
               text-white font-medium px-8 py-4 text-lg transition-colors focus-visible:outline-none 
               focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 
               disabled:opacity-50 ${isReadyToClone && hasEnoughCredits && hasEnoughAudio ? 'animate-pulse' : 'opacity-70'}
-              ${isMobile ? 'w-full' : ''}`}
-              onClick={handleGenerateVoice}
-              disabled={!isReadyToClone || !hasEnoughCredits || !hasEnoughAudio || isProcessing}
-            >
-              {isProcessing ? (
-                <>
+              ${isMobile ? 'w-full' : ''}`} onClick={handleGenerateVoice} disabled={!isReadyToClone || !hasEnoughCredits || !hasEnoughAudio || isProcessing}>
+              {isProcessing ? <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Creating Voice Memory...
-                </>
-              ) : (
-                "Create Voice Memory"
-              )}
+                </> : "Create Voice Memory"}
             </button>
           </section>
           
           <div className="text-center text-sm text-gray-500 mb-6">
-            {!hasEnoughCredits && (
-              <p className="text-red-500 font-medium">
+            {!hasEnoughCredits && <p className="text-red-500 font-medium">
                 You need at least 1 credit to generate a voice memory.
-              </p>
-            )}
-            {!hasEnoughAudio && hasEnoughCredits && (
-              <p className="text-amber-500 font-medium">
+              </p>}
+            {!hasEnoughAudio && hasEnoughCredits && <p className="text-amber-500 font-medium">
                 At least 30 seconds of audio is needed (1 minute recommended).
-              </p>
-            )}
+              </p>}
             <p>
               Generation will use 1 credit. You have {credits.available} credit{credits.available !== 1 ? 's' : ''} remaining.
             </p>
           </div>
           
           <ConfirmationDialog />
-        </>
-      ) : (
-        <CloneResult 
-          audioUrl={clonedAudioUrl}
-          text={textToUse}
-          onBack={() => setClonedAudioUrl(null)}
-          isMobile={isMobile}
-        />
-      )}
-    </main>
-  );
+        </> : <CloneResult audioUrl={clonedAudioUrl} text={textToUse} onBack={() => setClonedAudioUrl(null)} isMobile={isMobile} />}
+    </main>;
 };
-
 export default VoiceCloneContent;
