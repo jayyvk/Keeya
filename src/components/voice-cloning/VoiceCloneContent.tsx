@@ -78,9 +78,27 @@ const VoiceCloneContent: React.FC = () => {
 
   const handleGenerateVoice = async () => {
     if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "You need to be logged in to generate a voice memory.",
+        variant: "destructive"
+      });
       return;
     }
     if (!isReadyToClone || !hasEnoughCredits || !hasEnoughAudio) {
+      if (!hasEnoughCredits) {
+        toast({
+          title: "Insufficient credits",
+          description: "You need at least 1 credit to generate a voice memory.",
+          variant: "destructive"
+        });
+      } else if (!hasEnoughAudio) {
+        toast({
+          title: "Insufficient audio",
+          description: "You need at least 30 seconds of audio for voice cloning. 1 minute is recommended.",
+          variant: "default"
+        });
+      }
       return;
     }
     setIsProcessing(true);
@@ -118,12 +136,21 @@ const VoiceCloneContent: React.FC = () => {
           throw new Error("Failed to save voice memory");
         }
         setClonedAudioUrl(response.data.output);
+        toast({
+          title: "Voice cloned successfully",
+          description: "Your voice memory has been saved to your vault."
+        });
         await refreshCredits();
       } else {
         throw new Error("No output returned from the API");
       }
     } catch (error) {
       console.error("Error generating voice:", error);
+      toast({
+        title: "Generation failed",
+        description: error instanceof Error ? error.message : "Failed to generate voice. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsProcessing(false);
     }

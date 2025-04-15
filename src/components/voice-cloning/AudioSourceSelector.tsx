@@ -1,4 +1,3 @@
-
 import React, { useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Recording } from "@/types";
@@ -31,6 +30,13 @@ const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+  
+  const handleUploadClick = () => {
+    toast({
+      title: "Coming Soon",
+      description: "Audio and video upload will be available soon!",
+    });
   };
   
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,23 +74,16 @@ const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
           </div>
           
           {filteredRecordings.map(recording => {
-            const isSelected = selectedRecordings.some(r => r.id === recording.id);
-            return (
-              <div 
-                key={recording.id} 
-                onClick={() => onSelectRecording(recording)} 
-                className={`relative ${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg overflow-hidden cursor-pointer transition-all ${isSelected ? 'ring-2 ring-voicevault-primary shadow-lg' : 'hover:shadow-md'}`}
-              >
+          const isSelected = selectedRecordings.some(r => r.id === recording.id);
+          return <div key={recording.id} onClick={() => onSelectRecording(recording)} className={`relative ${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg overflow-hidden cursor-pointer transition-all ${isSelected ? 'ring-2 ring-voicevault-primary shadow-lg' : 'hover:shadow-md'}`}>
                 <div className="cassette-header h-full flex flex-col justify-between p-3">
                   <div className="flex justify-between">
                     <h4 className="font-medium text-sm truncate max-w-[80%] text-voicevault-neutralgray">
                       {recording.title}
                     </h4>
-                    {isSelected && 
-                      <span className="bg-white rounded-full p-1">
+                    {isSelected && <span className="bg-white rounded-full p-1">
                         <Check className="h-3 w-3 text-voicevault-primary" />
-                      </span>
-                    }
+                      </span>}
                   </div>
                   <div className="flex justify-between items-end">
                     <span className="text-xs text-voicevault-neutralgray">
@@ -92,17 +91,14 @@ const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
                     </span>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              </div>;
+        })}
           
-          {filteredRecordings.length === 0 && 
-            <div className={`${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg border border-voicevault-softpurple bg-voicevault-softgray/30 flex flex-col items-center justify-center`}>
+          {filteredRecordings.length === 0 && <div className={`${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg border border-voicevault-softpurple bg-voicevault-softgray/30 flex flex-col items-center justify-center`}>
               <span className="text-sm text-gray-500 text-center px-4">
                 {searchQuery ? "No matching recordings found" : "No recordings in your vault. Record some memories first!"}
               </span>
-            </div>
-          }
+            </div>}
         </div>
       </ScrollArea>
     </div>;
