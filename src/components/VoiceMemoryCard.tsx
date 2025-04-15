@@ -30,25 +30,50 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [password, setPassword] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isDeleting2, setIsDeleting2] = useState(false);
+  const [audioLoaded, setAudioLoaded] = useState(false);
+  const [audioError, setAudioError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
   const { deleteRecording } = useRecording();
 
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.addEventListener('timeupdate', updateProgress);
-      audioRef.current.addEventListener('ended', handleAudioEnd);
+    // Create a new audio element
+    const audio = new Audio(recording.audioUrl);
+    audioRef.current = audio;
+
+    // Add event listeners
+    audio.addEventListener('loadeddata', handleAudioLoaded);
+    audio.addEventListener('error', handleAudioError);
+    audio.addEventListener('timeupdate', updateProgress);
+    audio.addEventListener('ended', handleAudioEnd);
+    
+    // Clean up
+    return () => {
+      audio.removeEventListener('loadeddata', handleAudioLoaded);
+      audio.removeEventListener('error', handleAudioError);
+      audio.removeEventListener('timeupdate', updateProgress);
+      audio.removeEventListener('ended', handleAudioEnd);
       
-      return () => {
-        if (audioRef.current) {
-          audioRef.current.removeEventListener('timeupdate', updateProgress);
-          audioRef.current.removeEventListener('ended', handleAudioEnd);
-        }
-      };
-    }
-  }, []);
+      // Pause and reset audio if unmounting while playing
+      if (!audio.paused) {
+        audio.pause();
+      }
+    };
+  }, [recording.audioUrl]);
+
+  const handleAudioLoaded = () => {
+    setAudioLoaded(true);
+    setAudioError(null);
+    console.log(`Audio loaded successfully: ${recording.audioUrl}`);
+  };
+
+  const handleAudioError = (e: Event) => {
+    const error = e.target as HTMLAudioElement;
+    setAudioLoaded(false);
+    setAudioError(`Error loading audio: ${error.error?.message || 'Unknown error'}`);
+    console.error(`Audio load error for ${recording.audioUrl}:`, error.error);
+  };
 
   const updateProgress = () => {
     if (audioRef.current) {
@@ -76,13 +101,33 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
   };
 
   const togglePlayback = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      // Try to load the audio again if there was an error
+      if (audioError) {
+        audioRef.current.load();
       }
-      setIsPlaying(!isPlaying);
+      
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlaying(true);
+            console.log("Audio playback started successfully");
+          })
+          .catch(error => {
+            console.error("Playback error:", error);
+            toast({
+              variant: "destructive",
+              title: "Playback Error",
+              description: "There was an error playing this recording. Please try again."
+            });
+          });
+      }
     }
   };
 
@@ -129,13 +174,6 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden border border-voicevault-softpurple transition-all hover:shadow-lg hover:border-voicevault-primary">
-      <audio 
-        ref={audioRef}
-        src={recording.audioUrl}
-        onEnded={handleAudioEnd}
-        className="hidden"
-      />
-      
       <div className="bg-gradient-to-r from-voicevault-softpurple to-voicevault-softpink p-4">
         <div className="flex justify-between items-center">
           <h3 className="font-semibold text-lg text-voicevault-tertiary truncate">
@@ -146,6 +184,7 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
               onClick={() => skipBackward()}
               className="rounded-full p-2 bg-white text-voicevault-primary hover:bg-voicevault-softgray transition-colors"
               aria-label="Skip backward"
+              disabled={!audioLoaded}
             >
               <SkipBack size={16} />
             </button>
@@ -160,6 +199,7 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
               onClick={() => skipForward()}
               className="rounded-full p-2 bg-white text-voicevault-primary hover:bg-voicevault-softgray transition-colors"
               aria-label="Skip forward"
+              disabled={!audioLoaded}
             >
               <SkipForward size={16} />
             </button>
@@ -170,11 +210,17 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
           <Slider
             value={[currentTime]}
             min={0}
-            max={recording.duration}
+            max={recording.duration || 0}
             step={0.1}
             onValueChange={handleSliderChange}
           />
         </div>
+
+        {audioError && (
+          <div className="text-red-500 text-xs mt-2">
+            Error loading audio. Please try again.
+          </div>
+        )}
       </div>
       
       <div className="p-4">
