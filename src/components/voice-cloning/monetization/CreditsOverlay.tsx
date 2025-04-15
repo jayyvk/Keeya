@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Gift, Sparkles, Star } from "lucide-react";
+import { CreditCard, Gift, Loader, Sparkles, Star } from "lucide-react";
 import { Credits, PaymentType } from "@/types";
 import { 
   Dialog,
@@ -19,6 +19,7 @@ interface CreditsOverlayProps {
   selectedVoiceName?: string;
   isNewUser: boolean;
   credits: Credits;
+  isProcessingPayment?: boolean;
 }
 
 const CreditsOverlay: React.FC<CreditsOverlayProps> = ({
@@ -28,9 +29,10 @@ const CreditsOverlay: React.FC<CreditsOverlayProps> = ({
   selectedVoiceName = "this person",
   isNewUser,
   credits,
+  isProcessingPayment = false,
 }) => {
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={isProcessingPayment ? undefined : onClose}>
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-playfair text-voicevault-tertiary">
@@ -51,9 +53,19 @@ const CreditsOverlay: React.FC<CreditsOverlayProps> = ({
                 <Button 
                   onClick={() => onPurchase('one-time')}
                   className="w-full bg-white text-voicevault-primary hover:bg-gray-100"
+                  disabled={isProcessingPayment}
                 >
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Create your free voice memory
+                  {isProcessingPayment ? (
+                    <>
+                      <Loader className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Create your free voice memory
+                    </>
+                  )}
                 </Button>
               </div>
             )}
@@ -79,9 +91,19 @@ const CreditsOverlay: React.FC<CreditsOverlayProps> = ({
                   variant="outline" 
                   onClick={() => onPurchase('one-time')}
                   className="w-full mt-auto"
+                  disabled={isProcessingPayment}
                 >
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  Activate this memory
+                  {isProcessingPayment ? (
+                    <>
+                      <Loader className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      Activate this memory
+                    </>
+                  )}
                 </Button>
               </div>
 
@@ -115,9 +137,19 @@ const CreditsOverlay: React.FC<CreditsOverlayProps> = ({
                 <Button 
                   onClick={() => onPurchase('subscription')}
                   className="w-full mt-auto"
+                  disabled={isProcessingPayment}
                 >
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Unlock unlimited memories
+                  {isProcessingPayment ? (
+                    <>
+                      <Loader className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Unlock unlimited memories
+                    </>
+                  )}
                 </Button>
               </div>
             </div>

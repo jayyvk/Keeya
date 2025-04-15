@@ -7,6 +7,7 @@ interface MonetizationContextType {
   credits: Credits;
   isNewUser: boolean;
   showCreditsOverlay: boolean;
+  isProcessingPayment: boolean;
   setShowCreditsOverlay: (show: boolean) => void;
   handlePurchase: (type: PaymentType) => void;
   handleManageSubscription: () => void;
@@ -18,6 +19,7 @@ const MonetizationContext = createContext<MonetizationContextType | undefined>(u
 export function MonetizationProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   const [showCreditsOverlay, setShowCreditsOverlay] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [isNewUser, setIsNewUser] = useState(true);
   const [credits, setCredits] = useState<Credits>({
     available: 1,
@@ -25,34 +27,49 @@ export function MonetizationProvider({ children }: { children: ReactNode }) {
     subscriptionEndsAt: null
   });
 
-  const handlePurchase = (type: PaymentType) => {
-    toast({
-      title: type === 'subscription' ? "Subscription started" : "Credits purchased",
-      description: type === 'subscription' ? 
-        "You now have unlimited voice generations!" : 
-        "Credit has been added to your account."
-    });
+  const handlePurchase = async (type: PaymentType) => {
+    setIsProcessingPayment(true);
     
-    if (type === 'subscription') {
-      const nextMonth = new Date();
-      nextMonth.setMonth(nextMonth.getMonth() + 1);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      setCredits({
-        available: 9999,
-        subscription: 'basic',
-        subscriptionEndsAt: nextMonth
+      toast({
+        title: type === 'subscription' ? "Subscription started" : "Credits purchased",
+        description: type === 'subscription' ? 
+          "You now have unlimited voice generations!" : 
+          "Credit has been added to your account."
       });
-    } else {
-      setCredits(prev => ({
-        ...prev,
-        available: prev.available + (isNewUser ? 1 : 1)
-      }));
-    }
-    
-    setShowCreditsOverlay(false);
-    
-    if (isNewUser) {
-      setIsNewUser(false);
+      
+      if (type === 'subscription') {
+        const nextMonth = new Date();
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        
+        setCredits({
+          available: 9999,
+          subscription: 'basic',
+          subscriptionEndsAt: nextMonth
+        });
+      } else {
+        setCredits(prev => ({
+          ...prev,
+          available: prev.available + (isNewUser ? 1 : 1)
+        }));
+      }
+      
+      if (isNewUser) {
+        setIsNewUser(false);
+      }
+      
+      setShowCreditsOverlay(false);
+    } catch (error) {
+      toast({
+        title: "Payment failed",
+        description: "There was an error processing your payment. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessingPayment(false);
     }
   };
 
@@ -73,6 +90,7 @@ export function MonetizationProvider({ children }: { children: ReactNode }) {
         credits,
         isNewUser,
         showCreditsOverlay,
+        isProcessingPayment,
         setShowCreditsOverlay,
         handlePurchase,
         handleManageSubscription,

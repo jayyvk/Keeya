@@ -12,7 +12,8 @@ const VoiceCloningInner: React.FC = () => {
   const { 
     credits, 
     isNewUser, 
-    showCreditsOverlay, 
+    showCreditsOverlay,
+    isProcessingPayment,
     handlePurchase, 
     handleManageSubscription,
     handleAddCredits,
@@ -46,6 +47,7 @@ const VoiceCloningInner: React.FC = () => {
         selectedVoiceName={undefined}
         isNewUser={isNewUser}
         credits={credits}
+        isProcessingPayment={isProcessingPayment}
       />
     </SidebarProvider>
   );
