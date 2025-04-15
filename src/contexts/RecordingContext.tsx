@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useRef, ReactNode, useEffect } from "react";
 import { Recording, RecordingStatus } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,7 +17,7 @@ interface RecordingContextType {
   saveRecording: (title: string, tags: string[]) => Promise<void>;
   discardRecording: () => void;
   getRecording: (id: string) => Recording | undefined;
-  deleteRecording: (id: string, confirmationWord: string) => Promise<boolean>;
+  deleteRecording: (id: string) => Promise<boolean>;
 }
 
 const RecordingContext = createContext<RecordingContextType | undefined>(undefined);
@@ -171,10 +170,35 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
       
       console.log("Requesting microphone access...");
       
+      // Using navigator.permissions to check permission status first
+      let permissionStatus;
+      try {
+        permissionStatus = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+        console.log(`Microphone permission status: ${permissionStatus.state}`);
+        
+        if (permissionStatus.state === 'denied') {
+          toast({
+            variant: "destructive",
+            title: "Microphone access denied",
+            description: "Please allow microphone access in your browser settings and try again."
+          });
+          return;
+        }
+      } catch (permError) {
+        console.log("Permission API not supported, proceeding with direct request:", permError);
+      }
+      
       // Get microphone access with explicit error handling
       let stream;
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Added audio constraints for better compatibility
+        stream = await navigator.mediaDevices.getUserMedia({ 
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          } 
+        });
         console.log("Microphone access granted");
       } catch (error: any) {
         console.error("Microphone access error:", error);
@@ -211,26 +235,54 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
       
       streamRef.current = stream;
       
-      // Create MediaRecorder with audio/webm MIME type (most widely supported)
-      let mimeType = 'audio/webm';
-      
-      // Check for various supported formats, prioritizing MP3 if available
-      if (MediaRecorder.isTypeSupported('audio/mp3')) {
-        mimeType = 'audio/mp3';
-        console.log("Using MP3 format for recording");
-      } else if (MediaRecorder.isTypeSupported('audio/wav')) {
-        mimeType = 'audio/wav';
-        console.log("Using WAV format for recording");
-      } else {
-        console.log("Using WebM format for recording (mp3 not supported)");
+      // Check that we actually got audio tracks
+      if (stream.getAudioTracks().length === 0) {
+        toast({
+          variant: "destructive",
+          title: "Recording Error",
+          description: "No audio track was detected in your microphone."
+        });
+        return;
       }
       
-      const mediaRecorder = new MediaRecorder(stream, { mimeType });
+      console.log(`Got ${stream.getAudioTracks().length} audio tracks`);
+      
+      // Try different supported formats in order of preference
+      const mimeTypes = [
+        'audio/mp3',
+        'audio/webm;codecs=opus',
+        'audio/webm',
+        'audio/ogg;codecs=opus',
+        'audio/wav',
+        'audio/aac'
+      ];
+      
+      let selectedMimeType = '';
+      for (const mimeType of mimeTypes) {
+        if (MediaRecorder.isTypeSupported(mimeType)) {
+          selectedMimeType = mimeType;
+          console.log(`Using supported format: ${mimeType}`);
+          break;
+        }
+      }
+      
+      if (!selectedMimeType) {
+        console.warn("None of the preferred MIME types are supported, using default");
+        selectedMimeType = '';  // Let the browser choose
+      }
+      
+      // Create recorder with options for better quality
+      const mediaRecorder = new MediaRecorder(stream, { 
+        mimeType: selectedMimeType,
+        audioBitsPerSecond: 128000
+      });
+      
       mediaRecorderRef.current = mediaRecorder;
       
       // Set up event handlers
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
+          console.log(`Received audio chunk: ${event.data.size} bytes`);
           audioChunksRef.current.push(event.data);
         }
       };
@@ -238,13 +290,33 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
       mediaRecorder.onstop = async () => {
         console.log("MediaRecorder stopped, processing recording...");
         
+        if (audioChunksRef.current.length === 0) {
+          console.error("No audio data captured during recording");
+          toast({
+            variant: "destructive",
+            title: "Recording Error",
+            description: "No audio was captured. Please try again."
+          });
+          return;
+        }
+        
         // Combine audio chunks into a single blob
-        const rawAudioBlob = new Blob(audioChunksRef.current, { type: mimeType });
-        console.log(`Raw recording complete. Type: ${mimeType}, Size: ${rawAudioBlob.size} bytes`);
+        const rawAudioBlob = new Blob(audioChunksRef.current, { type: mediaRecorder.mimeType || 'audio/webm' });
+        console.log(`Raw recording complete. Type: ${mediaRecorder.mimeType}, Size: ${rawAudioBlob.size} bytes`);
+        
+        if (rawAudioBlob.size === 0) {
+          console.error("Audio blob has zero size");
+          toast({
+            variant: "destructive",
+            title: "Recording Error",
+            description: "Recording failed to capture any audio. Please try again."
+          });
+          return;
+        }
         
         try {
           // Convert to MP3 format if needed
-          const processedBlob = await convertToMp3(rawAudioBlob, mimeType);
+          const processedBlob = await convertToMp3(rawAudioBlob, mediaRecorder.mimeType || 'audio/webm');
           setCurrentRecording(processedBlob);
           console.log(`Recording processed. Final size: ${processedBlob.size} bytes`);
         } catch (error) {
@@ -255,7 +327,10 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
         
         // Stop the recording stream
         if (streamRef.current) {
-          streamRef.current.getTracks().forEach(track => track.stop());
+          streamRef.current.getTracks().forEach(track => {
+            console.log(`Stopping track: ${track.kind}, ${track.label}`);
+            track.stop();
+          });
         }
         
         // Stop the timer
@@ -265,8 +340,17 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
         }
       };
       
-      // Start recording
-      mediaRecorder.start(1000); // Capture data in 1-second chunks
+      mediaRecorder.onerror = (event) => {
+        console.error("MediaRecorder error:", event);
+        toast({
+          variant: "destructive",
+          title: "Recording Error",
+          description: "An error occurred during recording. Please try again."
+        });
+      };
+      
+      // Start recording with smaller chunk size for more frequent updates
+      mediaRecorder.start(500); 
       setRecordingStatus("recording");
       console.log("Recording started");
       
@@ -286,8 +370,22 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
 
   const stopRecording = () => {
     if (mediaRecorderRef.current && (recordingStatus === "recording" || recordingStatus === "paused")) {
-      mediaRecorderRef.current.stop();
-      setRecordingStatus("reviewing");
+      try {
+        mediaRecorderRef.current.stop();
+        setRecordingStatus("reviewing");
+        console.log("Recording stopped successfully");
+      } catch (error) {
+        console.error("Error stopping recording:", error);
+        // Clean up even if stop fails
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(track => track.stop());
+        }
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+        }
+        setRecordingStatus("inactive");
+      }
     }
   };
 
@@ -412,7 +510,7 @@ export function RecordingProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const deleteRecording = async (id: string, confirmationWord: string) => {
+  const deleteRecording = async (id: string) => {
     if (!user) return false;
     
     try {
