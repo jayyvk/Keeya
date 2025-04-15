@@ -35,7 +35,7 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
         <SidebarTrigger />
       </div>
       
-      <div className="absolute left-1/2 transform -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center">
+      <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center">
         <h1 
           onClick={handleHeaderClick} 
           className="text-2xl md:text-3xl font-bold text-voicevault-tertiary cursor-pointer hover:text-voicevault-primary transition-colors text-center"
