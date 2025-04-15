@@ -1,12 +1,12 @@
 
 import React, { useState, useRef, useEffect } from "react";
-import { Play, Pause, ArrowLeft, Save, Share2, Loader2, VolumeX, Volume2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { useRecording } from "@/contexts/RecordingContext";
+import { useToast } from "@/hooks/use-toast";
+import AudioControls from "./audio/AudioControls";
+import ActionButtons from "./audio/ActionButtons";
 
 interface CloneResultProps {
   audioUrl: string;
@@ -25,7 +25,6 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
   const [isSharing, setIsSharing] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
-  const { saveRecording } = useRecording();
   
   useEffect(() => {
     const audio = new Audio(audioUrl);
@@ -72,14 +71,12 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
   
   const handleSliderChange = (value: number[]) => {
     if (!audioRef.current) return;
-    
     audioRef.current.currentTime = value[0];
     setCurrentTime(value[0]);
   };
   
   const toggleMute = () => {
     if (!audioRef.current) return;
-    
     const newMuteState = !isMuted;
     audioRef.current.muted = newMuteState;
     setIsMuted(newMuteState);
@@ -87,7 +84,6 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
   
   const handleVolumeChange = (value: number[]) => {
     if (!audioRef.current) return;
-    
     const newVolume = value[0];
     audioRef.current.volume = newVolume;
     setVolume(newVolume);
@@ -99,18 +95,9 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
     }
   };
   
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-  };
-  
   const handleSaveToVault = async () => {
     setIsSaving(true);
-    
     try {
-      // In a real implementation, this would call the saveRecording function
-      // from the RecordingContext with proper data
       setTimeout(() => {
         toast({
           title: "Saved to Vault",
@@ -131,9 +118,7 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
   
   const handleShare = () => {
     setIsSharing(true);
-    
     try {
-      // Mock share functionality
       setTimeout(() => {
         toast({
           title: "Share Link Created",
@@ -171,54 +156,18 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
             </Badge>
           </div>
           
-          <div className={`flex ${isMobile ? 'flex-col' : 'justify-between'} items-center mb-4`}>
-            <button
-              onClick={togglePlayback}
-              className="bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow mb-4 md:mb-0"
-            >
-              {isPlaying ? (
-                <Pause className="text-voicevault-primary h-5 w-5" />
-              ) : (
-                <Play className="text-voicevault-primary h-5 w-5 ml-1" />
-              )}
-            </button>
-            
-            <div className={`${isMobile ? 'w-full' : 'flex-1 mx-4'}`}>
-              <Slider
-                value={[currentTime]}
-                max={duration || 100}
-                step={0.1}
-                onValueChange={handleSliderChange}
-                className="cursor-pointer"
-              />
-              <div className="flex justify-between text-xs text-white/70 mt-1">
-                <span>{formatTime(currentTime)}</span>
-                <span>{formatTime(duration)}</span>
-              </div>
-            </div>
-            
-            <div className={`flex items-center ${isMobile ? 'w-full justify-end mt-4' : ''}`}>
-              <button
-                onClick={toggleMute}
-                className="text-white mr-2"
-              >
-                {isMuted ? (
-                  <VolumeX className="h-5 w-5" />
-                ) : (
-                  <Volume2 className="h-5 w-5" />
-                )}
-              </button>
-              <div className={`${isMobile ? 'w-24' : 'w-20'}`}>
-                <Slider
-                  value={[isMuted ? 0 : volume]}
-                  min={0}
-                  max={1}
-                  step={0.1}
-                  onValueChange={handleVolumeChange}
-                />
-              </div>
-            </div>
-          </div>
+          <AudioControls
+            isPlaying={isPlaying}
+            currentTime={currentTime}
+            duration={duration}
+            isMuted={isMuted}
+            volume={volume}
+            onPlayPause={togglePlayback}
+            onTimeChange={handleSliderChange}
+            onMuteToggle={toggleMute}
+            onVolumeChange={handleVolumeChange}
+            isMobile={isMobile}
+          />
         </div>
         
         <CardContent className="p-4 md:p-6">
@@ -227,44 +176,13 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
             <p className="text-voicevault-tertiary text-sm md:text-base">{text}</p>
           </div>
           
-          <div className={`${isMobile ? 'flex flex-col' : 'flex'} gap-4`}>
-            <Button 
-              className={`${isMobile ? 'w-full mb-2' : 'flex-1'}`}
-              onClick={handleSaveToVault}
-              disabled={isSaving}
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="mr-2 h-4 w-4" />
-                  Save to Vault
-                </>
-              )}
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              className={`${isMobile ? 'w-full' : 'flex-1'}`}
-              onClick={handleShare}
-              disabled={isSharing}
-            >
-              {isSharing ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating Link...
-                </>
-              ) : (
-                <>
-                  <Share2 className="mr-2 h-4 w-4" />
-                  Share
-                </>
-              )}
-            </Button>
-          </div>
+          <ActionButtons
+            isSaving={isSaving}
+            isSharing={isSharing}
+            onSave={handleSaveToVault}
+            onShare={handleShare}
+            isMobile={isMobile}
+          />
         </CardContent>
       </Card>
     </div>
