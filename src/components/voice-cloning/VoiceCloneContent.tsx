@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useMonetization } from "@/contexts/MonetizationContext";
@@ -46,7 +45,6 @@ const VoiceCloneContent: React.FC = () => {
   const [generatedAudioUrl, setGeneratedAudioUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    // Refresh credits when component mounts
     if (user) {
       refreshCredits();
     }
@@ -117,7 +115,6 @@ const VoiceCloneContent: React.FC = () => {
           title: "Voice cloned successfully",
           description: "Your voice memory has been created.",
         });
-        // Refresh credits after successful generation
         refreshCredits();
       } else {
         throw new Error("No output returned from the API");

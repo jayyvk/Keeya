@@ -68,6 +68,7 @@ serve(async (req) => {
       })
     }
 
+    // Enhanced credit validation - ensure balance is at least 1
     if (!creditData || creditData.credits_balance < 1) {
       return new Response(JSON.stringify({ 
         error: "Insufficient credits" 
