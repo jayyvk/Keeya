@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, ChevronLeft } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { signupSchema } from "@/lib/validations/auth";
 import { z } from "zod";
 import { TermsModal } from "./TermsModal";
@@ -31,10 +31,6 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
   const [agreeToTerms, setAgreeToTerms] = React.useState(false);
   const [showTermsModal, setShowTermsModal] = React.useState(false);
   const [modalType, setModalType] = React.useState<'terms' | 'privacy'>('terms');
-
-  const previousStep = () => {
-    setStep(step - 1);
-  };
 
   const nextStep = async () => {
     if (step === 1) {
@@ -202,17 +198,6 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
 
   return (
     <div className="space-y-4">
-      {step > 1 && (
-        <Button
-          type="button"
-          variant="ghost"
-          className="mb-4"
-          onClick={previousStep}
-        >
-          <ChevronLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
-      )}
       
       {renderStepContent()}
       
