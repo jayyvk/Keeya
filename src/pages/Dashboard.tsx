@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -12,7 +11,7 @@ import AudioVault from "@/components/AudioVault";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/sonner";
 import CommonHeader from "@/components/CommonHeader";
 import { MonetizationProvider } from "@/contexts/MonetizationContext";
 
@@ -34,9 +33,6 @@ const Dashboard: React.FC = () => {
     logout
   } = useAuth();
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
   
   const handleLogout = async () => {
     try {
@@ -47,10 +43,12 @@ const Dashboard: React.FC = () => {
         description: "See you next time!"
       });
     } catch (error) {
+      console.error("Error during logout:", error);
+      navigate("/auth");
       toast({
         variant: "destructive",
-        title: "Error logging out",
-        description: "Please try again"
+        title: "Error during logout",
+        description: "You've been signed out anyway"
       });
     }
   };
@@ -138,4 +136,3 @@ const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
-

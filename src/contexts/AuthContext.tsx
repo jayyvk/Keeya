@@ -121,13 +121,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     console.log("Logout attempt");
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Logout error:", error.message);
+        throw error;
+      }
+      // Force user state to null regardless of session state
+      setUser(null);
+      console.log("Logout successful");
+    } catch (error: any) {
       console.error("Logout error:", error.message);
-      throw error;
+      // Force user state to null even if there was an error with Supabase
+      setUser(null);
+      // Even with an error, we'll clear the local state
+      console.log("User state cleared despite logout error");
     }
-    setUser(null);
-    console.log("Logout successful");
   };
 
   const register = async (name: string, email: string, password: string) => {
