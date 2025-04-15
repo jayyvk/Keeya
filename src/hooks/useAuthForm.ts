@@ -39,13 +39,14 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
         await login(email, password);
         toast.success("Logged in successfully!");
         console.log("Login successful, redirecting to dashboard");
+        // Let the Auth component handle the navigation based on auth state
       } else {
         console.log("Attempting to register with:", { name, email });
         await register(name, email, password);
         toast.success("Account created successfully!");
         console.log("Registration successful, redirecting to dashboard");
+        // Let the Auth component handle the navigation based on auth state
       }
-      navigate("/dashboard");
     } catch (err: any) {
       console.error(isLogin ? "Login error:" : "Registration error:", err);
       setError(err.message || `${isLogin ? "Login" : "Registration"} failed`);

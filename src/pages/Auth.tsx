@@ -10,16 +10,20 @@ import { SignupForm } from "@/components/auth/SignupForm";
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [step, setStep] = useState(1);
 
   useEffect(() => {
+    console.log("Auth page - Authentication status:", { isAuthenticated, user });
+    
     if (isAuthenticated) {
       console.log("User is authenticated, redirecting to dashboard");
-      navigate("/dashboard");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 100); // Add a slight delay to ensure state is fully updated
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, user]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-b from-voicevault-softpurple to-white">

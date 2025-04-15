@@ -32,11 +32,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             .eq('id', session.user.id)
             .single();
 
-          setUser({
+          const userData = {
             id: session.user.id,
             name: profile?.display_name || session.user.user_metadata.name || "",
             email: session.user.email || "",
-          });
+          };
+          
+          console.log("Setting user data:", userData);
+          setUser(userData);
           console.log("User set after auth state change");
         } else {
           setUser(null);
@@ -57,17 +60,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .eq('id', session.user.id)
           .single()
           .then(({ data: profile }) => {
-            setUser({
+            const userData = {
               id: session.user.id,
               name: profile?.display_name || session.user.user_metadata.name || "",
               email: session.user.email || "",
-            });
+            };
+            
+            console.log("Setting initial user data:", userData);
+            setUser(userData);
             console.log("User set after initial session check");
           });
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log("Cleaning up auth subscription");
+      subscription.unsubscribe();
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -90,11 +99,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('id', data.user.id)
         .single();
 
-      setUser({
+      const userData = {
         id: data.user.id,
         name: profile?.display_name || data.user.user_metadata.name || "",
         email: data.user.email || "",
-      });
+      };
+      
+      console.log("Setting user after login:", userData);
+      setUser(userData);
     }
   };
 
@@ -129,11 +141,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (data.user) {
       console.log("Registration successful for user:", data.user.id);
       // No need to fetch profile here as it might not be created yet
-      setUser({
+      const userData = {
         id: data.user.id,
         name: name,
         email: data.user.email || "",
-      });
+      };
+      
+      console.log("Setting user after registration:", userData);
+      setUser(userData);
     }
   };
 
