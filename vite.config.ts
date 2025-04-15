@@ -12,16 +12,11 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react({
-      // Corrected: Using proper SWC configuration
-      swcOptions: {
-        jsc: {
-          transform: {
-            react: {
-              refresh: true,
-            },
-          },
-        },
-      },
+      plugins: [
+        ['@swc/plugin-react-refresh', {
+          refresh: true,
+        }]
+      ]
     }),
     mode === 'development' &&
     componentTagger(),
