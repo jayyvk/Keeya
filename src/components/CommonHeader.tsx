@@ -35,9 +35,9 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
         <SidebarTrigger />
         <h1 
           onClick={handleHeaderClick} 
-          className="text-2xl md:text-3xl font-bold text-voicevault-tertiary cursor-pointer hover:text-voicevault-primary transition-colors px-0 mx-[50px]"
+          className="text-2xl md:text-3xl font-bold text-voicevault-tertiary cursor-pointer hover:text-voicevault-primary transition-colors px-0 mx-[50px] text-center"
         >
-          VoiceVault
+          Keeya
         </h1>
       </div>
       

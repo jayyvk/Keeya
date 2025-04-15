@@ -20,7 +20,7 @@ const Landing: React.FC = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="text-center"
+        className="text-center w-full"
       >
         <motion.div
           whileHover={{ scale: 1.05 }}
@@ -34,16 +34,16 @@ const Landing: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="text-4xl font-bold mb-2 text-voicevault-tertiary"
+          className="text-4xl font-bold mb-2 text-voicevault-tertiary text-center"
         >
-          VoiceVault
+          Keeya
         </motion.h1>
         
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5 }}
-          className="text-xl text-voicevault-secondary mb-8"
+          className="text-xl text-voicevault-secondary mb-8 text-center"
         >
           Preserve the voices you love, forever.
         </motion.p>
@@ -52,7 +52,7 @@ const Landing: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.5 }}
-          className="text-sm text-gray-500"
+          className="text-sm text-gray-500 text-center"
         >
           Tap anywhere to continue
         </motion.div>
