@@ -13,7 +13,6 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { useToast } from "@/hooks/use-toast";
 import CommonHeader from "@/components/CommonHeader";
-
 const Dashboard: React.FC = () => {
   const {
     recordings,
@@ -35,7 +34,6 @@ const Dashboard: React.FC = () => {
   const {
     toast
   } = useToast();
-
   const handleLogout = async () => {
     try {
       await logout();
@@ -52,13 +50,10 @@ const Dashboard: React.FC = () => {
       });
     }
   };
-
   const goToVoiceCloning = () => {
     navigate("/voice-cloning");
   };
-
-  return (
-    <SidebarProvider>
+  return <SidebarProvider>
       <div className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex">
         <DashboardSidebar />
         
@@ -68,6 +63,7 @@ const Dashboard: React.FC = () => {
             <div className="flex justify-between items-center px-6 py-4">
               <CommonHeader />
               <div className="flex items-center gap-4">
+                
                 <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-500 hover:text-red-500">
                   <LogOut size={16} />
                 </Button>
@@ -106,8 +102,6 @@ const Dashboard: React.FC = () => {
           <AudioVault recordings={recordings} />
         </div>
       </div>
-    </SidebarProvider>
-  );
+    </SidebarProvider>;
 };
-
 export default Dashboard;

@@ -9,8 +9,8 @@ import { MonetizationProvider } from "@/contexts/MonetizationContext";
 
 const VoiceCloning: React.FC = () => {
   return (
-    <MonetizationProvider>
-      <SidebarProvider>
+    <SidebarProvider>
+      <MonetizationProvider>
         <motion.div 
           className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex"
           initial={{ opacity: 0 }}
@@ -32,8 +32,8 @@ const VoiceCloning: React.FC = () => {
             </div>
           </div>
         </motion.div>
-      </SidebarProvider>
-    </MonetizationProvider>
+      </MonetizationProvider>
+    </SidebarProvider>
   );
 };
 
