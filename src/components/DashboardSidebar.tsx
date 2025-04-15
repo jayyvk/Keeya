@@ -1,5 +1,5 @@
 
-import { Home, User, PackageSearch, AlertCircle, Mic2, CreditCard } from "lucide-react";
+import { Home, Mic2, CreditCard, PackageSearch, AlertCircle, UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -11,20 +11,15 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarProvider,
-  SidebarTrigger,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const menuItems = [
   {
     title: "Home",
     icon: Home,
     url: "/dashboard",
-  },
-  {
-    title: "Profile",
-    icon: User,
-    url: "#profile",
   },
   {
     title: "Clone Voice",
@@ -62,19 +57,22 @@ export function DashboardSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-voicevault-tertiary text-sm font-semibold">
+            Menu
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton 
                     asChild 
-                    tooltip={item.title} 
+                    tooltip={item.title}
                     onClick={() => handleMenuItemClick(item.url)}
+                    className="text-gray-600 hover:text-voicevault-primary hover:bg-voicevault-softgray/50"
                   >
                     <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
+                      <item.icon className="text-voicevault-primary" />
+                      <span className="font-medium">{item.title}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -83,6 +81,20 @@ export function DashboardSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      
+      <SidebarFooter className="border-t border-gray-200 p-4">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-9 w-9 border-2 border-voicevault-primary">
+            <AvatarFallback className="bg-voicevault-softgray text-voicevault-primary">
+              {user?.name?.[0]?.toUpperCase() || 'U'}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-gray-700">{user?.name || 'User'}</span>
+            <span className="text-xs text-gray-500">{user?.email}</span>
+          </div>
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 }
