@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -32,9 +31,9 @@ const Auth = () => {
           <CardTitle className="text-2xl font-bold text-voicevault-tertiary">
             {isLogin ? "Welcome Back" : (
               <>
-                {step === 1 && "Welcome to VoiceVault"}
+                {step === 1 && "Welcome to Keeya"}
                 {step === 2 && "Tell us about yourself"}
-                {step === 3 && "How will you use VoiceVault?"}
+                {step === 3 && "How will you use Keeya?"}
               </>
             )}
           </CardTitle>

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuthForm } from "@/hooks/useAuthForm";
 import { Loader2 } from "lucide-react";
+import { TermsModal } from "./TermsModal";
 
 interface SignupFormProps {
   step: number;
@@ -28,6 +28,9 @@ export const SignupForm = ({ step, setStep }: SignupFormProps) => {
   const [purpose, setPurpose] = useState("");
   const [recordingFrequency, setRecordingFrequency] = useState("");
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [modalType, setModalType] = useState<'terms' | 'privacy'>('terms');
 
   const nextStep = () => {
     if (step === 1 && !email) {
@@ -37,6 +40,18 @@ export const SignupForm = ({ step, setStep }: SignupFormProps) => {
       return;
     }
     setStep(step + 1);
+  };
+
+  const handleTermsClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setModalType('terms');
+    setShowTermsModal(true);
+  };
+
+  const handlePrivacyClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setModalType('privacy');
+    setShowTermsModal(true);
   };
 
   const renderStepContent = () => {
@@ -86,7 +101,14 @@ export const SignupForm = ({ step, setStep }: SignupFormProps) => {
                 disabled={isLoading}
               />
               <Label htmlFor="terms" className="text-sm">
-                I am over 18 and agree to the <a href="#" className="text-voicevault-primary hover:underline">Terms</a> and <a href="#" className="text-voicevault-primary hover:underline">Privacy Policy</a>
+                I am over 18 and agree to the{" "}
+                <button onClick={handleTermsClick} className="text-voicevault-primary hover:underline">
+                  Terms
+                </button>{" "}
+                and{" "}
+                <button onClick={handlePrivacyClick} className="text-voicevault-primary hover:underline">
+                  Privacy Policy
+                </button>
               </Label>
             </div>
           </div>
@@ -97,7 +119,7 @@ export const SignupForm = ({ step, setStep }: SignupFormProps) => {
             <div className="space-y-2">
               <Label>What's your main purpose?</Label>
               <div className="grid grid-cols-2 gap-2">
-                {["Personal Memories", "Family History", "Legacy", "Other"].map((option) => (
+                {["Personal memories", "Family", "Fun", "Other"].map((option) => (
                   <Button
                     key={option}
                     variant={purpose === option ? "default" : "outline"}
@@ -159,6 +181,11 @@ export const SignupForm = ({ step, setStep }: SignupFormProps) => {
           )}
         </Button>
       )}
+      <TermsModal 
+        isOpen={showTermsModal} 
+        onClose={() => setShowTermsModal(false)} 
+        type={modalType}
+      />
     </div>
   );
 };
