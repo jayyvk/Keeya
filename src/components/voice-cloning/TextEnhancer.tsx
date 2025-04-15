@@ -61,13 +61,26 @@ const TextEnhancer: React.FC<TextEnhancerProps> = ({
   return (
     <div>
       <Tabs value={activeTab} onValueChange={onTabChange as (value: string) => void} className="w-full">
-        <TabsList className="mb-4">
-          <TabsTrigger value="input">Original</TabsTrigger>
-          <TabsTrigger value="enhanced" disabled={!enhancedText && !isEnhancing}>
-            Enhanced
-            {isEnhancing && <Loader2 className="ml-2 h-3 w-3 animate-spin" />}
-          </TabsTrigger>
-        </TabsList>
+        <div className="flex items-center justify-between mb-4">
+          <TabsList>
+            <TabsTrigger value="input">Original</TabsTrigger>
+            <TabsTrigger value="enhanced" disabled={!enhancedText && !isEnhancing}>
+              Enhanced
+              {isEnhancing && <Loader2 className="ml-2 h-3 w-3 animate-spin" />}
+            </TabsTrigger>
+          </TabsList>
+          
+          <Button 
+            onClick={onEnhance} 
+            disabled={!inputText.trim() || isEnhancing}
+            variant="ghost"
+            size="sm"
+            className="text-voicevault-tertiary hover:bg-transparent"
+          >
+            <Wand2 className="mr-2 h-4 w-4" />
+            Enhance with AI
+          </Button>
+        </div>
         
         <TabsContent value="input" className="space-y-4">
           <Textarea

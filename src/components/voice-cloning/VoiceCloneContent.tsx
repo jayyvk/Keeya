@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useMonetization } from "@/contexts/MonetizationContext";
@@ -178,52 +177,8 @@ const VoiceCloneContent: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white border border-voicevault-softpurple/20 rounded-2xl p-4 mb-6">
-        <h3 className="font-bold text-base mb-4">🗣️ Choose Voice Engine:</h3>
-        <RadioGroup 
-          value={selectedVoiceEngine} 
-          onValueChange={(value: 'standard' | 'elevenlabs') => setSelectedVoiceEngine(value)}
-          className="space-y-3"
-        >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="standard" id="standard" />
-            <Label htmlFor="standard" className="flex-1">
-              Standard (Fast, beta-level quality)
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2 opacity-50">
-            <RadioGroupItem 
-              value="elevenlabs" 
-              id="elevenlabs" 
-              disabled 
-              onClick={handleElevenLabsClick}
-            />
-            <Label htmlFor="elevenlabs" className="flex-1 flex items-center">
-              ElevenLabs (Coming Soon – ultra-realistic)
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Info className="ml-2 text-gray-500" size={16} />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    We're working to integrate ElevenLabs soon. 
-                    Join our waitlist to be first to try it!
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </Label>
-          </div>
-        </RadioGroup>
-      </div>
-
-      <WaitlistModal 
-        open={isWaitlistModalOpen} 
-        onOpenChange={setIsWaitlistModalOpen} 
-      />
-
       {!clonedAudioUrl ? <>
           <section className="mb-6 md:mb-8">
-            
             <AudioSourceSelector recordings={recordings} selectedRecordings={selectedSources} onSelectRecording={handleSourceSelect} isMobile={isMobile} />
             <div className="mt-2 text-sm text-gray-500 flex items-center">
               <span>
@@ -243,6 +198,44 @@ const VoiceCloneContent: React.FC = () => {
             <TextEnhancer inputText={inputText} enhancedText={enhancedText} onTextChange={handleTextChange} onEnhance={handleEnhanceText} isEnhancing={isEnhancing} activeTab={activeTab} onTabChange={setActiveTab} />
           </section>
           
+          <div className="bg-white border border-voicevault-softpurple/20 rounded-2xl p-4 mb-6">
+            <h3 className="font-bold text-base mb-4">Choose Voice Engine:</h3>
+            <RadioGroup 
+              value={selectedVoiceEngine} 
+              onValueChange={(value: 'standard' | 'elevenlabs') => setSelectedVoiceEngine(value)}
+              className="space-y-3"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="standard" id="standard" />
+                <Label htmlFor="standard" className="flex-1">
+                  Standard (Fast, beta-level quality)
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2 opacity-50">
+                <RadioGroupItem 
+                  value="elevenlabs" 
+                  id="elevenlabs" 
+                  disabled 
+                  onClick={handleElevenLabsClick}
+                />
+                <Label htmlFor="elevenlabs" className="flex-1 flex items-center">
+                  ElevenLabs (Coming Soon – ultra-realistic)
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info className="ml-2 text-gray-500" size={16} />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        We're working to integrate ElevenLabs soon. 
+                        Join our waitlist to be first to try it!
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
+
           <section className="flex justify-center mb-6 md:mb-8">
             <button className={`inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full 
               ${isReadyToClone && hasEnoughCredits && hasEnoughAudio ? 'bg-primary hover:bg-primary/90' : 'bg-gray-300 cursor-not-allowed'} 
