@@ -2,14 +2,24 @@
 import React from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router-dom";
-import { useMonetization } from "@/contexts/MonetizationContext";
+import { useMonetization, MonetizationProvider } from "@/contexts/MonetizationContext";
 import CreditDisplay from "./voice-cloning/monetization/CreditDisplay";
 
 interface CommonHeaderProps {
   title?: string;
 }
 
-const CommonHeader: React.FC<CommonHeaderProps> = ({
+// Create a wrapped version that ensures the MonetizationProvider is present
+const CommonHeaderWithProvider: React.FC<CommonHeaderProps> = (props) => {
+  return (
+    <MonetizationProvider>
+      <CommonHeaderContent {...props} />
+    </MonetizationProvider>
+  );
+};
+
+// The actual content of the header
+const CommonHeaderContent: React.FC<CommonHeaderProps> = ({
   title
 }) => {
   const navigate = useNavigate();
@@ -43,4 +53,5 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
   );
 };
 
-export default CommonHeader;
+// Export the wrapped component by default
+export default CommonHeaderWithProvider;
