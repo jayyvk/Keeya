@@ -2,6 +2,12 @@
 import { useState } from "react";
 import { Recording } from "@/types";
 import { useToast } from "@/hooks/use-toast";
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
 
 export function useVoiceClone() {
   const { toast } = useToast();
@@ -39,14 +45,19 @@ export function useVoiceClone() {
     setIsEnhancing(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulating API call
-      const enhanced = `${inputText}\n\nEnhanced with more warmth and personality. This voice message sounds natural and captures the essence of the original voice, with improved clarity and emotion.`;
-      setEnhancedText(enhanced);
-
-      toast({
-        title: "Text enhanced",
-        description: "Your text has been enhanced with AI.",
+      const { data, error } = await supabase.functions.invoke('enhance-text', {
+        body: { text: inputText }
       });
+
+      if (error) throw error;
+
+      if (data?.enhancedText) {
+        setEnhancedText(data.enhancedText);
+        toast({
+          title: "Text enhanced",
+          description: "Your text has been enhanced with Gemini AI.",
+        });
+      }
     } catch (error) {
       console.error("Error enhancing text:", error);
       toast({
