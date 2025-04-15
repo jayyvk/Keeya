@@ -30,6 +30,7 @@ const VoiceGenerationForm: React.FC<VoiceGenerationFormProps> = ({
     handleTextChange,
     handleEnhanceText,
     setTotalSelectedDuration,
+    setActiveTab, // Fixed: Properly extract setActiveTab from the hook
     ConfirmationDialog
   } = useVoiceClone();
 
