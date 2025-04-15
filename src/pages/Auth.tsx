@@ -1,103 +1,25 @@
-import React, { useState, useEffect } from "react";
+
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { toast } from "@/components/ui/sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { LoginForm } from "@/components/auth/LoginForm";
+import { SignupForm } from "@/components/auth/SignupForm";
 
-const Auth: React.FC = () => {
+const Auth = () => {
   const navigate = useNavigate();
-  const { login, register, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [step, setStep] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-  
-  // Basic Auth Fields
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  
-  // Onboarding Fields
-  const [purpose, setPurpose] = useState("");
-  const [recordingFrequency, setRecordingFrequency] = useState("");
-  const [agreeToTerms, setAgreeToTerms] = useState(false);
-  
-  const [error, setError] = useState("");
 
-  // Redirect if user is already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       console.log("User is authenticated, redirecting to dashboard");
       navigate("/dashboard");
     }
   }, [isAuthenticated, navigate]);
-
-  const handleSignUp = async () => {
-    setIsLoading(true);
-    setError("");
-
-    if (!email || !password || !name) {
-      setError("Please fill in all fields");
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      console.log("Attempting to register with:", { name, email });
-      await register(name, email, password);
-      toast.success("Account created successfully!");
-      console.log("Registration successful, redirecting to dashboard");
-      navigate("/dashboard");
-    } catch (err: any) {
-      console.error("Registration error:", err);
-      setError(err.message || "Registration failed");
-      toast.error(err.message || "Registration failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleLogin = async () => {
-    setIsLoading(true);
-    setError("");
-
-    if (!email || !password) {
-      setError("Please fill in all fields");
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      console.log("Attempting to login with:", { email });
-      await login(email, password);
-      toast.success("Logged in successfully!");
-      console.log("Login successful, redirecting to dashboard");
-      navigate("/dashboard");
-    } catch (err: any) {
-      console.error("Login error:", err);
-      setError(err.message || "Login failed");
-      toast.error(err.message || "Login failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const nextStep = () => {
-    if (step === 1 && !email) {
-      setError("Please enter your email");
-      return;
-    }
-    if (step === 2 && !name) {
-      setError("Please enter your name");
-      return;
-    }
-    setError("");
-    setStep(prev => prev + 1);
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-b from-voicevault-softpurple to-white">
@@ -131,181 +53,33 @@ const Auth: React.FC = () => {
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.3 }}
           >
-            {isLogin ? (
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input
-                    type="email"
-                    placeholder="your@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Password</Label>
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-              </CardContent>
-            ) : (
-              <>
-                {step === 1 && (
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Email</Label>
-                      <Input
-                        type="email"
-                        placeholder="your@email.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Password</Label>
-                      <Input
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                    </div>
-                  </CardContent>
-                )}
-
-                {step === 2 && (
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Full Name</Label>
-                      <Input
-                        placeholder="John Doe"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                      />
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="terms" 
-                        checked={agreeToTerms}
-                        onCheckedChange={(checked) => setAgreeToTerms(checked as boolean)}
-                      />
-                      <Label htmlFor="terms" className="text-sm">
-                        I am over 18 and agree to the <a href="#" className="text-voicevault-primary hover:underline">Terms</a> and <a href="#" className="text-voicevault-primary hover:underline">Privacy Policy</a>
-                      </Label>
-                    </div>
-                  </CardContent>
-                )}
-
-                {step === 3 && (
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>What's your main purpose?</Label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {["Personal Memories", "Family History", "Legacy", "Other"].map((option) => (
-                          <Button
-                            key={option}
-                            variant={purpose === option ? "default" : "outline"}
-                            onClick={() => setPurpose(option)}
-                            className="w-full"
-                          >
-                            {option}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>How often will you record?</Label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {["Daily", "Weekly", "Monthly", "Occasionally"].map((option) => (
-                          <Button
-                            key={option}
-                            variant={recordingFrequency === option ? "default" : "outline"}
-                            onClick={() => setRecordingFrequency(option)}
-                            className="w-full"
-                          >
-                            {option}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  </CardContent>
-                )}
-              </>
-            )}
-          </motion.div>
-        </AnimatePresence>
-
-        {error && <p className="text-red-500 text-sm px-6">{error}</p>}
-        
-        <CardFooter className="flex flex-col space-y-2">
-          {isLogin ? (
-            <>
-              <Button 
-                onClick={handleLogin}
-                disabled={isLoading}
-                className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
-              >
-                {isLoading ? "Signing in..." : "Sign In"}
-              </Button>
-              <div className="text-center mt-4">
-                <span className="text-sm text-gray-600">
-                  Don't have an account? {" "}
-                  <Button 
-                    variant="link" 
-                    className="text-voicevault-primary"
-                    onClick={() => {
-                      setIsLogin(false);
-                      setError("");
-                    }}
-                  >
-                    Sign Up
-                  </Button>
-                </span>
-              </div>
-            </>
-          ) : (
-            <>
-              {step < 3 ? (
-                <Button 
-                  onClick={nextStep} 
-                  className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
-                >
-                  Continue
-                </Button>
+            <CardContent>
+              {isLogin ? (
+                <LoginForm />
               ) : (
-                <Button 
-                  onClick={handleSignUp}
-                  disabled={isLoading || !purpose || !recordingFrequency}
-                  className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
-                >
-                  {isLoading ? "Creating Account..." : "Create Account"}
-                </Button>
+                <SignupForm step={step} setStep={setStep} />
               )}
               
-              {step === 1 && (
+              {(isLogin || step === 1) && (
                 <div className="text-center mt-4">
                   <span className="text-sm text-gray-600">
-                    Already have an account? {" "}
+                    {isLogin ? "Don't have an account? " : "Already have an account? "}
                     <Button 
                       variant="link" 
                       className="text-voicevault-primary"
                       onClick={() => {
-                        setIsLogin(true);
-                        setError("");
+                        setIsLogin(!isLogin);
+                        setStep(1);
                       }}
                     >
-                      Sign In
+                      {isLogin ? "Sign Up" : "Sign In"}
                     </Button>
                   </span>
                 </div>
               )}
-            </>
-          )}
-        </CardFooter>
+            </CardContent>
+          </motion.div>
+        </AnimatePresence>
       </Card>
     </div>
   );
