@@ -39,7 +39,6 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
   const { toast } = useToast();
   const { deleteRecording } = useRecording();
 
-  // Generate a random word when delete dialog opens
   useEffect(() => {
     if (isDeleting) {
       setDeleteWord(generateRandomWord(10));
@@ -47,19 +46,14 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
     }
   }, [isDeleting]);
 
-  // Create an audio element for this recording
   useEffect(() => {
     console.log(`Setting up audio for: ${recording.title} (${recording.id})`);
     console.log(`Audio URL: ${recording.audioUrl}`);
     
-    // Create a new audio element
     const audioElement = new Audio();
-    
-    // Add important attributes
     audioElement.crossOrigin = "anonymous";
     audioElement.preload = "metadata";
     
-    // Setup event handlers before setting source
     audioElement.addEventListener('loadeddata', handleAudioLoaded);
     audioElement.addEventListener('canplaythrough', () => {
       console.log(`Audio can now play through: ${recording.title}`);
@@ -69,11 +63,9 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
     audioElement.addEventListener('timeupdate', updateProgress);
     audioElement.addEventListener('ended', handleAudioEnd);
     
-    // Save reference and set source last
     audioRef.current = audioElement;
     audioElement.src = recording.audioUrl;
     
-    // Try to load the audio
     try {
       audioElement.load();
       console.log(`Audio load initiated for: ${recording.title}`);
@@ -81,7 +73,6 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
       console.error("Error loading audio:", err);
     }
     
-    // Cleanup on unmount
     return () => {
       console.log(`Cleaning up audio for: ${recording.title}`);
       audioElement.removeEventListener('loadeddata', handleAudioLoaded);
@@ -113,7 +104,6 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
     const target = e.target as HTMLAudioElement;
     setAudioLoaded(false);
     
-    // Get detailed error information
     let errorMessage = "Unknown error";
     if (target && target.error) {
       switch(target.error.code) {
@@ -136,7 +126,6 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
     
     setAudioError(`Error: ${errorMessage}`);
     
-    // Check URL validity
     fetch(recording.audioUrl, { method: 'HEAD' })
       .then(response => {
         console.log(`URL check for ${recording.title}: ${response.status} ${response.statusText}`);
@@ -321,71 +310,75 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
             </div>
           </div>
           
-          {recording.tags?.length > 0 && (
-            <div className="mt-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center text-xs text-gray-500">
-                  <Tag size={12} className="mr-1" />
-                  <span>Tags:</span>
-                </div>
-                <AlertDialog open={isDeleting} onOpenChange={setIsDeleting}>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-red-500 hover:bg-red-50"
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete Voice Memory</AlertDialogTitle>
-                      <AlertDialogDescription className="space-y-4">
-                        <p>This action cannot be undone. Please enter this word to confirm deletion:</p>
-                        <div className="p-2 bg-gray-100 rounded font-mono text-center text-lg">
-                          {deleteWord}
-                        </div>
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <div className="mt-4">
-                      <Input
-                        type="text"
-                        placeholder="Enter the confirmation word"
-                        value={deleteConfirmation}
-                        onChange={(e) => setDeleteConfirmation(e.target.value)}
-                        className="font-mono"
-                      />
+          <div className="mt-2 flex justify-between items-center">
+            {recording.tags?.length > 0 ? (
+              <div className="flex items-center text-xs text-gray-500">
+                <Tag size={12} className="mr-1" />
+                <span>Tags:</span>
+              </div>
+            ) : (
+              <div className="text-xs text-gray-500">No tags</div>
+            )}
+            
+            <AlertDialog open={isDeleting} onOpenChange={setIsDeleting}>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-red-500 hover:bg-red-50"
+                >
+                  <Trash2 size={16} />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Voice Memory</AlertDialogTitle>
+                  <AlertDialogDescription className="space-y-4">
+                    <p>This action cannot be undone. Please enter this word to confirm deletion:</p>
+                    <div className="p-2 bg-gray-100 rounded font-mono text-center text-lg">
+                      {deleteWord}
                     </div>
-                    <AlertDialogFooter className="mt-4">
-                      <AlertDialogCancel onClick={() => {
-                        setIsDeleting(false);
-                        setDeleteConfirmation("");
-                      }}>
-                        Cancel
-                      </AlertDialogCancel>
-                      <Button
-                        variant="destructive"
-                        onClick={handleDelete}
-                        disabled={!deleteConfirmation}
-                      >
-                        Delete
-                      </Button>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
-              <div className="flex flex-wrap gap-1.5 mt-1">
-                {recording.tags.map(tag => (
-                  <Badge 
-                    key={tag} 
-                    variant="outline"
-                    className="text-xs bg-voicevault-softgray text-voicevault-secondary"
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <div className="mt-4">
+                  <Input
+                    type="text"
+                    placeholder="Enter the confirmation word"
+                    value={deleteConfirmation}
+                    onChange={(e) => setDeleteConfirmation(e.target.value)}
+                    className="font-mono"
+                  />
+                </div>
+                <AlertDialogFooter className="mt-4">
+                  <AlertDialogCancel onClick={() => {
+                    setIsDeleting(false);
+                    setDeleteConfirmation("");
+                  }}>
+                    Cancel
+                  </AlertDialogCancel>
+                  <Button
+                    variant="destructive"
+                    onClick={handleDelete}
+                    disabled={!deleteConfirmation}
                   >
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
+                    Delete
+                  </Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+          
+          {recording.tags?.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-1">
+              {recording.tags.map(tag => (
+                <Badge 
+                  key={tag} 
+                  variant="outline"
+                  className="text-xs bg-voicevault-softgray text-voicevault-secondary"
+                >
+                  {tag}
+                </Badge>
+              ))}
             </div>
           )}
         </div>
