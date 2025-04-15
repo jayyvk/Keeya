@@ -1,23 +1,22 @@
+
 import React, { useState, useEffect } from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { useToast } from "@/hooks/use-toast";
-import { Recording } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Recording } from "@/types";
 import AudioSourceSelector from "@/components/voice-cloning/AudioSourceSelector";
 import TextEnhancer from "@/components/voice-cloning/TextEnhancer";
 import CloneResult from "@/components/voice-cloning/CloneResult";
-import { Wand2, Loader2 } from "lucide-react";
+import VoiceCloneHeader from "@/components/voice-cloning/VoiceCloneHeader";
+import VoiceCloneIntro from "@/components/voice-cloning/VoiceCloneIntro";
+import CreateVoiceMemoryButton from "@/components/voice-cloning/CreateVoiceMemoryButton";
 
 const VoiceCloning: React.FC = () => {
   const { recordings } = useRecording();
   const { user } = useAuth();
-  const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
   
@@ -122,10 +121,6 @@ const VoiceCloning: React.FC = () => {
       setIsCloning(false);
     }
   };
-  
-  const handleHeaderClick = () => {
-    navigate("/dashboard");
-  };
 
   const textToUse = enhancedText || inputText;
   const isReadyToClone = selectedSources.length > 0 && textToUse.trim().length > 0;
@@ -136,32 +131,10 @@ const VoiceCloning: React.FC = () => {
         <DashboardSidebar />
         
         <div className="flex-1 overflow-x-hidden">
-          <header className="bg-white shadow-sm p-4 flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <SidebarTrigger />
-              <h1 
-                className="text-xl font-bold text-voicevault-tertiary cursor-pointer hover:text-voicevault-primary transition-colors" 
-                onClick={handleHeaderClick}
-              >
-                VoiceVault
-              </h1>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">
-                Hello, {user?.name || 'there'}
-              </span>
-            </div>
-          </header>
+          <VoiceCloneHeader userName={user?.name} />
 
           <main className="mx-auto p-4 md:p-6 max-w-4xl">
-            <div className="mb-6 md:mb-8">
-              <h2 className="text-xl md:text-2xl font-semibold text-voicevault-tertiary mb-2 font-playfair">
-                Voice Cloning Studio
-              </h2>
-              <p className="text-sm md:text-base text-gray-600">
-                Preserve the voices you love by creating AI-generated voice memories that sound just like them.
-              </p>
-            </div>
+            <VoiceCloneIntro />
             
             {!clonedAudioUrl ? (
               <>
@@ -186,36 +159,21 @@ const VoiceCloning: React.FC = () => {
                     <h3 className="text-lg md:text-xl font-playfair text-voicevault-tertiary">What would you like this voice to say?</h3>
                   </div>
                   
-                  <Card className="mb-4">
-                    <CardContent className="pt-6">
-                      <TextEnhancer 
-                        inputText={inputText}
-                        enhancedText={enhancedText}
-                        onTextChange={handleTextChange}
-                        onEnhance={handleEnhanceText}
-                        isEnhancing={isEnhancing}
-                      />
-                    </CardContent>
-                  </Card>
+                  <TextEnhancer 
+                    inputText={inputText}
+                    enhancedText={enhancedText}
+                    onTextChange={handleTextChange}
+                    onEnhance={handleEnhanceText}
+                    isEnhancing={isEnhancing}
+                  />
                 </section>
                 
-                <section className="flex justify-center mb-6 md:mb-8">
-                  <Button 
-                    size={isMobile ? "default" : "lg"}
-                    className={`${isReadyToClone ? 'animate-pulse' : 'opacity-70'} ${isMobile ? 'px-4 py-2 text-base w-full' : 'px-8 py-6 text-lg'}`}
-                    onClick={handleCreateVoiceMemory}
-                    disabled={!isReadyToClone || isCloning}
-                  >
-                    {isCloning ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Creating Voice Memory...
-                      </>
-                    ) : (
-                      "Create Voice Memory"
-                    )}
-                  </Button>
-                </section>
+                <CreateVoiceMemoryButton
+                  isReadyToClone={isReadyToClone}
+                  isCloning={isCloning}
+                  onClick={handleCreateVoiceMemory}
+                  isMobile={isMobile}
+                />
               </>
             ) : (
               <CloneResult 
