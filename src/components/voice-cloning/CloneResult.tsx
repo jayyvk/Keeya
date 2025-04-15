@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,7 +14,12 @@ interface CloneResultProps {
   isMobile?: boolean;
 }
 
-const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMobile = false }) => {
+const CloneResult: React.FC<CloneResultProps> = ({ 
+  audioUrl, 
+  text, 
+  onBack, 
+  isMobile = false 
+}) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -25,10 +29,10 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
   const [isSharing, setIsSharing] = useState(false);
   const [audioLoaded, setAudioLoaded] = useState(false);
   const [audioError, setAudioError] = useState<string | null>(null);
-  
+  const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
-  
+
   useEffect(() => {
     console.log(`Initializing audio for CloneResult: ${audioUrl}`);
     const audio = new Audio();
@@ -72,6 +76,7 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
         });
     };
     
+    // Add event listeners
     audio.addEventListener("loadedmetadata", handleLoadedMetadata);
     audio.addEventListener("timeupdate", handleTimeUpdate);
     audio.addEventListener("ended", handleEnded);
@@ -83,6 +88,7 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
     
     // Set the source last
     audio.src = audioUrl;
+    audio.playbackRate = playbackSpeed;
     
     try {
       audio.load();
@@ -108,7 +114,13 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
       audioRef.current = null;
     };
   }, [audioUrl]);
-  
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = playbackSpeed;
+    }
+  }, [playbackSpeed]);
+
   const togglePlayback = () => {
     if (!audioRef.current) {
       console.error("No audio element available");
@@ -145,14 +157,14 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
       }
     }
   };
-  
+
   const handleSliderChange = (value: number[]) => {
     if (!audioRef.current) return;
     
     audioRef.current.currentTime = value[0];
     setCurrentTime(value[0]);
   };
-  
+
   const toggleMute = () => {
     if (!audioRef.current) return;
     
@@ -160,7 +172,7 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
     audioRef.current.muted = newMuteState;
     setIsMuted(newMuteState);
   };
-  
+
   const handleVolumeChange = (value: number[]) => {
     if (!audioRef.current) return;
     
@@ -174,7 +186,7 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
       setIsMuted(false);
     }
   };
-  
+
   const handleSaveToVault = async () => {
     setIsSaving(true);
     try {
@@ -195,7 +207,7 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
       setIsSaving(false);
     }
   };
-  
+
   const handleShare = () => {
     setIsSharing(true);
     try {
@@ -215,7 +227,13 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
       setIsSharing(false);
     }
   };
-  
+
+  const handleSpeedChange = (value: string) => {
+    if (value) {
+      setPlaybackSpeed(parseFloat(value));
+    }
+  };
+
   return (
     <div className="animate-fade-in">
       <Button 
@@ -231,9 +249,6 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
         <div className="bg-gradient-to-r from-voicevault-softpurple to-voicevault-softpink p-4 md:p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-lg md:text-xl text-white">Voice Memory</h3>
-            <Badge className="bg-white/20 text-white border-none text-xs md:text-sm">
-              AI-Generated
-            </Badge>
           </div>
           
           {audioError && (
@@ -248,10 +263,12 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMob
             duration={duration}
             isMuted={isMuted}
             volume={volume}
+            playbackSpeed={playbackSpeed}
             onPlayPause={togglePlayback}
             onTimeChange={handleSliderChange}
             onMuteToggle={toggleMute}
             onVolumeChange={handleVolumeChange}
+            onSpeedChange={handleSpeedChange}
             isMobile={isMobile}
           />
         </div>

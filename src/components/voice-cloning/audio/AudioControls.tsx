@@ -1,7 +1,9 @@
 
 import React from "react";
-import { Play, Pause, VolumeX, Volume2 } from "lucide-react";
+import { Play, Pause, VolumeX, Volume2, FastForward, Rewind } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface AudioControlsProps {
   isPlaying: boolean;
@@ -9,10 +11,12 @@ interface AudioControlsProps {
   duration: number;
   isMuted: boolean;
   volume: number;
+  playbackSpeed: number;
   onPlayPause: () => void;
   onTimeChange: (value: number[]) => void;
   onMuteToggle: () => void;
   onVolumeChange: (value: number[]) => void;
+  onSpeedChange: (value: string) => void;
   isMobile?: boolean;
 }
 
@@ -22,10 +26,12 @@ const AudioControls: React.FC<AudioControlsProps> = ({
   duration,
   isMuted,
   volume,
+  playbackSpeed,
   onPlayPause,
   onTimeChange,
   onMuteToggle,
   onVolumeChange,
+  onSpeedChange,
   isMobile = false,
 }) => {
   const formatTime = (time: number) => {
@@ -40,17 +46,39 @@ const AudioControls: React.FC<AudioControlsProps> = ({
 
   return (
     <div className={`flex ${isMobile ? 'flex-col' : 'justify-between'} items-center mb-4`}>
-      <button
-        onClick={onPlayPause}
-        className={`rounded-full w-12 h-12 flex items-center justify-center shadow-md ${isReady ? 'bg-white hover:shadow-lg' : 'bg-gray-200'} transition-shadow mb-4 md:mb-0`}
-        disabled={!isReady}
-      >
-        {isPlaying ? (
-          <Pause className={`${isReady ? 'text-voicevault-primary' : 'text-gray-400'} h-5 w-5`} />
-        ) : (
-          <Play className={`${isReady ? 'text-voicevault-primary' : 'text-gray-400'} h-5 w-5 ml-1`} />
-        )}
-      </button>
+      <div className="flex items-center gap-2 mb-4 md:mb-0">
+        <button
+          onClick={onPlayPause}
+          className={`rounded-full w-12 h-12 flex items-center justify-center shadow-md ${isReady ? 'bg-white hover:shadow-lg' : 'bg-gray-200'} transition-shadow`}
+          disabled={!isReady}
+        >
+          {isPlaying ? (
+            <Pause className={`${isReady ? 'text-voicevault-primary' : 'text-gray-400'} h-5 w-5`} />
+          ) : (
+            <Play className={`${isReady ? 'text-voicevault-primary' : 'text-gray-400'} h-5 w-5 ml-1`} />
+          )}
+        </button>
+        
+        <div className="flex items-center bg-white/10 rounded-lg px-2 py-1">
+          <ToggleGroup 
+            type="single" 
+            value={playbackSpeed.toString()} 
+            onValueChange={onSpeedChange}
+            className="flex gap-1"
+          >
+            {[0.5, 1, 1.5, 2].map((speed) => (
+              <ToggleGroupItem 
+                key={speed} 
+                value={speed.toString()}
+                aria-label={`${speed}x speed`}
+                className="px-2 py-1 text-xs data-[state=on]:bg-white/20"
+              >
+                {speed}x
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+        </div>
+      </div>
       
       <div className={`${isMobile ? 'w-full' : 'flex-1 mx-4'}`}>
         <Slider
