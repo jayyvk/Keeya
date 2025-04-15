@@ -1,4 +1,3 @@
-
 import React from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
@@ -7,6 +6,7 @@ import VoiceCloneContent from "@/components/voice-cloning/VoiceCloneContent";
 import CreditDisplay from "@/components/voice-cloning/monetization/CreditDisplay";
 import CreditsOverlay from "@/components/voice-cloning/monetization/CreditsOverlay";
 import { MonetizationProvider, useMonetization } from "@/contexts/MonetizationContext";
+import { PricingCards } from "@/components/voice-cloning/monetization/PricingCards";
 
 const VoiceCloningInner: React.FC = () => {
   const { 
@@ -36,7 +36,8 @@ const VoiceCloningInner: React.FC = () => {
             />
           </div>
 
-          <VoiceCloneContent />
+          {showCreditsOverlay && <PricingCards />}
+          {!showCreditsOverlay && <VoiceCloneContent />}
         </div>
       </div>
       
