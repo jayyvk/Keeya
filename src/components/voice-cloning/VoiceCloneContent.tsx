@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useMonetization } from "@/contexts/MonetizationContext";

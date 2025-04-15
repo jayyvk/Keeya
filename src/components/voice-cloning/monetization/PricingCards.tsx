@@ -1,13 +1,12 @@
-
 import React from "react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, CreditCard, Users } from "lucide-react";
-import { useCredits } from "@/hooks/use-credits";
+import { useMonetization } from "@/contexts/MonetizationContext";
 
 export function PricingCards() {
-  const { credits, handlePayment } = useCredits();
+  const { credits, handlePurchase } = useMonetization();
 
   return (
     <div className="w-full max-w-7xl mx-auto">
@@ -18,11 +17,9 @@ export function PricingCards() {
         <p className="text-sm sm:text-base text-gray-600 max-w-xl mx-auto">
           Get started with a trial or subscribe to a monthly plan for regular voice generations.
         </p>
-        {credits !== null && (
-          <p className="mt-2 text-sm text-gray-500">
-            You have {credits} credit{credits !== 1 ? 's' : ''} remaining
-          </p>
-        )}
+        <p className="mt-2 text-sm text-gray-500">
+          You have {credits.available} credit{credits.available !== 1 ? 's' : ''} remaining
+        </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
@@ -40,7 +37,7 @@ export function PricingCards() {
             <Button 
               className="w-full text-sm" 
               variant="outline"
-              onClick={() => handlePayment('starter')}
+              onClick={() => handlePurchase('starter')}
             >
               <Star className="w-4 h-4 mr-2" />
               Get Started
@@ -67,7 +64,7 @@ export function PricingCards() {
           <CardFooter>
             <Button 
               className="w-full text-sm"
-              onClick={() => handlePayment('pro')}
+              onClick={() => handlePurchase('pro')}
             >
               <CreditCard className="w-4 h-4 mr-2" />
               Subscribe Monthly
@@ -89,7 +86,7 @@ export function PricingCards() {
             <Button 
               className="w-full text-sm"
               variant="outline"
-              onClick={() => handlePayment('family')}
+              onClick={() => handlePurchase('family')}
             >
               <Users className="w-4 h-4 mr-2" />
               Subscribe Monthly
