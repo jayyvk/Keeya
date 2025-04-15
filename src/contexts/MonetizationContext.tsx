@@ -1,7 +1,9 @@
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Credits, PaymentType } from "@/types";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MonetizationContextType {
   credits: Credits;
@@ -12,63 +14,89 @@ interface MonetizationContextType {
   handlePurchase: (type: PaymentType) => void;
   handleManageSubscription: () => void;
   handleAddCredits: () => void;
+  refreshCredits: () => Promise<void>;
 }
 
 const MonetizationContext = createContext<MonetizationContextType | undefined>(undefined);
 
 export function MonetizationProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [showCreditsOverlay, setShowCreditsOverlay] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [isNewUser, setIsNewUser] = useState(true);
   const [credits, setCredits] = useState<Credits>({
-    available: 1,
+    available: 0,
     subscription: null,
     subscriptionEndsAt: null
   });
 
+  // Fetch credits when user changes
+  useEffect(() => {
+    if (user) {
+      refreshCredits();
+    }
+  }, [user]);
+
+  const refreshCredits = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('user_credits')
+        .select('credits_balance')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching user credits:", error);
+        return;
+      }
+
+      if (data) {
+        setCredits(prev => ({
+          ...prev,
+          available: data.credits_balance
+        }));
+      }
+    } catch (error) {
+      console.error("Error in refreshCredits:", error);
+    }
+  };
+
   const handlePurchase = async (type: PaymentType) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "You need to be logged in to make a purchase.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsProcessingPayment(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast({
-        title: type === 'subscription' ? "Subscription started" : "Credits purchased",
-        description: type === 'subscription' ? 
-          "You now have unlimited voice generations!" : 
-          "Credit has been added to your account."
+      const response = await supabase.functions.invoke('create-checkout', {
+        body: { 
+          planId: type === 'subscription' ? 'pro' : 'starter'
+        }
       });
+
+      if (response.error) throw response.error;
       
-      if (type === 'subscription') {
-        const nextMonth = new Date();
-        nextMonth.setMonth(nextMonth.getMonth() + 1);
-        
-        setCredits({
-          available: 9999,
-          subscription: 'basic',
-          subscriptionEndsAt: nextMonth
-        });
+      if (response.data?.url) {
+        window.location.href = response.data.url;
       } else {
-        setCredits(prev => ({
-          ...prev,
-          available: prev.available + (isNewUser ? 1 : 1)
-        }));
+        throw new Error("No checkout URL returned");
       }
-      
-      if (isNewUser) {
-        setIsNewUser(false);
-      }
-      
-      setShowCreditsOverlay(false);
     } catch (error) {
+      console.error('Payment error:', error);
       toast({
-        title: "Payment failed",
-        description: "There was an error processing your payment. Please try again.",
+        title: "Payment Error",
+        description: "Could not initiate payment. Please try again.",
         variant: "destructive"
       });
-    } finally {
       setIsProcessingPayment(false);
     }
   };
@@ -95,6 +123,7 @@ export function MonetizationProvider({ children }: { children: ReactNode }) {
         handlePurchase,
         handleManageSubscription,
         handleAddCredits,
+        refreshCredits,
       }}
     >
       {children}

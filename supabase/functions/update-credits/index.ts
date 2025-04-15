@@ -31,7 +31,8 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const { error } = await supabase.rpc('add_credits', {
+    // Use the RPC function to add credits
+    const { data, error } = await supabase.rpc('add_credits', {
       p_user_id: session.metadata?.userId,
       p_credits: parseInt(session.metadata?.credits || "0"),
     });
@@ -43,6 +44,7 @@ serve(async (req) => {
       status: 200,
     });
   } catch (error) {
+    console.error("Error in update-credits function:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 400,

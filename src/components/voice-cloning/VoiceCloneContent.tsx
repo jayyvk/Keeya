@@ -5,6 +5,7 @@ import { useMonetization } from "@/contexts/MonetizationContext";
 import { useVoiceClone } from "@/hooks/use-voice-clone";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/contexts/AuthContext";
 import AudioSourceSelector from "./AudioSourceSelector";
 import TextEnhancer from "./TextEnhancer";
 import CloneResult from "./CloneResult";
@@ -17,7 +18,8 @@ const VoiceCloneContent: React.FC = () => {
   const { recordings } = useRecording();
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const { credits, setShowCreditsOverlay } = useMonetization();
+  const { credits, refreshCredits } = useMonetization();
+  const { user } = useAuth();
   
   const {
     selectedSources,
@@ -44,6 +46,13 @@ const VoiceCloneContent: React.FC = () => {
   const [generatedAudioUrl, setGeneratedAudioUrl] = useState<string | null>(null);
 
   useEffect(() => {
+    // Refresh credits when component mounts
+    if (user) {
+      refreshCredits();
+    }
+  }, [user, refreshCredits]);
+
+  useEffect(() => {
     const total = selectedSources.reduce((sum, recording) => sum + recording.duration, 0);
     setTotalSelectedDuration(total);
   }, [selectedSources, setTotalSelectedDuration]);
@@ -54,6 +63,15 @@ const VoiceCloneContent: React.FC = () => {
   const hasEnoughAudio = totalSelectedDuration >= 30;
 
   const handleGenerateVoice = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "You need to be logged in to generate a voice memory.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!isReadyToClone || !hasEnoughCredits || !hasEnoughAudio) {
       if (!hasEnoughCredits) {
         toast({
@@ -61,12 +79,11 @@ const VoiceCloneContent: React.FC = () => {
           description: "You need at least 1 credit to generate a voice memory.",
           variant: "destructive",
         });
-        setShowCreditsOverlay(true);
       } else if (!hasEnoughAudio) {
         toast({
           title: "Insufficient audio",
           description: "You need at least 30 seconds of audio for voice cloning. 1 minute is recommended.",
-          variant: "default", // Changed from "warning" to "default"
+          variant: "default",
         });
       }
       return;
@@ -86,12 +103,12 @@ const VoiceCloneContent: React.FC = () => {
           text: textToUse,
           language: "en",
           emotion: "neutral",
-          userId: (await supabase.auth.getUser()).data.user?.id
+          userId: user.id
         }
       });
 
       if (response.error) {
-        throw new Error(response.error.message);
+        throw new Error(response.error.message || "Failed to generate voice");
       }
 
       if (response.data?.output) {
@@ -100,6 +117,8 @@ const VoiceCloneContent: React.FC = () => {
           title: "Voice cloned successfully",
           description: "Your voice memory has been created.",
         });
+        // Refresh credits after successful generation
+        refreshCredits();
       } else {
         throw new Error("No output returned from the API");
       }
@@ -193,7 +212,7 @@ const VoiceCloneContent: React.FC = () => {
               </p>
             )}
             <p>
-              Generation will use 1 credit. You have {credits.available} credit(s) remaining.
+              Generation will use 1 credit. You have {credits.available} credit{credits.available !== 1 ? 's' : ''} remaining.
             </p>
           </div>
           
@@ -212,4 +231,3 @@ const VoiceCloneContent: React.FC = () => {
 };
 
 export default VoiceCloneContent;
-
