@@ -6,8 +6,6 @@ import VoiceCloneContent from "@/components/voice-cloning/VoiceCloneContent";
 import CommonHeader from "@/components/CommonHeader";
 import { motion } from "framer-motion";
 import { MonetizationProvider } from "@/contexts/MonetizationContext";
-import CreditDisplay from "@/components/voice-cloning/monetization/CreditDisplay";
-import { useMonetization } from "@/contexts/MonetizationContext";
 import { Toaster } from "@/components/ui/sonner";
 
 const VoiceCloning: React.FC = () => {
@@ -27,17 +25,7 @@ const VoiceCloning: React.FC = () => {
             <div className="bg-gradient-to-b from-voicevault-softpurple to-transparent">
               <div className="flex justify-between items-center px-6 py-4">
                 <CommonHeader title="Voice Cloning Studio" />
-                <div className="flex items-center">
-                  <CreditDisplay 
-                    credits={{
-                      available: 0,  // This is a placeholder, will be updated by the context
-                      subscription: null,
-                      subscriptionEndsAt: null
-                    }}
-                    onManageSubscription={() => {}}
-                    onAddCredits={() => {}}
-                  />
-                </div>
+                {/* Removed redundant CreditDisplay */}
               </div>
             </div>
 

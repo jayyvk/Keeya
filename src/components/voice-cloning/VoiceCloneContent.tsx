@@ -111,14 +111,13 @@ const VoiceCloneContent: React.FC = () => {
       }
 
       if (response.data?.output) {
-        // Save the generated voice memory to the voice_memories table
         const { data: savedMemory, error: saveError } = await supabase
           .from('voice_memories')
           .insert({
             user_id: user.id,
             title: `Generated Voice - ${new Date().toLocaleDateString()}`,
             file_url: response.data.output,
-            duration: 0, // We'll need to calculate this from the audio
+            duration: 0,
             file_type: 'audio/mpeg',
             tags: ['generated', 'voice-clone']
           })
@@ -136,7 +135,6 @@ const VoiceCloneContent: React.FC = () => {
           description: "Your voice memory has been saved to your vault.",
         });
         
-        // Force refresh credits to show updated balance
         await refreshCredits();
       } else {
         throw new Error("No output returned from the API");
