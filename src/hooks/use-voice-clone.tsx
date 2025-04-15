@@ -39,16 +39,14 @@ export function useVoiceClone() {
     setIsEnhancing(true);
 
     try {
-      setTimeout(() => {
-        const enhanced = `${inputText}\n\nEnhanced with more warmth and personality. This voice message sounds natural and captures the essence of the original voice, with improved clarity and emotion.`;
-        setEnhancedText(enhanced);
-        setIsEnhancing(false);
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulating API call
+      const enhanced = `${inputText}\n\nEnhanced with more warmth and personality. This voice message sounds natural and captures the essence of the original voice, with improved clarity and emotion.`;
+      setEnhancedText(enhanced);
 
-        toast({
-          title: "Text enhanced",
-          description: "Your text has been enhanced with AI.",
-        });
-      }, 2000);
+      toast({
+        title: "Text enhanced",
+        description: "Your text has been enhanced with AI.",
+      });
     } catch (error) {
       console.error("Error enhancing text:", error);
       toast({
@@ -56,6 +54,7 @@ export function useVoiceClone() {
         description: "Unable to enhance text. Please try again.",
         variant: "destructive",
       });
+    } finally {
       setIsEnhancing(false);
     }
   };

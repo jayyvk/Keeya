@@ -50,6 +50,7 @@ export const SignupForm = ({ step, setStep }: SignupFormProps) => {
                 placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
               />
             </div>
             <div className="space-y-2">
@@ -59,6 +60,7 @@ export const SignupForm = ({ step, setStep }: SignupFormProps) => {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -72,6 +74,7 @@ export const SignupForm = ({ step, setStep }: SignupFormProps) => {
                 placeholder="John Doe"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                disabled={isLoading}
               />
             </div>
             <div className="flex items-center space-x-2">
@@ -79,6 +82,7 @@ export const SignupForm = ({ step, setStep }: SignupFormProps) => {
                 id="terms" 
                 checked={agreeToTerms}
                 onCheckedChange={(checked) => setAgreeToTerms(checked as boolean)}
+                disabled={isLoading}
               />
               <Label htmlFor="terms" className="text-sm">
                 I am over 18 and agree to the <a href="#" className="text-voicevault-primary hover:underline">Terms</a> and <a href="#" className="text-voicevault-primary hover:underline">Privacy Policy</a>
@@ -98,6 +102,7 @@ export const SignupForm = ({ step, setStep }: SignupFormProps) => {
                     variant={purpose === option ? "default" : "outline"}
                     onClick={() => setPurpose(option)}
                     className="w-full"
+                    disabled={isLoading}
                   >
                     {option}
                   </Button>
@@ -113,6 +118,7 @@ export const SignupForm = ({ step, setStep }: SignupFormProps) => {
                     variant={recordingFrequency === option ? "default" : "outline"}
                     onClick={() => setRecordingFrequency(option)}
                     className="w-full"
+                    disabled={isLoading}
                   >
                     {option}
                   </Button>
@@ -130,8 +136,9 @@ export const SignupForm = ({ step, setStep }: SignupFormProps) => {
       {error && <p className="text-red-500 text-sm">{error}</p>}
       {step < 3 ? (
         <Button 
-          onClick={nextStep} 
+          onClick={nextStep}
           className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
+          disabled={isLoading}
         >
           Continue
         </Button>
@@ -141,7 +148,14 @@ export const SignupForm = ({ step, setStep }: SignupFormProps) => {
           disabled={isLoading || !purpose || !recordingFrequency}
           className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
         >
-          {isLoading ? "Creating Account..." : "Create Account"}
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Creating Account...
+            </>
+          ) : (
+            "Create Account"
+          )}
         </Button>
       )}
     </div>

@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/hooks/use-toast";
 
 interface UseAuthFormProps {
   isLogin: boolean;
@@ -43,7 +43,6 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
         console.log("Registration successful, Auth component will handle redirect");
         toast.success("Account created successfully!");
       }
-      // The Auth component's useEffect will handle the redirection
     } catch (err: any) {
       console.error(isLogin ? "Login error:" : "Registration error:", err);
       setError(err.message || `${isLogin ? "Login" : "Registration"} failed`);
