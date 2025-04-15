@@ -11,13 +11,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react({
-      plugins: [
-        ['@swc/plugin-react-refresh', {
-          refresh: true,
-        }]
-      ]
-    }),
+    react(),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
