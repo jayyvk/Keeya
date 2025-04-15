@@ -25,6 +25,7 @@ const VoiceCloneContent: React.FC = () => {
     clonedAudioUrl,
     totalSelectedDuration,
     activeTab,
+    selectedModel,
     setActiveTab,
     setIsCloning,
     setClonedAudioUrl,
