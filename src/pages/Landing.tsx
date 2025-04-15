@@ -36,7 +36,7 @@ const Landing: React.FC = () => {
           transition={{ delay: 0.2, duration: 0.5 }}
           className="text-4xl font-bold mb-2 text-voicevault-tertiary"
         >
-          Keeya.ai
+          VoiceVault
         </motion.h1>
         
         <motion.p

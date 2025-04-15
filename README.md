@@ -1,9 +1,8 @@
+# VoiceVault: Preserve the voices you love, forever.
 
-# Keeya.ai: Preserve the voices you love, forever.
+VoiceVault is a personal voice memory platform where users can record, save, and organize the voices of their loved ones in a secure and emotionally calming space.
 
-Keeya.ai is a personal voice memory platform where users can record, save, and organize the voices of their loved ones in a secure and emotionally calming space.
-
-![Keeya.ai](https://i.imgur.com/v1OaHkG.png)
+![VoiceVault](https://i.imgur.com/v1OaHkG.png)
 
 ## Features
 
@@ -31,7 +30,7 @@ Clone the repository and install the dependencies:
 
 ```bash
 git clone <repository-url>
-cd keeya-ai
+cd voice-memory-garden
 npm install
 npm run dev
 ```

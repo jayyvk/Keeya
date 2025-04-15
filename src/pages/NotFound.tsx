@@ -1,4 +1,3 @@
-
 import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 import { ArrowLeft, Home } from "lucide-react";
@@ -19,7 +18,7 @@ const NotFound = () => {
       <div className="text-center bg-white p-8 rounded-xl shadow-lg max-w-md animate-fade-in">
         <h1 className="text-5xl font-bold mb-4 text-voicevault-tertiary">404</h1>
         <p className="text-xl text-gray-600 mb-8">
-          The voice memory you're looking for seems to be lost in Keeya.ai's time.
+          The voice memory you're looking for seems to be lost in time.
         </p>
         
         <div className="flex flex-col space-y-3">

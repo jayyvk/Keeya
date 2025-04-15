@@ -30,16 +30,16 @@ const Auth = () => {
       <Card className="w-full max-w-md shadow-xl animate-fade-in">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-voicevault-tertiary">
-            {isLogin ? "Welcome Back to Keeya.ai" : (
+            {isLogin ? "Welcome Back" : (
               <>
-                {step === 1 && "Welcome to Keeya.ai"}
+                {step === 1 && "Welcome to VoiceVault"}
                 {step === 2 && "Tell us about yourself"}
-                {step === 3 && "How will you use Keeya.ai?"}
+                {step === 3 && "How will you use VoiceVault?"}
               </>
             )}
           </CardTitle>
           <CardDescription>
-            {isLogin ? "Sign in to your Keeya.ai account" : (
+            {isLogin ? "Sign in to your account" : (
               <>
                 {step === 1 && "Preserve the voices you love, forever."}
                 {step === 2 && "Help us personalize your experience"}
