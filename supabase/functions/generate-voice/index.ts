@@ -96,26 +96,27 @@ serve(async (req) => {
       throw new Error("Failed to generate voice output")
     }
 
-    // Use the database function to deduct credits
-    const { data: decrementResult, error: decrementError } = await supabase.rpc(
-      'decrement_user_credits',
-      {
-        p_user_id: userId,
-        p_credits: 1
-      }
-    )
+    // Update the user's credits (deduct 1 credit)
+    const { data: updateResult, error: updateError } = await supabase
+      .from('user_credits')
+      .update({ 
+        credits_balance: creditData.credits_balance - 1,
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', userId)
+      .select()
 
-    if (decrementError) {
-      console.error("Error deducting credits:", decrementError)
+    if (updateError) {
+      console.error("Error deducting credits:", updateError)
       return new Response(JSON.stringify({ 
-        error: "Failed to deduct credits: " + decrementError.message 
+        error: "Failed to deduct credits: " + updateError.message 
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
       })
     }
 
-    console.log("Credit deduction result:", decrementResult)
+    console.log("Credit deduction result:", updateResult)
     
     return new Response(JSON.stringify({ output }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
