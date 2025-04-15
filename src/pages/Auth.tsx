@@ -19,8 +19,8 @@ const Auth = () => {
     console.log("Auth page - Authentication status:", { isAuthenticated, user });
     
     if (isAuthenticated && user) {
-      console.log("User is authenticated, redirecting to dashboard");
-      toast.success(`Welcome back, ${user.name || 'there'}!`);
+      // Only show the welcome toast once, and only if the user is authenticated
+      toast.success(`Welcome, ${user.name || 'there'}!`);
       navigate("/dashboard", { replace: true });
     }
   }, [isAuthenticated, navigate, user]);
