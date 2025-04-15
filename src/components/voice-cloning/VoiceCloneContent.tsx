@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useMonetization } from "@/contexts/MonetizationContext";
@@ -110,10 +111,29 @@ const VoiceCloneContent: React.FC = () => {
       }
 
       if (response.data?.output) {
+        // Save the generated voice memory to the voice_memories table
+        const { data: savedMemory, error: saveError } = await supabase
+          .from('voice_memories')
+          .insert({
+            user_id: user.id,
+            title: `Generated Voice - ${new Date().toLocaleDateString()}`,
+            file_url: response.data.output,
+            duration: 0, // We'll need to calculate this from the audio
+            file_type: 'audio/mpeg',
+            tags: ['generated', 'voice-clone']
+          })
+          .select()
+          .single();
+
+        if (saveError) {
+          console.error("Error saving voice memory:", saveError);
+          throw new Error("Failed to save voice memory");
+        }
+
         setClonedAudioUrl(response.data.output);
         toast({
           title: "Voice cloned successfully",
-          description: "Your voice memory has been created.",
+          description: "Your voice memory has been saved to your vault.",
         });
         refreshCredits();
       } else {
