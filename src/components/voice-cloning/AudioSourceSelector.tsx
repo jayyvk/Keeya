@@ -1,4 +1,3 @@
-
 import React, { useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Recording } from "@/types";
@@ -58,7 +57,6 @@ const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
 
       <ScrollArea className="h-[400px]">
         <div className={`flex ${isMobile ? 'flex-wrap' : ''} gap-3 p-4`}>
-          {/* Upload option (disabled with coming soon) */}
           <input 
             type="file"
             ref={fileInputRef}
@@ -68,18 +66,13 @@ const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
             disabled
           />
           <div 
-            className={`${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg border-2 border-dashed border-voicevault-softpurple bg-voicevault-softgray/30 flex flex-col items-center justify-center cursor-pointer hover:bg-voicevault-softgray/50 transition-colors relative`} 
-            onClick={handleUploadClick}
+            className={`${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg border-2 border-dashed border-gray-300 bg-gray-100 flex flex-col items-center justify-center opacity-50 cursor-not-allowed`} 
           >
-            {/* Blur overlay with coming soon message */}
-            <div className="absolute inset-0 backdrop-blur-[2px] bg-white/30 flex flex-col items-center justify-center">
-              <span className="text-sm font-medium text-voicevault-primary bg-white/70 px-2 py-1 rounded-md">Coming Soon</span>
-            </div>
-            <Upload className="h-8 w-8 text-voicevault-primary mb-2" />
-            <span className="text-sm text-voicevault-tertiary">Upload Audio/Video</span>
+            <Upload className="h-8 w-8 text-gray-500 mb-2" />
+            <span className="text-sm text-gray-500">Upload Audio/Video</span>
+            <span className="text-xs text-gray-400 mt-1">(Coming Soon)</span>
           </div>
           
-          {/* Recordings from vault */}
           {filteredRecordings.map(recording => {
           const isSelected = selectedRecordings.some(r => r.id === recording.id);
           return <div key={recording.id} onClick={() => onSelectRecording(recording)} className={`relative ${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg overflow-hidden cursor-pointer transition-all ${isSelected ? 'ring-2 ring-voicevault-primary shadow-lg' : 'hover:shadow-md'}`}>
