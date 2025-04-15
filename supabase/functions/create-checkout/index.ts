@@ -94,11 +94,11 @@ serve(async (req) => {
         },
       ],
       mode: isSubscription ? "subscription" : "payment",
-      success_url: `${origin}/voice-cloning?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/voice-cloning?canceled=true`,
+      success_url: `${origin}/pricing?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/pricing?canceled=true`,
       metadata: {
         userId: user.id,
-        credits: plan.credits,
+        credits: plan.credits.toString(),
         planType: isSubscription ? 'subscription' : 'one-time',
       },
     };

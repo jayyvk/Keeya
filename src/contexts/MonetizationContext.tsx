@@ -15,6 +15,7 @@ interface MonetizationContextType {
   handleManageSubscription: () => void;
   handleAddCredits: () => void;
   refreshCredits: () => Promise<void>;
+  verifyPaymentSuccess: (sessionId: string) => Promise<void>;
 }
 
 const MonetizationContext = createContext<MonetizationContextType | undefined>(undefined);
@@ -36,6 +37,64 @@ export function MonetizationProvider({ children }: { children: ReactNode }) {
       refreshCredits();
     }
   }, [user]);
+
+  // Check for payment success in URL params when component mounts
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const success = urlParams.get('success');
+    const sessionId = urlParams.get('session_id');
+    
+    if (success === 'true' && sessionId && user) {
+      verifyPaymentSuccess(sessionId);
+      
+      // Clean up URL parameters after processing
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    }
+  }, [user]);
+
+  const verifyPaymentSuccess = async (sessionId: string) => {
+    if (!user) return;
+    
+    try {
+      console.log("Verifying payment success for session:", sessionId);
+      setIsProcessingPayment(true);
+      
+      const response = await supabase.functions.invoke('update-credits', {
+        body: { sessionId }
+      });
+      
+      console.log("Credit update response:", response);
+      
+      if (response.error) {
+        console.error("Credit update error:", response.error);
+        toast({
+          title: "Payment verification failed",
+          description: "There was an issue verifying your payment. Please contact support.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      if (response.data?.success) {
+        await refreshCredits();
+        toast({
+          title: "Payment successful!",
+          description: "Your credits have been added to your account.",
+          variant: "default"
+        });
+      }
+    } catch (error) {
+      console.error("Error verifying payment:", error);
+      toast({
+        title: "Payment verification error",
+        description: "There was an issue processing your payment. Please contact support.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
 
   const refreshCredits = async () => {
     if (!user) return;
@@ -175,6 +234,7 @@ export function MonetizationProvider({ children }: { children: ReactNode }) {
         handleManageSubscription,
         handleAddCredits,
         refreshCredits,
+        verifyPaymentSuccess,
       }}
     >
       {children}
