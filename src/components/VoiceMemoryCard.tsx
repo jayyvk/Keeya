@@ -37,30 +37,53 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
   const { toast } = useToast();
   const { deleteRecording } = useRecording();
 
+  // Directly create an audio element that will be visible for debugging
   useEffect(() => {
-    // Create a new audio element
-    const audio = new Audio(recording.audioUrl);
-    audioRef.current = audio;
-
-    // Add event listeners
-    audio.addEventListener('loadeddata', handleAudioLoaded);
-    audio.addEventListener('error', handleAudioError);
-    audio.addEventListener('timeupdate', updateProgress);
-    audio.addEventListener('ended', handleAudioEnd);
+    // Create a new audio element for each recording
+    const audioElement = new Audio();
+    audioElement.crossOrigin = "anonymous"; // Important for CORS issues
+    audioElement.src = recording.audioUrl;
+    audioElement.preload = "auto"; // Ensure audio preloads
+    
+    // Add debug attributes
+    audioElement.id = `audio-${recording.id}`;
+    audioElement.controls = false; // We're using custom controls
+    
+    // Set up event listeners
+    audioElement.addEventListener('loadeddata', handleAudioLoaded);
+    audioElement.addEventListener('error', handleAudioError);
+    audioElement.addEventListener('timeupdate', updateProgress);
+    audioElement.addEventListener('ended', handleAudioEnd);
+    audioElement.addEventListener('canplaythrough', () => {
+      console.log(`Audio can play through: ${recording.audioUrl}`);
+      setAudioLoaded(true);
+    });
+    
+    // Save reference
+    audioRef.current = audioElement;
+    
+    // Load the audio
+    audioElement.load();
+    
+    console.log(`Created audio element for ${recording.title} with URL: ${recording.audioUrl}`);
     
     // Clean up
     return () => {
-      audio.removeEventListener('loadeddata', handleAudioLoaded);
-      audio.removeEventListener('error', handleAudioError);
-      audio.removeEventListener('timeupdate', updateProgress);
-      audio.removeEventListener('ended', handleAudioEnd);
+      audioElement.removeEventListener('loadeddata', handleAudioLoaded);
+      audioElement.removeEventListener('error', handleAudioError);
+      audioElement.removeEventListener('timeupdate', updateProgress);
+      audioElement.removeEventListener('ended', handleAudioEnd);
+      audioElement.removeEventListener('canplaythrough', () => {});
       
       // Pause and reset audio if unmounting while playing
-      if (!audio.paused) {
-        audio.pause();
+      if (!audioElement.paused) {
+        audioElement.pause();
       }
+      
+      // Release the audio element
+      audioRef.current = null;
     };
-  }, [recording.audioUrl]);
+  }, [recording.audioUrl, recording.id, recording.title]);
 
   const handleAudioLoaded = () => {
     setAudioLoaded(true);
@@ -69,10 +92,46 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
   };
 
   const handleAudioError = (e: Event) => {
-    const error = e.target as HTMLAudioElement;
+    console.error("Audio error event:", e);
+    const target = e.target as HTMLAudioElement;
     setAudioLoaded(false);
-    setAudioError(`Error loading audio: ${error.error?.message || 'Unknown error'}`);
-    console.error(`Audio load error for ${recording.audioUrl}:`, error.error);
+    
+    // Get more detailed error information
+    let errorMessage = "Unknown error";
+    if (target && target.error) {
+      switch(target.error.code) {
+        case MediaError.MEDIA_ERR_ABORTED:
+          errorMessage = "Fetching process aborted";
+          break;
+        case MediaError.MEDIA_ERR_NETWORK:
+          errorMessage = "Network error";
+          break;
+        case MediaError.MEDIA_ERR_DECODE:
+          errorMessage = "Decoding error";
+          break;
+        case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+          errorMessage = "Audio format not supported";
+          break;
+        default:
+          errorMessage = `Error code: ${target.error.code}`;
+      }
+    }
+    
+    setAudioError(`Error loading audio: ${errorMessage}`);
+    console.error(`Audio load error for ${recording.audioUrl}:`, errorMessage);
+    
+    // Try to fetch directly to check URL validity
+    fetch(recording.audioUrl, { method: 'HEAD' })
+      .then(response => {
+        console.log(`URL check response: ${response.status} ${response.statusText}`);
+        if (!response.ok) {
+          setAudioError(`URL check failed: ${response.status} ${response.statusText}`);
+        }
+      })
+      .catch(err => {
+        console.error("URL fetch error:", err);
+        setAudioError(`URL fetch error: ${err.message}`);
+      });
   };
 
   const updateProgress = () => {
@@ -101,16 +160,33 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
   };
 
   const togglePlayback = () => {
-    if (!audioRef.current) return;
+    if (!audioRef.current) {
+      console.error("No audio element available");
+      toast({
+        variant: "destructive",
+        title: "Playback Error",
+        description: "Audio player not initialized. Please refresh the page."
+      });
+      return;
+    }
 
+    console.log("Toggle playback. Current state:", isPlaying);
+    
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
+      console.log("Paused audio");
     } else {
       // Try to load the audio again if there was an error
       if (audioError) {
+        console.log("Reloading audio after error");
         audioRef.current.load();
       }
+      
+      // Add more debug logging
+      console.log("Attempting to play audio:", recording.audioUrl);
+      console.log("Audio element readyState:", audioRef.current.readyState);
+      console.log("Audio element duration:", audioRef.current.duration);
       
       const playPromise = audioRef.current.play();
       if (playPromise !== undefined) {
@@ -218,7 +294,7 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
 
         {audioError && (
           <div className="text-red-500 text-xs mt-2">
-            Error loading audio. Please try again.
+            {audioError}
           </div>
         )}
       </div>
