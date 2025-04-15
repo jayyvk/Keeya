@@ -72,6 +72,9 @@ export default {
                     secondary: '#7E69AB',
                     tertiary: '#6E59A5',
                     light: '#D6BCFA'
+                },
+                fontFamily: {
+                    'playfair': ['Playfair Display', 'serif'],
                 }
 			},
 			borderRadius: {

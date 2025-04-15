@@ -3,7 +3,7 @@ import React from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, Wand2 } from "lucide-react";
 import RecordButton from "@/components/RecordButton";
 import RecordingTimer from "@/components/RecordingTimer";
 import AudioWaveform from "@/components/AudioWaveform";
@@ -47,6 +47,10 @@ const Dashboard: React.FC = () => {
         description: "Please try again",
       });
     }
+  };
+
+  const goToVoiceCloning = () => {
+    navigate("/voice-cloning");
   };
 
   return (
@@ -107,6 +111,17 @@ const Dashboard: React.FC = () => {
                   onPause={pauseRecording}
                   onResume={resumeRecording}
                 />
+                
+                <div className="mt-12 text-center">
+                  <Button 
+                    variant="outline" 
+                    onClick={goToVoiceCloning}
+                    className="bg-voicevault-softgray/30 border-voicevault-softpurple hover:bg-voicevault-softgray/50"
+                  >
+                    <Wand2 className="mr-2 h-4 w-4 text-voicevault-primary" />
+                    Voice Cloning Studio
+                  </Button>
+                </div>
               </div>
             )}
           </main>
