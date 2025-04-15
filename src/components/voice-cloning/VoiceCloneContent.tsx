@@ -10,15 +10,16 @@ import AudioSourceSelector from "./AudioSourceSelector";
 import TextEnhancer from "./TextEnhancer";
 import CloneResult from "./CloneResult";
 import VoiceCloneIntro from "./VoiceCloneIntro";
+import CreateVoiceMemoryButton from "./CreateVoiceMemoryButton";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Coins, Info } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
+import CreditDisplay from "./monetization/CreditDisplay";
 
 const VoiceCloneContent: React.FC = () => {
   const { recordings } = useRecording();
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const { credits, refreshCredits } = useMonetization();
+  const { credits, refreshCredits, handleAddCredits, handleManageSubscription } = useMonetization();
   const { user } = useAuth();
   
   const {
@@ -43,6 +44,7 @@ const VoiceCloneContent: React.FC = () => {
   } = useVoiceClone();
 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [generatedAudioUrl, setGeneratedAudioUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -154,30 +156,19 @@ const VoiceCloneContent: React.FC = () => {
 
   return (
     <main className="mx-auto p-4 md:p-6 max-w-4xl">
-      <Card className="mb-8 bg-white/70 border-none shadow-sm">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-2xl md:text-3xl font-bold text-voicevault-tertiary">
-              Voice Cloning Studio
-            </h1>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center bg-white rounded-full px-3 py-1 border border-purple-100 shadow-sm">
-                <Coins className="h-4 w-4 text-voicevault-primary mr-1" />
-                <span className="text-sm font-medium text-voicevault-tertiary">{credits.available}</span>
-                <Info className="h-3 w-3 text-gray-400 ml-1" />
-              </div>
-            </div>
-          </div>
-          <p className="text-gray-600">
-            Preserve the voices you love by creating AI-generated voice memories that sound just like them.
-          </p>
-        </CardContent>
-      </Card>
+      <div className="flex justify-between items-center mb-6">
+        <VoiceCloneIntro />
+        <CreditDisplay 
+          credits={credits}
+          onManageSubscription={handleManageSubscription}
+          onAddCredits={handleAddCredits}
+        />
+      </div>
       
       {!clonedAudioUrl ? (
         <>
           <section className="mb-6 md:mb-8">
-            <h3 className="text-lg md:text-xl font-medium text-voicevault-tertiary mb-4">
+            <h3 className="text-lg md:text-xl font-playfair text-voicevault-tertiary mb-4">
               Select Voice Source
             </h3>
             <AudioSourceSelector 
@@ -198,7 +189,7 @@ const VoiceCloneContent: React.FC = () => {
           
           <section className="mb-6 md:mb-8">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg md:text-xl font-medium text-voicevault-tertiary">
+              <h3 className="text-lg md:text-xl font-playfair text-voicevault-tertiary">
                 What would you like this voice to say?
               </h3>
             </div>
@@ -220,7 +211,7 @@ const VoiceCloneContent: React.FC = () => {
               ${isReadyToClone && hasEnoughCredits && hasEnoughAudio ? 'bg-primary hover:bg-primary/90' : 'bg-gray-300 cursor-not-allowed'} 
               text-white font-medium px-8 py-4 text-lg transition-colors focus-visible:outline-none 
               focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 
-              disabled:opacity-50 ${isReadyToClone && hasEnoughCredits && hasEnoughAudio ? 'shadow-md hover:shadow-lg' : 'opacity-70'}
+              disabled:opacity-50 ${isReadyToClone && hasEnoughCredits && hasEnoughAudio ? 'animate-pulse' : 'opacity-70'}
               ${isMobile ? 'w-full' : ''}`}
               onClick={handleGenerateVoice}
               disabled={!isReadyToClone || !hasEnoughCredits || !hasEnoughAudio || isProcessing}

@@ -6,15 +6,16 @@ import VoiceCloneContent from "@/components/voice-cloning/VoiceCloneContent";
 import CommonHeader from "@/components/CommonHeader";
 import { motion } from "framer-motion";
 import { MonetizationProvider } from "@/contexts/MonetizationContext";
-import { Toaster } from "@/components/ui/sonner";
+import CreditDisplay from "@/components/voice-cloning/monetization/CreditDisplay";
 import { useMonetization } from "@/contexts/MonetizationContext";
+import { Toaster } from "@/components/ui/sonner";
 
 const VoiceCloning: React.FC = () => {
   return (
     <SidebarProvider>
       <MonetizationProvider>
         <motion.div 
-          className="min-h-screen w-full bg-voicevault-softpurple/30 flex"
+          className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -23,7 +24,23 @@ const VoiceCloning: React.FC = () => {
           <DashboardSidebar />
           
           <div className="flex-1 flex flex-col overflow-hidden">
-            <CommonHeader title="Voice Cloning Studio" />
+            <div className="bg-gradient-to-b from-voicevault-softpurple to-transparent">
+              <div className="flex justify-between items-center px-6 py-4">
+                <CommonHeader title="Voice Cloning Studio" />
+                <div className="flex items-center">
+                  <CreditDisplay 
+                    credits={{
+                      available: 0,  // This is a placeholder, will be updated by the context
+                      subscription: null,
+                      subscriptionEndsAt: null
+                    }}
+                    onManageSubscription={() => {}}
+                    onAddCredits={() => {}}
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="flex-1 overflow-y-auto">
               <VoiceCloneContent />
             </div>
