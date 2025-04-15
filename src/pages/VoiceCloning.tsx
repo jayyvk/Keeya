@@ -24,7 +24,7 @@ const VoiceCloning: React.FC = () => {
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="bg-gradient-to-b from-voicevault-softpurple to-transparent">
               <div className="flex justify-between items-center px-6 py-4">
-                <CommonHeader title="Voice Cloning Studio" />
+                <CommonHeader />
               </div>
             </div>
 
