@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useMonetization } from "@/contexts/MonetizationContext";
@@ -51,7 +50,7 @@ const VoiceCloneContent: React.FC = () => {
   const textToUse = activeTab === "enhanced" ? enhancedText : inputText;
   const isReadyToClone = selectedSources.length > 0 && textToUse.trim().length > 0;
   const hasEnoughCredits = credits.available > 0;
-  const hasEnoughAudio = totalSelectedDuration >= 60;
+  const hasEnoughAudio = totalSelectedDuration >= 30;
 
   const handleGenerateVoice = async () => {
     if (!isReadyToClone || !hasEnoughCredits || !hasEnoughAudio) {
@@ -65,8 +64,8 @@ const VoiceCloneContent: React.FC = () => {
       } else if (!hasEnoughAudio) {
         toast({
           title: "Insufficient audio",
-          description: "You need at least 60 seconds of audio for voice cloning.",
-          variant: "destructive",
+          description: "You need at least 30 seconds of audio for voice cloning. 1 minute is recommended.",
+          variant: "warning",
         });
       }
       return;
@@ -75,7 +74,6 @@ const VoiceCloneContent: React.FC = () => {
     setIsProcessing(true);
 
     try {
-      // Get the URL of the first selected recording
       const referenceAudio = selectedSources[0];
       if (!referenceAudio || !referenceAudio.audioUrl) {
         throw new Error("No reference audio selected");
@@ -96,8 +94,6 @@ const VoiceCloneContent: React.FC = () => {
       }
 
       if (response.data?.output) {
-        // For demo purposes, to avoid actual API calls:
-        // Set a short timeout to simulate API processing
         setClonedAudioUrl(response.data.output);
         toast({
           title: "Voice cloned successfully",
@@ -192,7 +188,7 @@ const VoiceCloneContent: React.FC = () => {
             )}
             {!hasEnoughAudio && hasEnoughCredits && (
               <p className="text-amber-500 font-medium">
-                You need at least 60 seconds of audio for voice cloning.
+                At least 30 seconds of audio is needed (1 minute recommended).
               </p>
             )}
             <p>
