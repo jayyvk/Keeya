@@ -167,13 +167,13 @@ const VoiceCloneContent: React.FC = () => {
       >
         <AlertTriangle className="text-amber-500 mt-1 flex-shrink-0" size={24} />
         <div>
-          <h3 className="font-bold text-base mb-2">⚠️ Voice Engine Notice</h3>
+          <h3 className="font-bold text-base mb-2">Voice Engine Notice</h3>
           <p className="text-sm text-gray-700">
             We're currently using our own lightweight voice engine to generate cloned voices. 
             ElevenLabs integration is coming soon for ultra-realistic voice memories.
           </p>
           <p className="text-sm text-gray-500 mt-2">
-            Thanks for being part of the early access — your feedback helps us improve. 💛
+            Thanks for being part of the early access — your feedback helps us improve. 💜
           </p>
         </div>
       </div>
