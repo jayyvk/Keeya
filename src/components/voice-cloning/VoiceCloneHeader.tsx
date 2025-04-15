@@ -3,11 +3,9 @@ import React from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router-dom";
 
-interface VoiceCloneHeaderProps {
-  userName?: string;
-}
+interface VoiceCloneHeaderProps {}
 
-const VoiceCloneHeader: React.FC<VoiceCloneHeaderProps> = ({ userName }) => {
+const VoiceCloneHeader: React.FC<VoiceCloneHeaderProps> = () => {
   const navigate = useNavigate();
 
   const handleHeaderClick = () => {
@@ -24,11 +22,6 @@ const VoiceCloneHeader: React.FC<VoiceCloneHeaderProps> = ({ userName }) => {
         >
           VoiceVault
         </h1>
-      </div>
-      <div className="flex items-center gap-4">
-        <span className="text-sm text-gray-600">
-          Hello, {userName || 'there'}
-        </span>
       </div>
     </header>
   );
