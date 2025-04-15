@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { Play, Pause, Clock, Calendar, Tag, Trash2, SkipBack, SkipForward } from "lucide-react";
 import { Recording } from "@/types";
@@ -253,6 +254,7 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
     }
 
     try {
+      // Fixed: Using proper Promise handling with async/await
       await deleteRecording(recording.id);
       setIsDeleting(false);
       setDeleteConfirmation("");
