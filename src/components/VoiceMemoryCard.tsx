@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { Play, Pause, Clock, Calendar, Tag, Trash2, SkipBack, SkipForward } from "lucide-react";
 import { Recording } from "@/types";
@@ -6,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRecording } from "@/contexts/RecordingContext";
+import { generateRandomWord } from "@/utils/randomWord";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -30,12 +30,22 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [password, setPassword] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [deleteWord, setDeleteWord] = useState("");
   const [audioLoaded, setAudioLoaded] = useState(false);
   const [audioError, setAudioError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
   const { deleteRecording } = useRecording();
+
+  // Generate a random word when delete dialog opens
+  useEffect(() => {
+    if (isDeleting) {
+      setDeleteWord(generateRandomWord(10));
+      setDeleteConfirmation("");
+    }
+  }, [isDeleting]);
 
   // Create an audio element for this recording
   useEffect(() => {
@@ -219,34 +229,28 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
   };
 
   const handleDelete = async () => {
-    try {
-      // Verify password
-      const { error } = await supabase.auth.signInWithPassword({
-        email: user?.email || "",
-        password: password
+    if (deleteConfirmation !== deleteWord) {
+      toast({
+        variant: "destructive",
+        title: "Invalid confirmation",
+        description: "The confirmation word does not match. Please try again.",
       });
+      return;
+    }
 
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Invalid password",
-          description: "Please enter the correct password to delete this recording"
-        });
-        return;
-      }
-
-      // Delete the recording
+    try {
       await deleteRecording(recording.id);
-      
-      // Reset state
       setIsDeleting(false);
-      setPassword("");
-      
+      setDeleteConfirmation("");
+      toast({
+        title: "Success",
+        description: "Voice memory deleted successfully",
+      });
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to delete the recording. Please try again."
+        description: "Failed to delete the recording. Please try again.",
       });
     }
   };
@@ -337,29 +341,33 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete Voice Memory</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. Please enter your password to confirm deletion.
+                      <AlertDialogDescription className="space-y-4">
+                        <p>This action cannot be undone. Please enter this word to confirm deletion:</p>
+                        <div className="p-2 bg-gray-100 rounded font-mono text-center text-lg">
+                          {deleteWord}
+                        </div>
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <div className="mt-4">
                       <Input
-                        type="password"
-                        placeholder="Enter your password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        type="text"
+                        placeholder="Enter the confirmation word"
+                        value={deleteConfirmation}
+                        onChange={(e) => setDeleteConfirmation(e.target.value)}
+                        className="font-mono"
                       />
                     </div>
                     <AlertDialogFooter className="mt-4">
                       <AlertDialogCancel onClick={() => {
                         setIsDeleting(false);
-                        setPassword("");
+                        setDeleteConfirmation("");
                       }}>
                         Cancel
                       </AlertDialogCancel>
                       <Button
                         variant="destructive"
                         onClick={handleDelete}
-                        disabled={!password}
+                        disabled={!deleteConfirmation}
                       >
                         Delete
                       </Button>
