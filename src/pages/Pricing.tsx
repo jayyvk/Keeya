@@ -12,7 +12,7 @@ const Pricing: React.FC = () => {
         <DashboardSidebar />
         
         <div className="flex-1 overflow-x-hidden">
-          <CommonHeader title="Buy Voice Credits" />
+          <CommonHeader title="Pricing Plans" />
           <PricingCards />
         </div>
       </div>
