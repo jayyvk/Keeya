@@ -4,6 +4,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "./use-toast";
 
+type PlanId = 'starter' | 'pro' | 'family';
+
 export function useCredits() {
   const { user } = useAuth();
   const [credits, setCredits] = useState<number | null>(null);
@@ -38,7 +40,7 @@ export function useCredits() {
     }
   };
 
-  const handlePayment = async (planId: 'starter' | 'pro' | 'family') => {
+  const handlePayment = async (planId: PlanId) => {
     try {
       const response = await supabase.functions.invoke('create-checkout', {
         body: { planId },

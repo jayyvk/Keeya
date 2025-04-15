@@ -12,10 +12,11 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
   apiVersion: "2023-10-16",
 });
 
+// Updated plans to match the pricing page
 const PLANS = {
-  starter: { price: 100, credits: 8 },
-  pro: { price: 300, credits: 30 },
-  family: { price: 500, credits: 60 },
+  starter: { price: 100, credits: 8 },   // Trial plan - one-time payment
+  pro: { price: 1000, credits: 80 },     // Basic plan - $10/month for 80 credits
+  family: { price: 2000, credits: 200 }  // Premium plan - $20/month for 200 credits
 };
 
 serve(async (req) => {
@@ -44,29 +45,36 @@ serve(async (req) => {
     const { data: { user }, error: userError } = await supabase.auth.getUser(token);
     if (userError || !user) throw new Error("Unauthorized");
 
-    const session = await stripe.checkout.sessions.create({
+    // Determine if this is a subscription or one-time payment
+    const isSubscription = planId !== 'starter';
+    
+    const sessionConfig = {
       payment_method_types: ["card"],
       line_items: [
         {
           price_data: {
             currency: "usd",
             product_data: {
-              name: `${planId.charAt(0).toUpperCase() + planId.slice(1)} Credits`,
-              description: `${plan.credits} voice generation credits`,
+              name: `${planId === 'starter' ? 'Trial' : planId === 'pro' ? 'Basic' : 'Premium'} Plan`,
+              description: `${plan.credits} voice generation credits${isSubscription ? '/month' : ''}`,
             },
             unit_amount: plan.price,
+            ...(isSubscription && { recurring: { interval: "month" } }),
           },
           quantity: 1,
         },
       ],
-      mode: "payment",
+      mode: isSubscription ? "subscription" : "payment",
       success_url: `${req.headers.get("origin")}/voice-cloning?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/voice-cloning?canceled=true`,
       metadata: {
         userId: user.id,
         credits: plan.credits,
+        planType: isSubscription ? 'subscription' : 'one-time',
       },
-    });
+    };
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

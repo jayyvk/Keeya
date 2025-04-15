@@ -40,7 +40,7 @@ export function PricingCards() {
             <Button 
               className="w-full" 
               variant="outline"
-              onClick={() => handlePayment('trial')}
+              onClick={() => handlePayment('starter')}
             >
               <Star className="w-4 h-4 mr-2" />
               Get Started
@@ -67,7 +67,7 @@ export function PricingCards() {
           <CardFooter>
             <Button 
               className="w-full" 
-              onClick={() => handlePayment('basic')}
+              onClick={() => handlePayment('pro')}
             >
               <CreditCard className="w-4 h-4 mr-2" />
               Subscribe Monthly
@@ -89,7 +89,7 @@ export function PricingCards() {
             <Button 
               className="w-full" 
               variant="outline"
-              onClick={() => handlePayment('premium')}
+              onClick={() => handlePayment('family')}
             >
               <Users className="w-4 h-4 mr-2" />
               Subscribe Monthly
