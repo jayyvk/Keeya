@@ -1,9 +1,11 @@
+
 import React from "react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, CreditCard, Users } from "lucide-react";
 import { useMonetization } from "@/contexts/MonetizationContext";
+import { PaymentType } from "@/types";
 
 export function PricingCards() {
   const { credits, handlePurchase } = useMonetization();

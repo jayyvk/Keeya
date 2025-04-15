@@ -24,4 +24,4 @@ export interface Credits {
 
 export type SubscriptionTier = 'none' | 'basic' | 'premium';
 
-export type PaymentType = 'one-time' | 'subscription';
+export type PaymentType = 'one-time' | 'subscription' | 'starter' | 'pro' | 'family';
