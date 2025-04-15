@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -75,8 +76,8 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col justify-center overflow-hidden">
-              <main className="container mx-auto px-6 max-w-md flex-1 flex flex-col justify-center items-center space-y-8">
+            <div className="flex-1 flex flex-col justify-center items-center overflow-hidden">
+              <main className="container mx-auto px-6 max-w-md flex-1 flex flex-col justify-center items-center">
                 {recordingStatus === "reviewing" && currentRecording ? (
                   <RecordingReview 
                     recordingBlob={currentRecording} 
