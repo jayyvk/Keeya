@@ -14,7 +14,6 @@ import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { toast } from "sonner";
 import CommonHeader from "@/components/CommonHeader";
 import { MonetizationProvider } from "@/contexts/MonetizationContext";
-
 const Dashboard: React.FC = () => {
   const {
     recordings,
@@ -33,7 +32,6 @@ const Dashboard: React.FC = () => {
     logout
   } = useAuth();
   const navigate = useNavigate();
-  
   const handleLogout = async () => {
     try {
       await logout();
@@ -46,17 +44,17 @@ const Dashboard: React.FC = () => {
       navigate("/auth");
       toast("Error during logout", {
         description: "You've been signed out anyway",
-        style: { backgroundColor: 'red', color: 'white' }
+        style: {
+          backgroundColor: 'red',
+          color: 'white'
+        }
       });
     }
   };
-  
   const goToVoiceCloning = () => {
     navigate("/voice-cloning");
   };
-  
-  return (
-    <SidebarProvider>
+  return <SidebarProvider>
       <MonetizationProvider>
         <div className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex">
           <DashboardSidebar />
@@ -76,16 +74,8 @@ const Dashboard: React.FC = () => {
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col overflow-hidden">
-              <main className="container mx-auto p-6 pt-10 max-w-md flex-1 flex flex-col">
-                {recordingStatus === "reviewing" && currentRecording ? (
-                  <RecordingReview 
-                    recordingBlob={currentRecording} 
-                    duration={recordingTime} 
-                    onSave={saveRecording} 
-                    onDiscard={discardRecording} 
-                  />
-                ) : (
-                  <div className="flex-1 flex flex-col items-center justify-center">
+              <main className="container mx-auto p-6 pt-10 max-w-md flex-1 flex flex-col py-0 px-0">
+                {recordingStatus === "reviewing" && currentRecording ? <RecordingReview recordingBlob={currentRecording} duration={recordingTime} onSave={saveRecording} onDiscard={discardRecording} /> : <div className="flex-1 flex flex-col items-center justify-center my-0 py-0">
                     <div className="text-center mb-8">
                       <h2 className="text-2xl font-semibold text-voicevault-tertiary mb-2">
                         Record a Voice Memory
@@ -99,26 +89,15 @@ const Dashboard: React.FC = () => {
                     
                     <AudioWaveform status={recordingStatus} />
                     
-                    <RecordButton 
-                      status={recordingStatus} 
-                      onStart={startRecording} 
-                      onStop={stopRecording} 
-                      onPause={pauseRecording} 
-                      onResume={resumeRecording} 
-                    />
+                    <RecordButton status={recordingStatus} onStart={startRecording} onStop={stopRecording} onPause={pauseRecording} onResume={resumeRecording} />
                     
                     <div className="mt-12 text-center">
-                      <Button 
-                        variant="outline" 
-                        onClick={goToVoiceCloning} 
-                        className="bg-voicevault-softgray/30 border-voicevault-softpurple hover:bg-voicevault-softgray/50"
-                      >
+                      <Button variant="outline" onClick={goToVoiceCloning} className="bg-voicevault-softgray/30 border-voicevault-softpurple hover:bg-voicevault-softgray/50">
                         <Wand2 className="mr-2 h-4 w-4 text-voicevault-primary" />
                         Voice Cloning Studio
                       </Button>
                     </div>
-                  </div>
-                )}
+                  </div>}
               </main>
               
               {/* Audio Vault */}
@@ -129,8 +108,6 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </MonetizationProvider>
-    </SidebarProvider>
-  );
+    </SidebarProvider>;
 };
-
 export default Dashboard;
