@@ -1,17 +1,12 @@
-
 import React from "react";
-
 const VoiceCloneIntro: React.FC = () => {
-  return (
-    <div className="mb-6 md:mb-8">
-      <h2 className="text-xl md:text-2xl font-semibold text-voicevault-tertiary mb-2 font-playfair">
+  return <div className="mb-6 md:mb-8">
+      <h2 className="text-xl md:text-2xl font-semibold text-voicevault-tertiary mb-2 font-playfair text-center">
         Voice Cloning Studio
       </h2>
-      <p className="text-sm md:text-base text-gray-600">
+      <p className="text-sm md:text-base text-gray-600 text-center">
         Preserve the voices you love by creating AI-generated voice memories that sound just like them.
       </p>
-    </div>
-  );
+    </div>;
 };
-
 export default VoiceCloneIntro;
