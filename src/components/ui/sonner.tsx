@@ -1,3 +1,4 @@
+
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, toast } from "sonner"
 
@@ -10,6 +11,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
+      duration={2000} // Reduce duration to 2 seconds (2000 milliseconds)
       toastOptions={{
         classNames: {
           toast:
@@ -27,3 +29,4 @@ const Toaster = ({ ...props }: ToasterProps) => {
 }
 
 export { Toaster, toast }
+
