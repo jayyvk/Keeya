@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { SignupForm } from "@/components/auth/SignupForm";
+import { toast } from "@/components/ui/sonner";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -17,11 +18,10 @@ const Auth = () => {
   useEffect(() => {
     console.log("Auth page - Authentication status:", { isAuthenticated, user });
     
-    if (isAuthenticated) {
+    if (isAuthenticated && user) {
       console.log("User is authenticated, redirecting to dashboard");
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 100); // Add a slight delay to ensure state is fully updated
+      toast.success(`Welcome back, ${user.name || 'there'}!`);
+      navigate("/dashboard", { replace: true });
     }
   }, [isAuthenticated, navigate, user]);
 

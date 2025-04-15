@@ -21,26 +21,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         console.log("Auth state changed:", event, session ? "session exists" : "no session");
         
         if (session?.user) {
           // Fetch the user's profile
-          const { data: profile } = await supabase
+          supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
-            .single();
-
-          const userData = {
-            id: session.user.id,
-            name: profile?.display_name || session.user.user_metadata.name || "",
-            email: session.user.email || "",
-          };
-          
-          console.log("Setting user data:", userData);
-          setUser(userData);
-          console.log("User set after auth state change");
+            .single()
+            .then(({ data: profile, error }) => {
+              if (error) {
+                console.error("Error fetching profile:", error);
+              }
+              
+              const userData = {
+                id: session.user.id,
+                name: profile?.display_name || session.user.user_metadata.name || "",
+                email: session.user.email || "",
+              };
+              
+              console.log("Setting user data after auth state change:", userData);
+              setUser(userData);
+            });
         } else {
           setUser(null);
           console.log("User set to null after auth state change");
@@ -59,7 +63,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .select('*')
           .eq('id', session.user.id)
           .single()
-          .then(({ data: profile }) => {
+          .then(({ data: profile, error }) => {
+            if (error) {
+              console.error("Error fetching profile:", error);
+            }
+            
             const userData = {
               id: session.user.id,
               name: profile?.display_name || session.user.user_metadata.name || "",
@@ -68,7 +76,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             
             console.log("Setting initial user data:", userData);
             setUser(userData);
-            console.log("User set after initial session check");
           });
       }
     });
@@ -90,6 +97,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error("Login error:", error.message);
       throw error;
     }
+    
+    console.log("Login API call successful, session:", data.session ? "exists" : "none");
     
     if (data.user) {
       console.log("Login successful for user:", data.user.id);

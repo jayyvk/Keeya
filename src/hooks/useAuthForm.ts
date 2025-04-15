@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/components/ui/sonner";
 
@@ -9,7 +8,6 @@ interface UseAuthFormProps {
 }
 
 export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
-  const navigate = useNavigate();
   const { login, register } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -37,16 +35,15 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
       if (isLogin) {
         console.log("Attempting to login with:", { email });
         await login(email, password);
+        console.log("Login successful, Auth component will handle redirect");
         toast.success("Logged in successfully!");
-        console.log("Login successful, redirecting to dashboard");
-        // Let the Auth component handle the navigation based on auth state
       } else {
         console.log("Attempting to register with:", { name, email });
         await register(name, email, password);
+        console.log("Registration successful, Auth component will handle redirect");
         toast.success("Account created successfully!");
-        console.log("Registration successful, redirecting to dashboard");
-        // Let the Auth component handle the navigation based on auth state
       }
+      // The Auth component's useEffect will handle the redirection
     } catch (err: any) {
       console.error(isLogin ? "Login error:" : "Registration error:", err);
       setError(err.message || `${isLogin ? "Login" : "Registration"} failed`);
