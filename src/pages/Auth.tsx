@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const Auth: React.FC = () => {
   const navigate = useNavigate();
+  const { login, register, isAuthenticated } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,16 +28,12 @@ const Auth: React.FC = () => {
   
   const [error, setError] = useState("");
 
+  // Redirect if user is already authenticated
   useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate("/dashboard");
-      }
-    };
-
-    checkSession();
-  }, [navigate]);
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSignUp = async () => {
     setIsLoading(true);
@@ -50,22 +46,9 @@ const Auth: React.FC = () => {
     }
 
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name,
-            purpose,
-            recording_frequency: recordingFrequency,
-            terms_accepted: agreeToTerms
-          }
-        }
-      });
-      
-      if (error) throw error;
-      
-      toast.success("Account created successfully! Please check your email to verify.");
+      // Use the register function from AuthContext
+      await register(name, email, password);
+      toast.success("Account created successfully!");
       navigate("/dashboard");
     } catch (err: any) {
       setError(err.message || "Registration failed");
@@ -86,13 +69,8 @@ const Auth: React.FC = () => {
     }
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (error) throw error;
-      
+      // Use the login function from AuthContext
+      await login(email, password);
       toast.success("Logged in successfully!");
       navigate("/dashboard");
     } catch (err: any) {
