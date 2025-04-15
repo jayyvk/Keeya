@@ -33,6 +33,14 @@ const CloneResult: React.FC<CloneResultProps> = ({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
+  const formatTime = (time: number) => {
+    if (!time || isNaN(time)) return "0:00";
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    const roundedSeconds = Number((time % 60).toFixed(2));
+    return `${minutes}:${roundedSeconds.toLocaleString('en-US', {minimumIntegerDigits: 2, minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+  };
+
   useEffect(() => {
     console.log(`Initializing audio for CloneResult: ${audioUrl}`);
     const audio = new Audio();

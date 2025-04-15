@@ -277,6 +277,13 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
     }
   };
 
+  const formatTime = (time: number) => {
+    if (!time || isNaN(time)) return "0:00";
+    const minutes = Math.floor(time / 60);
+    const seconds = Number((time % 60).toFixed(2));
+    return `${minutes}:${seconds.toLocaleString('en-US', {minimumIntegerDigits: 2, minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden border border-voicevault-softpurple transition-all hover:shadow-lg hover:border-voicevault-primary">
       <div className="bg-gradient-to-r from-voicevault-softpurple to-voicevault-softpink p-4">
@@ -359,7 +366,7 @@ const VoiceMemoryCard: React.FC<VoiceMemoryCardProps> = ({ recording }) => {
             </div>
             <div className="flex items-center">
               <Clock size={14} className="mr-1" />
-              <span>{Math.floor(currentTime)}s / {Math.floor(recording.duration)}s</span>
+              <span>{formatTime(currentTime)} / {formatTime(recording.duration)}</span>
             </div>
           </div>
           
