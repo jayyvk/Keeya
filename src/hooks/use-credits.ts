@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "./use-toast";
@@ -11,23 +11,40 @@ export function useCredits() {
   const [credits, setCredits] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isRefreshingRef = useRef(false);
 
   useEffect(() => {
     if (user) {
       fetchCredits();
     }
+    
+    return () => {
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+      }
+    };
   }, [user]);
 
   const fetchCredits = async () => {
+    // Prevent multiple simultaneous refresh calls
+    if (isRefreshingRef.current) return;
+    
     try {
+      isRefreshingRef.current = true;
+      setIsLoading(true);
+      
       const { data, error } = await supabase
         .from('user_credits')
         .select('credits_balance')
         .eq('user_id', user?.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      setCredits(data.credits_balance);
+      
+      if (data) {
+        setCredits(data.credits_balance);
+      }
     } catch (error) {
       console.error('Error fetching credits:', error);
       toast({
@@ -37,6 +54,12 @@ export function useCredits() {
       });
     } finally {
       setIsLoading(false);
+      isRefreshingRef.current = false;
+      
+      // Debounce multiple rapid refresh calls
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+      }
     }
   };
 
@@ -60,10 +83,21 @@ export function useCredits() {
     }
   };
 
+  // Debounced refresh function to prevent multiple rapid calls
+  const refreshCredits = () => {
+    if (refreshTimeoutRef.current) {
+      clearTimeout(refreshTimeoutRef.current);
+    }
+    
+    refreshTimeoutRef.current = setTimeout(() => {
+      fetchCredits();
+    }, 300);
+  };
+
   return {
     credits,
     isLoading,
     handlePayment,
-    refreshCredits: fetchCredits,
+    refreshCredits,
   };
 }

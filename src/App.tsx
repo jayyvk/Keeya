@@ -14,7 +14,16 @@ import VoiceCloning from "./pages/VoiceCloning";
 import Pricing from "./pages/Pricing";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+// Configure the query client with proper settings
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      staleTime: 30000, // 30 seconds
+      retry: 1,
+    },
+  },
+});
 
 const AnimatedRoutes = () => {
   const location = useLocation();
