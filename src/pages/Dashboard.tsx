@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -60,20 +61,22 @@ const Dashboard: React.FC = () => {
         
         <div className="flex-1">
           {/* Header */}
-          <div className="bg-white p-4 flex justify-between items-center">
-            <CommonHeader />
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">
-                Hello, {user?.name || 'there'}
-              </span>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={handleLogout}
-                className="text-gray-500 hover:text-red-500"
-              >
-                <LogOut size={16} />
-              </Button>
+          <div className="bg-gradient-to-b from-voicevault-softpurple to-transparent">
+            <div className="flex justify-between items-center px-6 py-4">
+              <CommonHeader />
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-gray-600">
+                  Hello, {user?.name || 'there'}
+                </span>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleLogout}
+                  className="text-gray-500 hover:text-red-500"
+                >
+                  <LogOut size={16} />
+                </Button>
+              </div>
             </div>
           </div>
 
