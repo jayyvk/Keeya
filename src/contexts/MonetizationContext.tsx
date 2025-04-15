@@ -117,10 +117,10 @@ export function MonetizationProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    setIsProcessingPayment(true);
-    console.log("Starting payment process for plan:", type);
-    
     try {
+      setIsProcessingPayment(true);
+      console.log("Starting payment process for plan:", type);
+      
       const response = await supabase.functions.invoke('create-checkout', {
         body: { planId: type }
       });
@@ -129,7 +129,7 @@ export function MonetizationProvider({ children }: { children: ReactNode }) {
       
       if (response.error) {
         console.error("Checkout error:", response.error);
-        throw response.error;
+        throw new Error(response.error);
       }
       
       if (response.data?.url) {
@@ -141,11 +141,13 @@ export function MonetizationProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       console.error('Payment error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Could not initiate payment';
       toast({
         title: "Payment Error",
-        description: "Could not initiate payment. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
+    } finally {
       setIsProcessingPayment(false);
     }
   };

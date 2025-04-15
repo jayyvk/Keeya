@@ -3,16 +3,28 @@ import React from "react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, CreditCard, Users } from "lucide-react";
+import { Star, CreditCard, Users, Loader2 } from "lucide-react";
 import { useMonetization } from "@/contexts/MonetizationContext";
 import { PaymentType } from "@/types";
+import { useToast } from "@/hooks/use-toast";
 
 export function PricingCards() {
   const { credits, handlePurchase, isProcessingPayment } = useMonetization();
+  const { toast } = useToast();
 
   const onPurchaseClick = (planType: PaymentType) => {
     console.log(`Initiating purchase for plan: ${planType}`);
-    handlePurchase(planType);
+    
+    try {
+      handlePurchase(planType);
+    } catch (error) {
+      console.error("Error in purchase click handler:", error);
+      toast({
+        title: "Error",
+        description: "Failed to initiate payment process. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -47,8 +59,17 @@ export function PricingCards() {
               onClick={() => onPurchaseClick('starter')}
               disabled={isProcessingPayment}
             >
-              <Star className="w-4 h-4 mr-2" />
-              {isProcessingPayment ? 'Processing...' : 'Get Started'}
+              {isProcessingPayment ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <Star className="w-4 h-4 mr-2" />
+                  Get Started
+                </>
+              )}
             </Button>
           </CardFooter>
         </Card>
@@ -75,8 +96,17 @@ export function PricingCards() {
               onClick={() => onPurchaseClick('pro')}
               disabled={isProcessingPayment}
             >
-              <CreditCard className="w-4 h-4 mr-2" />
-              {isProcessingPayment ? 'Processing...' : 'Subscribe Monthly'}
+              {isProcessingPayment ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Subscribe Monthly
+                </>
+              )}
             </Button>
           </CardFooter>
         </Card>
@@ -98,8 +128,17 @@ export function PricingCards() {
               onClick={() => onPurchaseClick('family')}
               disabled={isProcessingPayment}
             >
-              <Users className="w-4 h-4 mr-2" />
-              {isProcessingPayment ? 'Processing...' : 'Subscribe Monthly'}
+              {isProcessingPayment ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <Users className="w-4 h-4 mr-2" />
+                  Subscribe Monthly
+                </>
+              )}
             </Button>
           </CardFooter>
         </Card>
@@ -107,6 +146,7 @@ export function PricingCards() {
 
       <div className="text-center mt-6">
         <p className="text-sm text-gray-500">Credits roll over each month for active subscriptions</p>
+        <p className="text-sm text-gray-400 mt-2">Use test card 4242 4242 4242 4242 with any future expiry date and CVC</p>
       </div>
     </div>
   );
