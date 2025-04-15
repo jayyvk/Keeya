@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -59,12 +60,12 @@ const Dashboard: React.FC = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen w-full bg-soft-gradient">
+      <div className="min-h-screen w-full bg-soft-gradient flex">
         <DashboardSidebar />
         
-        <div className="flex-1 flex flex-col min-h-screen">
+        <div className="flex-1 flex flex-col min-h-screen w-full">
           {/* Header */}
-          <div className="bg-gradient-to-b from-voicevault-softpurple to-transparent">
+          <div className="bg-gradient-to-b from-voicevault-softpurple to-transparent w-full">
             <div className="container flex justify-between items-center py-4">
               <CommonHeader />
               <div className="flex items-center gap-compact">
@@ -74,14 +75,14 @@ const Dashboard: React.FC = () => {
                   onClick={handleLogout} 
                   className="text-gray-500 hover:text-red-500"
                 >
-                  <LogOut size={16} />
+                  <LogOut size={20} />
                 </Button>
               </div>
             </div>
           </div>
 
           {/* Main Content */}
-          <main className="container flex-1 flex flex-col items-center justify-center py-section max-w-md mx-auto">
+          <main className="container flex-1 flex flex-col items-center justify-center py-section mx-auto">
             {recordingStatus === "reviewing" && currentRecording ? (
               <RecordingReview 
                 recordingBlob={currentRecording} 
@@ -92,10 +93,10 @@ const Dashboard: React.FC = () => {
             ) : (
               <div className="w-full flex flex-col items-center justify-center">
                 <div className="text-center mb-8 px-4">
-                  <h2 className="text-header font-semibold text-voicevault-tertiary mb-2">
+                  <h2 className="text-2xl md:text-3xl font-semibold text-voicevault-tertiary mb-4">
                     Record a Voice Memory
                   </h2>
-                  <p className="text-gray-600 max-w-xs mx-auto">
+                  <p className="text-gray-600 text-lg max-w-md mx-auto">
                     Tap the microphone to start recording your precious voice memories
                   </p>
                 </div>
@@ -114,9 +115,9 @@ const Dashboard: React.FC = () => {
                   <Button 
                     variant="outline" 
                     onClick={goToVoiceCloning}
-                    className="w-full md:w-auto bg-white/50 border-voicevault-softpurple hover:bg-voicevault-softgray/50"
+                    className="w-full md:w-auto bg-white/50 border-voicevault-softpurple hover:bg-voicevault-softgray/50 text-base"
                   >
-                    <Wand2 className="mr-2 h-4 w-4 text-voicevault-primary" />
+                    <Wand2 className="mr-2 h-5 w-5 text-voicevault-primary" />
                     Voice Cloning Studio
                   </Button>
                 </div>

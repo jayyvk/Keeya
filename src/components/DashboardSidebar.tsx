@@ -51,8 +51,8 @@ export function DashboardSidebar() {
                     onClick={() => handleMenuItemClick(item.url)} 
                     className="text-gray-500 hover:text-voicevault-primary hover:bg-voicevault-softgray/50"
                   >
-                    <a href={item.url}>
-                      <item.icon className="text-gray-500 hover:text-voicevault-primary" />
+                    <a href={item.url} className="text-base md:text-lg">
+                      <item.icon className="text-gray-500 hover:text-voicevault-primary h-5 w-5 md:h-6 md:w-6" />
                       <span className="font-medium">{item.title}</span>
                     </a>
                   </SidebarMenuButton>
