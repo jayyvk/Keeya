@@ -2,7 +2,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import "https://deno.land/x/xhr@0.1.0/mod.ts"
 
-const GEMINI_API_KEY = "AIzaSyDlQ8TkKQERzgf3deXT_-0lGiIubd-FWNQ";
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
 const MODEL_NAME = "gemini-pro";
 
 const corsHeaders = {
@@ -17,6 +17,10 @@ serve(async (req) => {
   }
 
   try {
+    if (!GEMINI_API_KEY) {
+      throw new Error('Gemini API key not configured');
+    }
+
     const { text } = await req.json();
 
     if (!text) {
