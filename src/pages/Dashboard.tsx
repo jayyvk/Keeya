@@ -60,7 +60,7 @@ const Dashboard: React.FC = () => {
         
         <div className="flex-1">
           {/* Header */}
-          <header className="bg-white shadow-sm p-4 flex justify-between items-center">
+          <div className="bg-white p-4 flex justify-between items-center">
             <CommonHeader />
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-600">
@@ -75,7 +75,7 @@ const Dashboard: React.FC = () => {
                 <LogOut size={16} />
               </Button>
             </div>
-          </header>
+          </div>
 
           {/* Main Content */}
           <main className="container mx-auto p-6 pt-10 max-w-md">

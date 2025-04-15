@@ -15,7 +15,7 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({ title }) => {
   };
 
   return (
-    <div className="flex justify-between items-center px-4 py-4 border-b bg-white w-full">
+    <div className="flex justify-between items-center px-4 py-4 bg-white w-full">
       <div className="flex items-center gap-4">
         <SidebarTrigger />
         <h1 
