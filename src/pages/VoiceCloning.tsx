@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { Suspense } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import VoiceCloneContent from "@/components/voice-cloning/VoiceCloneContent";
@@ -23,7 +23,9 @@ const VoiceCloning: React.FC = () => {
             </div>
 
             <div className="flex-1 overflow-y-auto">
-              <VoiceCloneContent />
+              <Suspense fallback={<div className="p-8 text-center">Loading voice tools...</div>}>
+                <VoiceCloneContent />
+              </Suspense>
             </div>
           </div>
           <Toaster />

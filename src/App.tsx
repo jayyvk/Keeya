@@ -14,13 +14,14 @@ import VoiceCloning from "./pages/VoiceCloning";
 import Pricing from "./pages/Pricing";
 import NotFound from "./pages/NotFound";
 
-// Configure the query client with proper settings
+// Configure the query client with even more aggressive settings to reduce loading time
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      staleTime: 30000, // 30 seconds
-      retry: 1,
+      staleTime: 60000, // Increased to 1 minute
+      retry: 0, // Disable retries to prevent delay on failures
+      networkMode: 'always', // Force requests even when offline
     },
   },
 });
@@ -29,7 +30,7 @@ const AnimatedRoutes = () => {
   const location = useLocation();
   
   return (
-    <AnimatePresence mode="wait" initial={false}>
+    <AnimatePresence mode="sync" initial={false}>
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Landing />} />
         <Route path="/auth" element={<Auth />} />
