@@ -8,19 +8,21 @@ interface AudioSourceSelectorProps {
   recordings: Recording[];
   selectedRecordings: Recording[];
   onSelectRecording: (recording: Recording) => void;
+  isMobile?: boolean;
 }
 
 const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
   recordings,
   selectedRecordings,
-  onSelectRecording
+  onSelectRecording,
+  isMobile = false
 }) => {
   return (
     <ScrollArea className="w-full border rounded-lg bg-white p-2">
-      <div className="flex gap-4 p-2 pb-4">
+      <div className={`flex ${isMobile ? 'flex-wrap' : ''} gap-3 p-2 pb-4`}>
         {/* Upload option */}
         <div 
-          className="min-w-[180px] h-[120px] rounded-lg border-2 border-dashed border-voicevault-softpurple bg-voicevault-softgray/30 flex flex-col items-center justify-center cursor-pointer hover:bg-voicevault-softgray/50 transition-colors"
+          className={`${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg border-2 border-dashed border-voicevault-softpurple bg-voicevault-softgray/30 flex flex-col items-center justify-center cursor-pointer hover:bg-voicevault-softgray/50 transition-colors mb-2`}
           onClick={() => alert("Upload functionality would be implemented here")}
         >
           <Plus className="h-8 w-8 text-voicevault-primary mb-2" />
@@ -34,7 +36,7 @@ const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
             <div 
               key={recording.id}
               onClick={() => onSelectRecording(recording)}
-              className={`relative min-w-[180px] h-[120px] rounded-lg overflow-hidden cursor-pointer transition-all ${
+              className={`relative ${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg overflow-hidden cursor-pointer transition-all mb-2 ${
                 isSelected 
                   ? 'ring-2 ring-voicevault-primary shadow-lg' 
                   : 'hover:shadow-md'
@@ -42,7 +44,7 @@ const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
             >
               <div className="cassette-header h-full flex flex-col justify-between p-3">
                 <div className="flex justify-between">
-                  <h4 className="font-medium text-white text-sm truncate">
+                  <h4 className="font-medium text-white text-sm truncate max-w-[80%]">
                     {recording.title}
                   </h4>
                   {isSelected && (
@@ -63,7 +65,7 @@ const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
         })}
         
         {recordings.length === 0 && (
-          <div className="min-w-[180px] h-[120px] rounded-lg border border-voicevault-softpurple bg-voicevault-softgray/30 flex flex-col items-center justify-center">
+          <div className={`${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg border border-voicevault-softpurple bg-voicevault-softgray/30 flex flex-col items-center justify-center`}>
             <span className="text-sm text-gray-500 text-center px-4">
               No recordings in your vault. Record some memories first!
             </span>

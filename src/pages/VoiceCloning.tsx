@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { useToast } from "@/hooks/use-toast";
 import { Recording } from "@/types";
+import { useIsMobile } from "@/hooks/use-mobile";
 import AudioSourceSelector from "@/components/voice-cloning/AudioSourceSelector";
 import TextEnhancer from "@/components/voice-cloning/TextEnhancer";
 import CloneResult from "@/components/voice-cloning/CloneResult";
@@ -19,6 +19,7 @@ const VoiceCloning: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   
   const [selectedSources, setSelectedSources] = useState<Recording[]>([]);
   const [inputText, setInputText] = useState("");
@@ -134,7 +135,7 @@ const VoiceCloning: React.FC = () => {
       <div className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex">
         <DashboardSidebar />
         
-        <div className="flex-1">
+        <div className="flex-1 overflow-x-hidden">
           <header className="bg-white shadow-sm p-4 flex justify-between items-center">
             <div className="flex items-center gap-4">
               <SidebarTrigger />
@@ -152,24 +153,25 @@ const VoiceCloning: React.FC = () => {
             </div>
           </header>
 
-          <main className="container mx-auto p-6 max-w-4xl">
-            <div className="mb-8">
-              <h2 className="text-2xl font-semibold text-voicevault-tertiary mb-2 font-playfair">
+          <main className="mx-auto p-4 md:p-6 max-w-4xl">
+            <div className="mb-6 md:mb-8">
+              <h2 className="text-xl md:text-2xl font-semibold text-voicevault-tertiary mb-2 font-playfair">
                 Voice Cloning Studio
               </h2>
-              <p className="text-gray-600">
+              <p className="text-sm md:text-base text-gray-600">
                 Preserve the voices you love by creating AI-generated voice memories that sound just like them.
               </p>
             </div>
             
             {!clonedAudioUrl ? (
               <>
-                <section className="mb-8">
-                  <h3 className="text-xl font-playfair text-voicevault-tertiary mb-4">Select Voice Source</h3>
+                <section className="mb-6 md:mb-8">
+                  <h3 className="text-lg md:text-xl font-playfair text-voicevault-tertiary mb-4">Select Voice Source</h3>
                   <AudioSourceSelector 
                     recordings={recordings} 
                     selectedRecordings={selectedSources}
                     onSelectRecording={handleSourceSelect}
+                    isMobile={isMobile}
                   />
                   <div className="mt-2 text-sm text-gray-500 flex items-center">
                     <span>{Math.floor(totalSelectedDuration / 60)}:{(totalSelectedDuration % 60).toString().padStart(2, '0')} selected</span>
@@ -179,9 +181,9 @@ const VoiceCloning: React.FC = () => {
                   </div>
                 </section>
                 
-                <section className="mb-8">
+                <section className="mb-6 md:mb-8">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-xl font-playfair text-voicevault-tertiary">What would you like this voice to say?</h3>
+                    <h3 className="text-lg md:text-xl font-playfair text-voicevault-tertiary">What would you like this voice to say?</h3>
                   </div>
                   
                   <Card className="mb-4">
@@ -197,10 +199,10 @@ const VoiceCloning: React.FC = () => {
                   </Card>
                 </section>
                 
-                <section className="flex justify-center mb-8">
+                <section className="flex justify-center mb-6 md:mb-8">
                   <Button 
-                    size="lg"
-                    className={`${isReadyToClone ? 'animate-pulse' : 'opacity-70'} px-8 py-6 text-lg`}
+                    size={isMobile ? "default" : "lg"}
+                    className={`${isReadyToClone ? 'animate-pulse' : 'opacity-70'} ${isMobile ? 'px-4 py-2 text-base w-full' : 'px-8 py-6 text-lg'}`}
                     onClick={handleCreateVoiceMemory}
                     disabled={!isReadyToClone || isCloning}
                   >
@@ -220,6 +222,7 @@ const VoiceCloning: React.FC = () => {
                 audioUrl={clonedAudioUrl}
                 text={textToUse}
                 onBack={() => setClonedAudioUrl(null)}
+                isMobile={isMobile}
               />
             )}
           </main>

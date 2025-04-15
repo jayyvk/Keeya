@@ -12,9 +12,10 @@ interface CloneResultProps {
   audioUrl: string;
   text: string;
   onBack: () => void;
+  isMobile?: boolean;
 }
 
-const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack }) => {
+const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack, isMobile = false }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -162,18 +163,18 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack }) => 
       </Button>
       
       <Card className="overflow-hidden border-voicevault-softpurple">
-        <div className="bg-gradient-to-r from-voicevault-softpurple to-voicevault-softpink p-6">
+        <div className="bg-gradient-to-r from-voicevault-softpurple to-voicevault-softpink p-4 md:p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-xl text-white">Voice Memory</h3>
-            <Badge className="bg-white/20 text-white border-none">
+            <h3 className="font-semibold text-lg md:text-xl text-white">Voice Memory</h3>
+            <Badge className="bg-white/20 text-white border-none text-xs md:text-sm">
               AI-Generated
             </Badge>
           </div>
           
-          <div className="flex justify-between items-center mb-4">
+          <div className={`flex ${isMobile ? 'flex-col' : 'justify-between'} items-center mb-4`}>
             <button
               onClick={togglePlayback}
-              className="bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow"
+              className="bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow mb-4 md:mb-0"
             >
               {isPlaying ? (
                 <Pause className="text-voicevault-primary h-5 w-5" />
@@ -182,7 +183,7 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack }) => 
               )}
             </button>
             
-            <div className="flex-1 mx-4">
+            <div className={`${isMobile ? 'w-full' : 'flex-1 mx-4'}`}>
               <Slider
                 value={[currentTime]}
                 max={duration || 100}
@@ -196,7 +197,7 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack }) => 
               </div>
             </div>
             
-            <div className="flex items-center">
+            <div className={`flex items-center ${isMobile ? 'w-full justify-end mt-4' : ''}`}>
               <button
                 onClick={toggleMute}
                 className="text-white mr-2"
@@ -207,7 +208,7 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack }) => 
                   <Volume2 className="h-5 w-5" />
                 )}
               </button>
-              <div className="w-20">
+              <div className={`${isMobile ? 'w-24' : 'w-20'}`}>
                 <Slider
                   value={[isMuted ? 0 : volume]}
                   min={0}
@@ -220,15 +221,15 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack }) => 
           </div>
         </div>
         
-        <CardContent className="p-6">
+        <CardContent className="p-4 md:p-6">
           <div className="mb-6">
             <h4 className="text-sm font-medium text-gray-500 mb-2">Content</h4>
-            <p className="text-voicevault-tertiary">{text}</p>
+            <p className="text-voicevault-tertiary text-sm md:text-base">{text}</p>
           </div>
           
-          <div className="flex gap-4">
+          <div className={`${isMobile ? 'flex flex-col' : 'flex'} gap-4`}>
             <Button 
-              className="flex-1"
+              className={`${isMobile ? 'w-full mb-2' : 'flex-1'}`}
               onClick={handleSaveToVault}
               disabled={isSaving}
             >
@@ -247,7 +248,7 @@ const CloneResult: React.FC<CloneResultProps> = ({ audioUrl, text, onBack }) => 
             
             <Button 
               variant="outline" 
-              className="flex-1"
+              className={`${isMobile ? 'w-full' : 'flex-1'}`}
               onClick={handleShare}
               disabled={isSharing}
             >
