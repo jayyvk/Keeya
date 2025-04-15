@@ -1,73 +1,67 @@
-# Welcome to your Lovable project
+# VoiceVault: Preserve the voices you love, forever.
 
-## Project info
+VoiceVault is a personal voice memory platform where users can record, save, and organize the voices of their loved ones in a secure and emotionally calming space.
 
-**URL**: https://lovable.dev/projects/07b5f862-25e5-44af-bc29-899cd3c64c12
+![VoiceVault](https://i.imgur.com/v1OaHkG.png)
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+### 🎙️ Voice Recording
+- Simple tap-to-record interface
+- Animated soundwave visualization
+- Pause, resume, and stop controls
+- Name and tag your recordings
 
-**Use Lovable**
+### 🔒 Secure Audio Vault
+- Cassette-style layout for saved recordings
+- Search and filter by tags
+- Play recordings directly from the vault
+- Mobile-first responsive design
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/07b5f862-25e5-44af-bc29-899cd3c64c12) and start prompting.
+### ✨ Beautiful Design
+- Ghibli-inspired, nostalgic aesthetics
+- Soft gradients and calming color palette
+- Simple animations for a delightful experience
+- Intuitive user interface
 
-Changes made via Lovable will be committed automatically to this repo.
+## Getting Started
 
-**Use your preferred IDE**
+Clone the repository and install the dependencies:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+git clone <repository-url>
+cd voice-memory-garden
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Technologies Used
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- React with TypeScript
+- Tailwind CSS for styling
+- shadcn/ui component library
+- HTML5 Audio APIs for recording
+- Framer Motion for animations
 
-**Use GitHub Codespaces**
+## Project Structure
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- `src/components/` - UI components
+- `src/contexts/` - React context providers
+- `src/pages/` - Main application pages
+- `src/types/` - TypeScript type definitions
+- `src/utils/` - Utility functions
 
-## What technologies are used for this project?
+## Future Roadmap
 
-This project is built with:
+- Voice cloning for storytelling with ElevenLabs API
+- Share & request voice clips with friends and family
+- Community marketplace for shared voices and stories
+- Mobile apps for iOS and Android
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Contributing
 
-## How can I deploy this project?
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-Simply open [Lovable](https://lovable.dev/projects/07b5f862-25e5-44af-bc29-899cd3c64c12) and click on Share -> Publish.
+## License
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+This project is licensed under the MIT License - see the LICENSE file for details.

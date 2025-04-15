@@ -1,0 +1,99 @@
+
+import React from "react";
+import { useRecording } from "@/contexts/RecordingContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
+import RecordButton from "@/components/RecordButton";
+import RecordingTimer from "@/components/RecordingTimer";
+import AudioWaveform from "@/components/AudioWaveform";
+import RecordingReview from "@/components/RecordingReview";
+import AudioVault from "@/components/AudioVault";
+import { useNavigate } from "react-router-dom";
+
+const Dashboard: React.FC = () => {
+  const { 
+    recordings,
+    currentRecording,
+    recordingStatus,
+    recordingTime,
+    startRecording,
+    stopRecording,
+    pauseRecording,
+    resumeRecording,
+    saveRecording,
+    discardRecording
+  } = useRecording();
+  
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-voicevault-softpurple via-white to-white">
+      {/* Header */}
+      <header className="bg-white shadow-sm p-4 flex justify-between items-center">
+        <div className="flex items-center">
+          <h1 className="text-xl font-bold text-voicevault-tertiary">VoiceVault</h1>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-gray-600">
+            Hello, {user?.name}
+          </span>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleLogout}
+            className="text-gray-500 hover:text-red-500"
+          >
+            <LogOut size={16} />
+          </Button>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="container mx-auto p-6 pt-10 max-w-md">
+        {recordingStatus === "reviewing" && currentRecording ? (
+          <RecordingReview
+            recordingBlob={currentRecording}
+            duration={recordingTime}
+            onSave={saveRecording}
+            onDiscard={discardRecording}
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-center">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-semibold text-voicevault-tertiary mb-2">
+                Record a Voice Memory
+              </h2>
+              <p className="text-gray-600 max-w-xs mx-auto">
+                Tap the microphone to start recording your precious voice memories
+              </p>
+            </div>
+            
+            <RecordingTimer status={recordingStatus} time={recordingTime} />
+            
+            <AudioWaveform status={recordingStatus} />
+            
+            <RecordButton
+              status={recordingStatus}
+              onStart={startRecording}
+              onStop={stopRecording}
+              onPause={pauseRecording}
+              onResume={resumeRecording}
+            />
+          </div>
+        )}
+      </main>
+      
+      {/* Audio Vault */}
+      <AudioVault recordings={recordings} />
+    </div>
+  );
+};
+
+export default Dashboard;
