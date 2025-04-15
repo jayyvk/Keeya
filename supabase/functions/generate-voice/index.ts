@@ -45,9 +45,10 @@ serve(async (req) => {
       userId
     })
 
-    // Call the OpenVoice API on Replicate
+    // Call the OpenVoice API on Replicate with an updated model version
+    // Using the updated and valid model version for OpenVoice
     const output = await replicate.run(
-      "chenxwh/openvoice:5e2b06bb6dcce4b21f89e2da5b08a8cf7482d7e31e2ac69463457518d6a1d925",
+      "lucataco/openvoice-24:77b436f65a3b2865b3cece65c32c9d6f10ffe7d9f9a1d859c7b250cd8cf193aa",
       {
         input: {
           text: text,
