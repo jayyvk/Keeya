@@ -12,7 +12,7 @@ const Pricing: React.FC = () => {
         <DashboardSidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="bg-gradient-to-b from-voicevault-softpurple to-transparent">
-            <CommonHeader title="Pricing" />
+            <CommonHeader />
           </div>
           <div className="flex-1 overflow-y-auto">
             <div className="container mx-auto px-4 py-6">
@@ -26,3 +26,4 @@ const Pricing: React.FC = () => {
 };
 
 export default Pricing;
+
