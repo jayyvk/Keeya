@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useMonetization } from "@/contexts/MonetizationContext";
@@ -65,7 +66,7 @@ const VoiceCloneContent: React.FC = () => {
         toast({
           title: "Insufficient audio",
           description: "You need at least 30 seconds of audio for voice cloning. 1 minute is recommended.",
-          variant: "warning",
+          variant: "default", // Changed from "warning" to "default"
         });
       }
       return;
@@ -211,3 +212,4 @@ const VoiceCloneContent: React.FC = () => {
 };
 
 export default VoiceCloneContent;
+
