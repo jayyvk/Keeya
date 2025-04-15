@@ -1,8 +1,12 @@
-import React from "react";
+
+import React, { useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Recording } from "@/types";
-import { Plus, Check } from "lucide-react";
+import { Plus, Check, Upload } from "lucide-react";
 import VoiceSourceSearch from "./VoiceSourceSearch";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { processAndUploadFile, uploadToVault } from "@/utils/audioUpload";
 
 interface AudioSourceSelectorProps {
   recordings: Recording[];
@@ -18,13 +22,61 @@ const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
   isMobile = false
 }) => {
   const [searchQuery, setSearchQuery] = React.useState("");
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const formatTime = (duration: number) => {
-    const minutes = Math.floor(duration / 60);
-    const seconds = Math.floor(duration % 60);
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
   };
-
+  
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+    
+    try {
+      const processedFile = await processAndUploadFile(file, user.id);
+      
+      if (!processedFile) {
+        toast({
+          title: "Invalid file",
+          description: "Please upload an audio or video file",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      const success = await uploadToVault(
+        processedFile,
+        user.id,
+        file.name.replace(/\.[^/.]+$/, '')
+      );
+      
+      if (success) {
+        toast({
+          title: "Upload successful",
+          description: processedFile.type === 'video' 
+            ? "Video processed and audio extracted successfully"
+            : "Audio uploaded successfully"
+        });
+      } else {
+        throw new Error("Failed to upload file");
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload file. Please try again.",
+        variant: "destructive"
+      });
+    }
+    
+    // Clear the input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+  
   const filteredRecordings = React.useMemo(() => {
     return recordings.filter(recording => recording.title.toLowerCase().includes(searchQuery.toLowerCase()));
   }, [recordings, searchQuery]);
@@ -37,9 +89,19 @@ const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
       <ScrollArea className="h-[400px]">
         <div className={`flex ${isMobile ? 'flex-wrap' : ''} gap-3 p-4`}>
           {/* Upload option */}
-          <div className={`${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg border-2 border-dashed border-voicevault-softpurple bg-voicevault-softgray/30 flex flex-col items-center justify-center cursor-pointer hover:bg-voicevault-softgray/50 transition-colors`} onClick={() => alert("Upload functionality would be implemented here")}>
-            <Plus className="h-8 w-8 text-voicevault-primary mb-2" />
-            <span className="text-sm text-voicevault-tertiary">Upload Audio</span>
+          <input 
+            type="file"
+            ref={fileInputRef}
+            className="hidden"
+            accept="audio/*,video/*"
+            onChange={handleFileChange}
+          />
+          <div 
+            className={`${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg border-2 border-dashed border-voicevault-softpurple bg-voicevault-softgray/30 flex flex-col items-center justify-center cursor-pointer hover:bg-voicevault-softgray/50 transition-colors`} 
+            onClick={handleUploadClick}
+          >
+            <Upload className="h-8 w-8 text-voicevault-primary mb-2" />
+            <span className="text-sm text-voicevault-tertiary">Upload Audio/Video</span>
           </div>
           
           {/* Recordings from vault */}
