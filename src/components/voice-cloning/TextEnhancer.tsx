@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,7 +10,8 @@ import {
   Heart, 
   Cake, 
   BookOpen,
-  Gift 
+  Gift,
+  RotateCcw
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -55,9 +57,9 @@ const TextEnhancer: React.FC<TextEnhancerProps> = ({
   // Switch to enhanced tab when enhancement is complete
   React.useEffect(() => {
     if (enhancedText && !isEnhancing) {
-      setActiveTabInternal("enhanced");
+      onTabChange("enhanced");
     }
-  }, [enhancedText, isEnhancing]);
+  }, [enhancedText, isEnhancing, onTabChange]);
   
   return (
     <div>
@@ -122,18 +124,24 @@ const TextEnhancer: React.FC<TextEnhancerProps> = ({
           />
           
           <div className="flex justify-between">
-            <Button 
-              variant="outline" 
-              onClick={() => setActiveTabInternal("input")}
-              className="text-voicevault-tertiary"
-            >
-              Edit Original
-            </Button>
-            
-            <p className="text-xs text-gray-500 flex items-center">
-              <Wand2 className="mr-1 h-3 w-3" />
-              Enhanced with AI
-            </p>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => onTabChange("input")}
+                className="text-voicevault-tertiary"
+              >
+                Edit Original
+              </Button>
+              <Button
+                variant="outline"
+                onClick={onEnhance}
+                disabled={isEnhancing}
+                className="text-voicevault-tertiary"
+              >
+                <RotateCcw className="mr-2 h-4 w-4" />
+                Retry
+              </Button>
+            </div>
           </div>
         </TabsContent>
       </Tabs>
