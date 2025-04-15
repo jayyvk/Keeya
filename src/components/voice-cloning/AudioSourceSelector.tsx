@@ -3,12 +3,14 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Recording } from "@/types";
 import { Plus, Check } from "lucide-react";
 import VoiceSourceSearch from "./VoiceSourceSearch";
+
 interface AudioSourceSelectorProps {
   recordings: Recording[];
   selectedRecordings: Recording[];
   onSelectRecording: (recording: Recording) => void;
   isMobile?: boolean;
 }
+
 const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
   recordings,
   selectedRecordings,
@@ -16,9 +18,17 @@ const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
   isMobile = false
 }) => {
   const [searchQuery, setSearchQuery] = React.useState("");
+  
+  const formatTime = (duration: number) => {
+    const minutes = Math.floor(duration / 60);
+    const seconds = Math.floor(duration % 60);
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
+
   const filteredRecordings = React.useMemo(() => {
     return recordings.filter(recording => recording.title.toLowerCase().includes(searchQuery.toLowerCase()));
   }, [recordings, searchQuery]);
+
   return <div className="border rounded-lg bg-white overflow-hidden">
       <div className="p-4 border-b">
         <VoiceSourceSearch searchQuery={searchQuery} onSearchChange={setSearchQuery} />
@@ -47,9 +57,8 @@ const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
                   </div>
                   <div className="flex justify-between items-end">
                     <span className="text-xs text-voicevault-neutralgray">
-                      {Math.floor(recording.duration / 60)}:{(recording.duration % 60).toString().padStart(2, '0')}
+                      {formatTime(recording.duration)}
                     </span>
-                    
                   </div>
                 </div>
               </div>;
@@ -64,4 +73,5 @@ const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
       </ScrollArea>
     </div>;
 };
+
 export default AudioSourceSelector;
