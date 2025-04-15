@@ -3,7 +3,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import "https://deno.land/x/xhr@0.1.0/mod.ts"
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
-const MODEL_NAME = "gemini-pro";
+const MODEL_NAME = "gemini-1.5-flash"; // Updated to the latest model name
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -27,7 +27,8 @@ serve(async (req) => {
       throw new Error('Text is required');
     }
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/${MODEL_NAME}:generateContent?key=${GEMINI_API_KEY}`, {
+    // Updated API URL structure - using the AI API endpoint
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -50,11 +51,14 @@ serve(async (req) => {
     const data = await response.json();
     console.log('Gemini API response:', data);
 
+    // Updated response parsing to match the current Gemini API response format
     if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
       const enhancedText = data.candidates[0].content.parts[0].text;
       return new Response(JSON.stringify({ enhancedText }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
+    } else if (data.error) {
+      throw new Error(`Gemini API error: ${data.error.message || JSON.stringify(data.error)}`);
     } else {
       throw new Error('Unexpected API response format');
     }
