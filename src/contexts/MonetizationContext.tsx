@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Credits, PaymentType } from "@/types";
 import { useToast } from "@/hooks/use-toast";
@@ -31,7 +30,6 @@ export function MonetizationProvider({ children }: { children: ReactNode }) {
     subscriptionEndsAt: null
   });
 
-  // Fetch credits when user changes
   useEffect(() => {
     if (user) {
       refreshCredits();
@@ -68,7 +66,6 @@ export function MonetizationProvider({ children }: { children: ReactNode }) {
         }));
       } else {
         console.log("No credit data found for user");
-        // Create a new credit record for this user
         await createUserCreditRecord();
       }
     } catch (error) {
@@ -87,7 +84,7 @@ export function MonetizationProvider({ children }: { children: ReactNode }) {
         .from('user_credits')
         .insert({
           user_id: user?.id,
-          credits_balance: 2, // Start with 2 free credits
+          credits_balance: 2,
         })
         .select()
         .single();
@@ -123,9 +120,7 @@ export function MonetizationProvider({ children }: { children: ReactNode }) {
     
     try {
       const response = await supabase.functions.invoke('create-checkout', {
-        body: { 
-          planId: type === 'subscription' ? 'pro' : 'starter'
-        }
+        body: { planId: type }
       });
 
       if (response.error) throw response.error;
