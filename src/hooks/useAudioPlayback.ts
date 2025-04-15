@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -151,10 +150,10 @@ export const useAudioPlayback = (audioUrl: string) => {
     }
   };
 
-  const seek = (time: number) => {
+  const seek = (value: number[]) => {
     if (audioRef.current) {
-      audioRef.current.currentTime = time;
-      setCurrentTime(time);
+      audioRef.current.currentTime = value[0];
+      setCurrentTime(value[0]);
     }
   };
 
