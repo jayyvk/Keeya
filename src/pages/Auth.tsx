@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const Auth: React.FC = () => {
   const navigate = useNavigate();
+  const [isLogin, setIsLogin] = useState(true);
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -120,26 +121,34 @@ const Auth: React.FC = () => {
       <Card className="w-full max-w-md shadow-xl animate-fade-in">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-voicevault-tertiary">
-            {step === 1 && "Welcome to VoiceVault"}
-            {step === 2 && "Tell us about yourself"}
-            {step === 3 && "How will you use VoiceVault?"}
+            {isLogin ? "Welcome Back" : (
+              <>
+                {step === 1 && "Welcome to VoiceVault"}
+                {step === 2 && "Tell us about yourself"}
+                {step === 3 && "How will you use VoiceVault?"}
+              </>
+            )}
           </CardTitle>
           <CardDescription>
-            {step === 1 && "Preserve the voices you love, forever."}
-            {step === 2 && "Help us personalize your experience"}
-            {step === 3 && "Understanding your goals helps us improve"}
+            {isLogin ? "Sign in to your account" : (
+              <>
+                {step === 1 && "Preserve the voices you love, forever."}
+                {step === 2 && "Help us personalize your experience"}
+                {step === 3 && "Understanding your goals helps us improve"}
+              </>
+            )}
           </CardDescription>
         </CardHeader>
         
         <AnimatePresence mode="wait">
           <motion.div 
-            key={step}
+            key={`${isLogin ? 'login' : `signup-${step}`}`}
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.3 }}
           >
-            {step === 1 && (
+            {isLogin ? (
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label>Email</Label>
@@ -160,64 +169,89 @@ const Auth: React.FC = () => {
                   />
                 </div>
               </CardContent>
-            )}
+            ) : (
+              <>
+                {step === 1 && (
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Email</Label>
+                      <Input
+                        type="email"
+                        placeholder="your@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Password</Label>
+                      <Input
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </div>
+                  </CardContent>
+                )}
 
-            {step === 2 && (
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Full Name</Label>
-                  <Input
-                    placeholder="John Doe"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="terms" 
-                    checked={agreeToTerms}
-                    onCheckedChange={(checked) => setAgreeToTerms(checked as boolean)}
-                  />
-                  <Label htmlFor="terms" className="text-sm">
-                    I am over 18 and agree to the <a href="#" className="text-voicevault-primary hover:underline">Terms</a> and <a href="#" className="text-voicevault-primary hover:underline">Privacy Policy</a>
-                  </Label>
-                </div>
-              </CardContent>
-            )}
+                {step === 2 && (
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Full Name</Label>
+                      <Input
+                        placeholder="John Doe"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="terms" 
+                        checked={agreeToTerms}
+                        onCheckedChange={(checked) => setAgreeToTerms(checked as boolean)}
+                      />
+                      <Label htmlFor="terms" className="text-sm">
+                        I am over 18 and agree to the <a href="#" className="text-voicevault-primary hover:underline">Terms</a> and <a href="#" className="text-voicevault-primary hover:underline">Privacy Policy</a>
+                      </Label>
+                    </div>
+                  </CardContent>
+                )}
 
-            {step === 3 && (
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>What's your main purpose?</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {["Personal Memories", "Family History", "Legacy", "Other"].map((option) => (
-                      <Button
-                        key={option}
-                        variant={purpose === option ? "default" : "outline"}
-                        onClick={() => setPurpose(option)}
-                        className="w-full"
-                      >
-                        {option}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>How often will you record?</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {["Daily", "Weekly", "Monthly", "Occasionally"].map((option) => (
-                      <Button
-                        key={option}
-                        variant={recordingFrequency === option ? "default" : "outline"}
-                        onClick={() => setRecordingFrequency(option)}
-                        className="w-full"
-                      >
-                        {option}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
+                {step === 3 && (
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>What's your main purpose?</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {["Personal Memories", "Family History", "Legacy", "Other"].map((option) => (
+                          <Button
+                            key={option}
+                            variant={purpose === option ? "default" : "outline"}
+                            onClick={() => setPurpose(option)}
+                            className="w-full"
+                          >
+                            {option}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>How often will you record?</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {["Daily", "Weekly", "Monthly", "Occasionally"].map((option) => (
+                          <Button
+                            key={option}
+                            variant={recordingFrequency === option ? "default" : "outline"}
+                            onClick={() => setRecordingFrequency(option)}
+                            className="w-full"
+                          >
+                            {option}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                )}
+              </>
             )}
           </motion.div>
         </AnimatePresence>
@@ -225,36 +259,68 @@ const Auth: React.FC = () => {
         {error && <p className="text-red-500 text-sm px-6">{error}</p>}
         
         <CardFooter className="flex flex-col space-y-2">
-          {step < 3 ? (
-            <Button 
-              onClick={nextStep} 
-              className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
-            >
-              Continue
-            </Button>
+          {isLogin ? (
+            <>
+              <Button 
+                onClick={handleLogin}
+                disabled={isLoading}
+                className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
+              >
+                {isLoading ? "Signing in..." : "Sign In"}
+              </Button>
+              <div className="text-center mt-4">
+                <span className="text-sm text-gray-600">
+                  Don't have an account? {" "}
+                  <Button 
+                    variant="link" 
+                    className="text-voicevault-primary"
+                    onClick={() => {
+                      setIsLogin(false);
+                      setError("");
+                    }}
+                  >
+                    Sign Up
+                  </Button>
+                </span>
+              </div>
+            </>
           ) : (
-            <Button 
-              onClick={handleSignUp}
-              disabled={isLoading || !purpose || !recordingFrequency}
-              className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
-            >
-              {isLoading ? "Creating Account..." : "Create Account"}
-            </Button>
-          )}
-          
-          {step === 1 && (
-            <div className="text-center mt-4">
-              <span className="text-sm text-gray-600">
-                Already have an account? {" "}
+            <>
+              {step < 3 ? (
                 <Button 
-                  variant="link" 
-                  className="text-voicevault-primary"
-                  onClick={handleLogin}
+                  onClick={nextStep} 
+                  className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
                 >
-                  Log In
+                  Continue
                 </Button>
-              </span>
-            </div>
+              ) : (
+                <Button 
+                  onClick={handleSignUp}
+                  disabled={isLoading || !purpose || !recordingFrequency}
+                  className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
+                >
+                  {isLoading ? "Creating Account..." : "Create Account"}
+                </Button>
+              )}
+              
+              {step === 1 && (
+                <div className="text-center mt-4">
+                  <span className="text-sm text-gray-600">
+                    Already have an account? {" "}
+                    <Button 
+                      variant="link" 
+                      className="text-voicevault-primary"
+                      onClick={() => {
+                        setIsLogin(true);
+                        setError("");
+                      }}
+                    >
+                      Sign In
+                    </Button>
+                  </span>
+                </div>
+              )}
+            </>
           )}
         </CardFooter>
       </Card>
