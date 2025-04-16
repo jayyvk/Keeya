@@ -1,13 +1,13 @@
-
 import React from "react";
 import { RecordingStatus } from "@/types";
-
 interface RecordingTimerProps {
   status: RecordingStatus;
   time: number;
 }
-
-const RecordingTimer: React.FC<RecordingTimerProps> = ({ status, time }) => {
+const RecordingTimer: React.FC<RecordingTimerProps> = ({
+  status,
+  time
+}) => {
   // Format seconds to MM:SS
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
@@ -42,17 +42,9 @@ const RecordingTimer: React.FC<RecordingTimerProps> = ({ status, time }) => {
         return "text-gray-500";
     }
   };
-
-  return (
-    <div className="text-center mb-4">
-      {status !== "inactive" && (
-        <div className="text-2xl font-mono mb-1">{formatTime(time)}</div>
-      )}
-      <div className={`text-sm font-medium ${getStatusColor()}`}>
-        {getStatusText()}
-      </div>
-    </div>
-  );
+  return <div className="text-center mb-4">
+      {status !== "inactive" && <div className="text-2xl font-mono mb-1">{formatTime(time)}</div>}
+      
+    </div>;
 };
-
 export default RecordingTimer;

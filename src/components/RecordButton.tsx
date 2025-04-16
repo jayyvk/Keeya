@@ -1,8 +1,6 @@
-
 import React from "react";
 import { Mic, MicOff, Pause, Play, StopCircle } from "lucide-react";
 import { RecordingStatus } from "@/types";
-
 interface RecordButtonProps {
   status: RecordingStatus;
   onStart: () => void;
@@ -10,7 +8,6 @@ interface RecordButtonProps {
   onPause: () => void;
   onResume: () => void;
 }
-
 const RecordButton: React.FC<RecordButtonProps> = ({
   status,
   onStart,
@@ -67,31 +64,17 @@ const RecordButton: React.FC<RecordButtonProps> = ({
   // Alternative controls for recording state
   const renderAlternativeControls = () => {
     if (status === "recording" || status === "paused") {
-      return (
-        <button
-          onClick={onStop}
-          className="rounded-full p-4 bg-gray-200 hover:bg-gray-300 transition-colors"
-          aria-label="Stop recording"
-        >
+      return <button onClick={onStop} className="rounded-full p-4 bg-gray-200 hover:bg-gray-300 transition-colors" aria-label="Stop recording">
           <StopCircle className="h-8 w-8 text-red-500" />
-        </button>
-      );
+        </button>;
     }
     return null;
   };
-
-  return (
-    <div className="flex items-center justify-center gap-6">
-      <button
-        onClick={handleClick}
-        className={`rounded-full p-6 transition-all shadow-lg ${getButtonStyle()}`}
-        aria-label={`${status === "inactive" ? "Start" : status} recording`}
-      >
+  return <div className="flex items-center justify-center gap-6 my-0">
+      <button onClick={handleClick} className={`rounded-full p-6 transition-all shadow-lg ${getButtonStyle()}`} aria-label={`${status === "inactive" ? "Start" : status} recording`}>
         {getButtonIcon()}
       </button>
       {renderAlternativeControls()}
-    </div>
-  );
+    </div>;
 };
-
 export default RecordButton;
