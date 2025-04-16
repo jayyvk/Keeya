@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Recording } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
@@ -128,9 +127,18 @@ export function useRecordingsStorage(userId: string | undefined) {
         throw new Error("Recording not found");
       }
       
-      const urlParts = recordingToDelete.audioUrl.split('/');
-      const fileName = urlParts[urlParts.length - 1];
-      const filePath = `${userId}/${fileName}`;
+      const fileUrl = new URL(recordingToDelete.audioUrl);
+      const pathParts = fileUrl.pathname.split('/');
+      const filePath = `${userId}/${pathParts[pathParts.length - 1]}`;
+      
+      const { error: storageError } = await supabase
+        .storage
+        .from('voice_memories')
+        .remove([filePath]);
+      
+      if (storageError) {
+        console.error("Storage deletion error:", storageError);
+      }
       
       const { error: dbError } = await supabase
         .from('voice_memories')
@@ -140,11 +148,6 @@ export function useRecordingsStorage(userId: string | undefined) {
       if (dbError) {
         throw dbError;
       }
-      
-      await supabase
-        .storage
-        .from('voice_memories')
-        .remove([filePath]);
       
       setRecordings(prev => prev.filter(recording => recording.id !== id));
       
