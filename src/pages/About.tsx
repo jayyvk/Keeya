@@ -30,13 +30,13 @@ const About = () => {
   };
 
   const handleSubmitRating = async () => {
-    if (rating === 0) return;
+    if (rating === 0 || !user) return;
 
     try {
       const { error } = await supabase
         .from('app_ratings')
         .insert({
-          user_id: user?.id,
+          user_id: user.id,
           rating: rating,
         });
 
