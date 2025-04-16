@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -84,7 +85,7 @@ const Dashboard: React.FC = () => {
                     onDiscard={discardRecording} 
                   />
                 ) : (
-                  <div className="flex flex-col items-center justify-center text-center space-y-4">
+                  <div className="flex flex-col items-center justify-center text-center space-y-6">
                     <div>
                       <h2 className="text-2xl font-semibold text-voicevault-tertiary mb-2">
                         Record a Voice Memory
@@ -106,12 +107,8 @@ const Dashboard: React.FC = () => {
                       onResume={resumeRecording} 
                     />
                     
-                    <div className="flex flex-col items-center space-y-2 w-full">
-                      <Button 
-                        variant="outline" 
-                        onClick={goToVoiceCloning} 
-                        className="bg-voicevault-softgray/30 border-voicevault-softpurple hover:bg-voicevault-softgray/50 w-full"
-                      >
+                    <div className="flex flex-col items-center space-y-2">
+                      <Button variant="outline" onClick={goToVoiceCloning} className="bg-voicevault-softgray/30 border-voicevault-softpurple hover:bg-voicevault-softgray/50">
                         <Wand2 className="mr-2 h-4 w-4 text-voicevault-primary" />
                         Voice Cloning Studio
                       </Button>
