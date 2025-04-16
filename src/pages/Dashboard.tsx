@@ -36,13 +36,13 @@ const Dashboard: React.FC = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate("/auth");
+      navigate("/"); // Change from "/auth" to "/"
       toast("Logged out successfully", {
         description: "See you next time!"
       });
     } catch (error) {
       console.error("Error during logout:", error);
-      navigate("/auth");
+      navigate("/"); // Also change error case redirection
       toast("Error during logout", {
         description: "You've been signed out anyway",
         style: {
@@ -135,3 +135,4 @@ const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
+
