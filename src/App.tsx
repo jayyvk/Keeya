@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +9,7 @@ import { RecordingProvider } from "@/contexts/RecordingContext";
 import { AnimatePresence } from "framer-motion";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
+import About from "./pages/About";
 import Dashboard from "./pages/Dashboard";
 import VoiceCloning from "./pages/VoiceCloning";
 import Pricing from "./pages/Pricing";
@@ -34,6 +36,7 @@ const AnimatedRoutes = () => {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Landing />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/about" element={<About />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/voice-cloning" element={<VoiceCloning />} />
         <Route path="/pricing" element={<Pricing />} />
