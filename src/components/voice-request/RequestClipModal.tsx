@@ -41,7 +41,7 @@ const RequestClipModal: React.FC<RequestClipModalProps> = ({ isOpen, onClose }) 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md rounded-xl">
         <DialogHeader>
           <DialogTitle>Request a Voice Memory</DialogTitle>
           <DialogDescription>
