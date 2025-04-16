@@ -99,7 +99,14 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans text-body antialiased;
+    @apply bg-gradient-to-b from-voicevault-softpurple via-white to-white text-foreground font-sans text-body antialiased;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    padding-top: env(safe-area-inset-top);
+  }
+
+  html {
+    height: -webkit-fill-available;
   }
 
   h1, h2, h3, h4, h5, h6 {

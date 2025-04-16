@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -63,7 +64,7 @@ const Dashboard: React.FC = () => {
           <DashboardSidebar />
           
           <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="bg-gradient-to-b from-voicevault-softpurple to-transparent">
+            <div className="bg-gradient-to-b from-voicevault-softpurple to-transparent pt-safe">
               <div className="flex justify-between items-center px-6 py-4">
                 <CommonHeader />
                 <div className="flex items-center gap-4">
