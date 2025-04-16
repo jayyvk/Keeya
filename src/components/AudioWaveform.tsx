@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { RecordingStatus } from "@/types";
 
 interface AudioWaveformProps {
@@ -11,24 +11,22 @@ const AudioWaveform: React.FC<AudioWaveformProps> = ({ status }) => {
   const barsCount = 30;
 
   return (
-    <div className="flex items-center justify-center h-24 gap-1 my-4">
+    <div className="flex items-center justify-center h-24 gap-0.5 my-4">
       {Array.from({ length: barsCount }).map((_, index) => {
-        // Height variation logic for bars
         const height = isActive 
-          ? Math.max(20, Math.random() * 60) 
-          : 20 + (Math.sin(index * 0.4) * 10);
+          ? Math.max(15, Math.random() * 45) 
+          : 15 + (Math.sin(index * 0.4) * 8);
         
-        // Animation delay logic for bars
         const delay = `${index * 0.05}s`;
         
         return (
           <div
             key={index}
-            className={`bg-voicevault-primary rounded-full w-1.5 ${isActive ? 'animate-wave' : ''}`}
+            className={`bg-voicevault-primary/80 rounded-full w-1 ${isActive ? 'animate-wave' : ''}`}
             style={{
               height: `${height}px`,
               animationDelay: delay,
-              opacity: isActive ? 1 : 0.5,
+              opacity: isActive ? 0.8 : 0.4,
               animationDuration: `${0.7 + Math.random() * 0.6}s`
             }}
           />

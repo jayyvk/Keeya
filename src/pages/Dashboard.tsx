@@ -98,19 +98,21 @@ const Dashboard: React.FC = () => {
                     
                     <AudioWaveform status={recordingStatus} />
                     
-                    <RecordButton 
-                      status={recordingStatus} 
-                      onStart={startRecording} 
-                      onStop={stopRecording} 
-                      onPause={pauseRecording} 
-                      onResume={resumeRecording} 
-                    />
+                    <div className="transform scale-95">
+                      <RecordButton 
+                        status={recordingStatus} 
+                        onStart={startRecording} 
+                        onStop={stopRecording} 
+                        onPause={pauseRecording} 
+                        onResume={resumeRecording} 
+                      />
+                    </div>
                     
                     <div className="flex flex-col items-center space-y-2 w-full">
                       <Button 
                         variant="outline" 
                         onClick={goToVoiceCloning} 
-                        className="bg-voicevault-softgray/30 border-voicevault-softpurple hover:bg-voicevault-softgray/50 w-full"
+                        className="bg-voicevault-softgray/30 border-2 border-voicevault-softpurple hover:bg-voicevault-softgray/50 w-full font-semibold"
                       >
                         <Wand2 className="mr-2 h-4 w-4 text-voicevault-primary" />
                         Voice Cloning Studio
