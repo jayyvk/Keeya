@@ -144,7 +144,7 @@ export function MonetizationProvider({ children }: { children: ReactNode }) {
         .from('user_credits')
         .insert({
           user_id: user?.id,
-          credits_balance: 2,
+          credits_balance: 5, // Updated from 2 to 5 to match the new default
         })
         .select()
         .single();
