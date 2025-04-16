@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Mic } from "lucide-react";
@@ -16,6 +15,8 @@ const Landing: React.FC = () => {
       className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-voicevault-softpurple to-white"
       onClick={handleClick}
     >
+      <h1 className="sr-only">keeya - Record and Preserve the Voices You Love Forever with AI Voice Memories</h1>
+      
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -30,14 +31,14 @@ const Landing: React.FC = () => {
           <Mic className="h-16 w-16 text-voicevault-primary" />
         </motion.div>
         
-        <motion.h1
+        <motion.h2
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
           className="text-4xl font-bold mb-2 text-voicevault-tertiary text-center"
         >
           Keeya
-        </motion.h1>
+        </motion.h2>
         
         <motion.p
           initial={{ opacity: 0, y: 20 }}
