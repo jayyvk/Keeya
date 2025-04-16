@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Mic } from "lucide-react";
@@ -35,16 +36,16 @@ const Landing: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="text-4xl font-bold mb-2 text-voicevault-tertiary text-center"
+          className="font-sans text-heading-lg font-semibold mb-2 text-voicevault-tertiary text-center"
         >
-          Keeya
+          keeya
         </motion.h2>
         
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5 }}
-          className="text-xl text-voicevault-secondary mb-8 text-center"
+          className="font-sans text-body text-voicevault-secondary mb-8 text-center"
         >
           Preserve the voices you love, forever.
         </motion.p>
@@ -53,7 +54,7 @@ const Landing: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.5 }}
-          className="text-sm text-gray-500 text-center"
+          className="font-mono text-sm text-gray-500 text-center"
         >
           Tap anywhere to continue
         </motion.div>

@@ -18,6 +18,16 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: ['Apercu', 'Sora', 'Work Sans', 'system-ui', 'sans-serif'],
+				mono: ['Apercu Mono', 'Roboto Mono', 'monospace'],
+			},
+			fontSize: {
+				'heading-lg': '2rem',
+				'heading': '1.5rem',
+				'body': '1rem',
+				'button': '0.95rem',
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
