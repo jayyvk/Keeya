@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import VoiceCloning from "./pages/VoiceCloning";
 import Pricing from "./pages/Pricing";
 import NotFound from "./pages/NotFound";
+import RecordClip from "./pages/RecordClip";
 
 // Configure the query client with even more aggressive settings to reduce loading time
 const queryClient = new QueryClient({
@@ -37,6 +37,7 @@ const AnimatedRoutes = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/voice-cloning" element={<VoiceCloning />} />
         <Route path="/pricing" element={<Pricing />} />
+        <Route path="/record/:id" element={<RecordClip />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>

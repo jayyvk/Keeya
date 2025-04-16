@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,8 @@ import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { toast } from "sonner";
 import CommonHeader from "@/components/CommonHeader";
 import { MonetizationProvider } from "@/contexts/MonetizationContext";
+import RequestClipModal from "@/components/voice-request/RequestClipModal";
+import { MessageSquarePlus } from "lucide-react";
 
 const Dashboard: React.FC = () => {
   const {
@@ -33,6 +34,8 @@ const Dashboard: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -68,6 +71,14 @@ const Dashboard: React.FC = () => {
               <div className="flex justify-between items-center px-6 py-4">
                 <CommonHeader />
                 <div className="flex items-center gap-4">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setIsRequestModalOpen(true)}
+                    className="bg-white/50 border-voicevault-primary text-voicevault-primary hover:bg-white/80"
+                  >
+                    <MessageSquarePlus className="mr-2 h-4 w-4" />
+                    Request a Clip
+                  </Button>
                   <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-500 hover:bg-red-100">
                     <LogOut size={16} />
                   </Button>
@@ -108,6 +119,11 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
         </div>
+
+        <RequestClipModal 
+          isOpen={isRequestModalOpen} 
+          onClose={() => setIsRequestModalOpen(false)} 
+        />
       </MonetizationProvider>
     </SidebarProvider>;
 };

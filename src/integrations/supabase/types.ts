@@ -178,6 +178,8 @@ export type Database = {
           file_type: string | null
           file_url: string
           id: string
+          request_id: string | null
+          source: string | null
           tags: string[] | null
           title: string
           user_id: string
@@ -188,6 +190,8 @@ export type Database = {
           file_type?: string | null
           file_url: string
           id?: string
+          request_id?: string | null
+          source?: string | null
           tags?: string[] | null
           title: string
           user_id: string
@@ -198,9 +202,46 @@ export type Database = {
           file_type?: string | null
           file_url?: string
           id?: string
+          request_id?: string | null
+          source?: string | null
           tags?: string[] | null
           title?: string
           user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "voice_memories_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "voice_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      voice_requests: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          is_fulfilled: boolean
+          recipient_name: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string
+          id?: string
+          is_fulfilled?: boolean
+          recipient_name: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          is_fulfilled?: boolean
+          recipient_name?: string
         }
         Relationships: []
       }
