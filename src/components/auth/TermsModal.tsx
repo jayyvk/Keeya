@@ -1,4 +1,3 @@
-
 import {
   Dialog,
   DialogContent,
@@ -83,10 +82,8 @@ export const TermsModal = ({ isOpen, onClose, type }: TermsModalProps) => {
                 </ul>
               </div>
 
-              {/* ... Continue with sections 3-7 */}
-
               <div>
-                <h3 className="font-semibold mb-2">7. Contact</h3>
+                <h3 className="font-semibold mb-2">3. Contact</h3>
                 <p>If you have questions about our Terms or Privacy Policy, please reach out at: keeya.app@gmail.com</p>
               </div>
 
