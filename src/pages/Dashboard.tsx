@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -75,9 +76,9 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex-1 flex flex-col justify-center items-center overflow-hidden">
-              <main className="container mx-auto max-w-md w-full flex-1 flex flex-col justify-center items-center px-[24px] py-[24px] my-[60px]">
-                {recordingStatus === "reviewing" && currentRecording ? <RecordingReview recordingBlob={currentRecording} duration={recordingTime} onSave={saveRecording} onDiscard={discardRecording} /> : <div className="flex flex-col items-center justify-center text-center space-y-4">
+            <div className="flex-1 flex flex-col justify-start items-center overflow-hidden">
+              <main className="container mx-auto max-w-md w-full flex-1 flex flex-col justify-start items-center px-[24px] py-[24px]">
+                {recordingStatus === "reviewing" && currentRecording ? <RecordingReview recordingBlob={currentRecording} duration={recordingTime} onSave={saveRecording} onDiscard={discardRecording} /> : <div className="flex flex-col items-center justify-start text-center space-y-4 w-full">
                     <div>
                       <h2 className="text-2xl font-semibold text-voicevault-tertiary mb-2 my-[5px]">
                         Record a Voice Memory
@@ -104,7 +105,7 @@ const Dashboard: React.FC = () => {
                   </div>}
               </main>
               
-              <div className="flex-shrink-0 overflow-hidden">
+              <div className="flex-shrink-0 overflow-hidden w-full">
                 <AudioVault recordings={recordings} />
               </div>
             </div>
