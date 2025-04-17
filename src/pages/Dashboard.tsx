@@ -14,6 +14,7 @@ import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { toast } from "sonner";
 import CommonHeader from "@/components/CommonHeader";
 import { MonetizationProvider } from "@/contexts/MonetizationContext";
+
 const Dashboard: React.FC = () => {
   const {
     recordings,
@@ -32,16 +33,17 @@ const Dashboard: React.FC = () => {
     logout
   } = useAuth();
   const navigate = useNavigate();
+
   const handleLogout = async () => {
     try {
       await logout();
-      navigate("/"); // Change from "/auth" to "/"
+      navigate("/");
       toast("Logged out successfully", {
         description: "See you next time!"
       });
     } catch (error) {
       console.error("Error during logout:", error);
-      navigate("/"); // Also change error case redirection
+      navigate("/");
       toast("Error during logout", {
         description: "You've been signed out anyway",
         style: {
@@ -51,9 +53,11 @@ const Dashboard: React.FC = () => {
       });
     }
   };
+
   const goToVoiceCloning = () => {
     navigate("/voice-cloning");
   };
+
   return <SidebarProvider>
       <MonetizationProvider>
         <div className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex">
@@ -72,7 +76,7 @@ const Dashboard: React.FC = () => {
             </div>
 
             <div className="flex-1 flex flex-col justify-center items-center overflow-hidden">
-              <main className="container mx-auto max-w-md flex-1 flex flex-col justify-center items-center px-[24px] py-[24px] my-[60px]">
+              <main className="container mx-auto max-w-md w-full flex-1 flex flex-col justify-center items-center px-[24px] py-[24px] my-[60px]">
                 {recordingStatus === "reviewing" && currentRecording ? <RecordingReview recordingBlob={currentRecording} duration={recordingTime} onSave={saveRecording} onDiscard={discardRecording} /> : <div className="flex flex-col items-center justify-center text-center space-y-4">
                     <div>
                       <h2 className="text-2xl font-semibold text-voicevault-tertiary mb-2 my-[5px]">
@@ -109,4 +113,5 @@ const Dashboard: React.FC = () => {
       </MonetizationProvider>
     </SidebarProvider>;
 };
+
 export default Dashboard;
