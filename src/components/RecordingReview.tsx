@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,13 +10,15 @@ interface RecordingReviewProps {
   duration: number;
   onSave: (title: string, tags: string[]) => void;
   onDiscard: () => void;
+  className?: string;
 }
 
 const RecordingReview: React.FC<RecordingReviewProps> = ({
   recordingBlob,
   duration,
   onSave,
-  onDiscard
+  onDiscard,
+  className
 }) => {
   const [title, setTitle] = useState<string>("");
   const [currentTag, setCurrentTag] = useState<string>("");
@@ -26,14 +27,12 @@ const RecordingReview: React.FC<RecordingReviewProps> = ({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioUrl = useRef<string>("");
   
-  // Format duration (seconds) to MM:SS
   const formatDuration = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
-  // Create URL for the audio blob
   useEffect(() => {
     audioUrl.current = URL.createObjectURL(recordingBlob);
     return () => {
@@ -41,7 +40,6 @@ const RecordingReview: React.FC<RecordingReviewProps> = ({
     };
   }, [recordingBlob]);
 
-  // Add tag to the tags array
   const addTag = () => {
     if (currentTag.trim() && !tags.includes(currentTag.trim())) {
       setTags(prev => [...prev, currentTag.trim()]);
@@ -49,12 +47,10 @@ const RecordingReview: React.FC<RecordingReviewProps> = ({
     }
   };
 
-  // Remove tag from the tags array
   const removeTag = (tagToRemove: string) => {
     setTags(prev => prev.filter(tag => tag !== tagToRemove));
   };
 
-  // Handle keydown events for adding tags
   const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -62,7 +58,6 @@ const RecordingReview: React.FC<RecordingReviewProps> = ({
     }
   };
 
-  // Toggle audio playback
   const togglePlayback = () => {
     if (audioRef.current) {
       if (isPlaying) {
@@ -74,25 +69,21 @@ const RecordingReview: React.FC<RecordingReviewProps> = ({
     }
   };
 
-  // Handle audio end event
   const handleAudioEnd = () => {
     setIsPlaying(false);
   };
 
-  // Default title based on date
   useEffect(() => {
     const now = new Date();
     setTitle(`Recording ${now.toLocaleDateString()}`);
   }, []);
 
-  // Suggested tags
   const suggestedTags = ["Family", "Story", "Memory", "Personal", "Important"];
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md animate-scale-in">
+    <div className={`bg-white p-6 rounded-lg shadow-lg w-full max-w-md animate-scale-in ${className || ''}`}>
       <h2 className="text-2xl font-semibold text-voicevault-tertiary mb-4">Save Your Recording</h2>
       
-      {/* Audio Player */}
       <div className="mb-6">
         <audio 
           ref={audioRef}
@@ -111,7 +102,6 @@ const RecordingReview: React.FC<RecordingReviewProps> = ({
         </div>
       </div>
       
-      {/* Title Input */}
       <div className="mb-4">
         <Label htmlFor="title" className="block mb-2 text-sm font-medium">
           Title
@@ -125,7 +115,6 @@ const RecordingReview: React.FC<RecordingReviewProps> = ({
         />
       </div>
       
-      {/* Tags Input */}
       <div className="mb-6">
         <Label htmlFor="tags" className="block mb-2 text-sm font-medium">
           Tags
@@ -144,7 +133,6 @@ const RecordingReview: React.FC<RecordingReviewProps> = ({
           </Button>
         </div>
         
-        {/* Selected Tags */}
         {tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-3">
             {tags.map(tag => (
@@ -162,7 +150,6 @@ const RecordingReview: React.FC<RecordingReviewProps> = ({
           </div>
         )}
         
-        {/* Suggested Tags */}
         <div className="mt-2">
           <p className="text-xs text-gray-500 mb-1">Suggested:</p>
           <div className="flex flex-wrap gap-1.5">
@@ -184,7 +171,6 @@ const RecordingReview: React.FC<RecordingReviewProps> = ({
         </div>
       </div>
       
-      {/* Action Buttons */}
       <div className="flex justify-between gap-4">
         <Button 
           variant="outline" 
