@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarFooter } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
 const menuItems = [{
   title: "Home",
   icon: Home,
@@ -18,36 +19,54 @@ const menuItems = [{
 }, {
   title: "Marketplace",
   icon: PackageSearch,
-  url: "#marketplace"
+  url: "#marketplace",
+  disabled: true
 }, {
   title: "About",
   icon: AlertCircle,
-  url: "#about"
+  url: "/about"
 }];
+
 export function DashboardSidebar() {
   const navigate = useNavigate();
-  const {
-    user
-  } = useAuth();
-  const handleMenuItemClick = (url: string) => {
+  const { user } = useAuth();
+
+  const handleMenuItemClick = (url: string, disabled?: boolean) => {
+    if (disabled) return;
     if (url.startsWith('/')) {
       navigate(url);
     }
   };
-  return <Sidebar>
+
+  return (
+    <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map(item => <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild tooltip={item.title} onClick={() => handleMenuItemClick(item.url)} className="text-gray-600 hover:text-voicevault-primary hover:bg-voicevault-softgray/50">
-                    <a href={item.url}>
-                      <item.icon className="text-voicevault-primary" />
-                      <span className="font-medium">{item.title}</span>
+              {menuItems.map(item => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton 
+                    asChild 
+                    tooltip={item.disabled ? "Coming Soon" : undefined}
+                    onClick={() => handleMenuItemClick(item.url, item.disabled)} 
+                    className={`
+                      text-gray-600 
+                      ${item.disabled 
+                        ? 'opacity-50 cursor-not-allowed text-gray-400' 
+                        : 'hover:text-voicevault-primary hover:bg-voicevault-softgray/50'}
+                    `}
+                  >
+                    <a href={item.disabled ? undefined : item.url}>
+                      <item.icon className={`${item.disabled ? 'text-gray-400' : 'text-voicevault-primary'}`} />
+                      <span className="font-medium">
+                        {item.title}
+                        {item.disabled && <span className="text-xs text-gray-400 ml-2">(Coming Soon)</span>}
+                      </span>
                     </a>
                   </SidebarMenuButton>
-                </SidebarMenuItem>)}
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -66,5 +85,6 @@ export function DashboardSidebar() {
           </div>
         </div>
       </SidebarFooter>
-    </Sidebar>;
+    </Sidebar>
+  );
 }
