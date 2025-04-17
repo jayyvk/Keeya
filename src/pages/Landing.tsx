@@ -3,6 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Mic } from "lucide-react";
 import { motion } from "framer-motion";
+import { Typewriter } from "@/components/ui/typewriter";
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
@@ -45,9 +46,15 @@ const Landing: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5 }}
-          className="font-sans text-body text-voicevault-secondary mb-8 text-center"
+          className="font-sans text-body text-voicevault-secondary mb-8 text-center h-6"
         >
-          Preserve the voices you love, forever.
+          <Typewriter 
+            text={["Preserve the voices you love, forever.", "Record memories that last a lifetime.", "Capture voices that matter to you."]} 
+            loop={true} 
+            delay={2000}
+            cursor="|"
+            className="font-sans text-body text-voicevault-secondary"
+          />
         </motion.p>
         
         <motion.div
