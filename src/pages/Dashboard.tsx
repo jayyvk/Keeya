@@ -14,6 +14,7 @@ import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { toast } from "sonner";
 import CommonHeader from "@/components/CommonHeader";
 import { MonetizationProvider } from "@/contexts/MonetizationContext";
+
 const Dashboard: React.FC = () => {
   const {
     recordings,
@@ -32,6 +33,7 @@ const Dashboard: React.FC = () => {
     logout
   } = useAuth();
   const navigate = useNavigate();
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -51,16 +53,18 @@ const Dashboard: React.FC = () => {
       });
     }
   };
+
   const goToVoiceCloning = () => {
     navigate("/voice-cloning");
   };
+
   return <SidebarProvider>
       <MonetizationProvider>
         <div className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex">
           <DashboardSidebar />
           
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="bg-gradient-to-b from-voicevault-softpurple to-transparent pt-safe">
+          <div className="flex-1 flex flex-col">
+            <header className="sticky top-0 z-10 bg-gradient-to-b from-voicevault-softpurple to-transparent">
               <div className="flex justify-between items-center px-6 py-4">
                 <CommonHeader />
                 <div className="flex items-center gap-4">
@@ -69,9 +73,9 @@ const Dashboard: React.FC = () => {
                   </Button>
                 </div>
               </div>
-            </div>
+            </header>
 
-            <div className="flex-1 flex flex-col justify-start items-center overflow-hidden">
+            <div className="flex-1 flex flex-col justify-start items-center overflow-y-auto">
               <main className="container mx-auto max-w-md w-full flex-1 flex flex-col justify-start items-center px-[24px] py-[24px]">
                 {recordingStatus === "reviewing" && currentRecording ? <RecordingReview recordingBlob={currentRecording} duration={recordingTime} onSave={saveRecording} onDiscard={discardRecording} className="py-[20px] my-[45px]" /> : <div className="flex flex-col items-center justify-start text-center space-y-4 w-full">
                     <div>
@@ -109,4 +113,5 @@ const Dashboard: React.FC = () => {
       </MonetizationProvider>
     </SidebarProvider>;
 };
+
 export default Dashboard;
