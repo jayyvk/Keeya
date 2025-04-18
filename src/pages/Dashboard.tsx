@@ -73,7 +73,7 @@ const Dashboard: React.FC = () => {
 
             <div className="flex-1 flex flex-col justify-start items-center overflow-hidden">
               <main className="container mx-auto max-w-md w-full flex-1 flex flex-col justify-start items-center px-[24px] py-[24px]">
-                {recordingStatus === "reviewing" && currentRecording ? <RecordingReview recordingBlob={currentRecording} duration={recordingTime} onSave={saveRecording} onDiscard={discardRecording} className="py-[20px] my-[45px]" /> : <div className="flex flex-col items-center justify-start text-center space-y-4 w-full">
+                {recordingStatus === "reviewing" && currentRecording ? <RecordingReview recordingBlob={currentRecording} duration={recordingTime} onSave={saveRecording} onDiscard={discardRecording} className="my-[50px] py-[22px]" /> : <div className="flex flex-col items-center justify-start text-center space-y-4 w-full">
                     <div>
                       <h2 className="text-2xl font-semibold text-voicevault-tertiary mb-2 my-[5px]">
                         Record a Voice Memory
