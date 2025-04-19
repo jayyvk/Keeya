@@ -14,58 +14,59 @@ const Landing: React.FC = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-voicevault-softpurple via-white to-white pt-safe"
+      className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-b from-[#E8E1FF] via-[#F4F0FF] to-white"
       onClick={handleClick}
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
-      <div className="text-center max-w-md w-full space-y-8">
+      <div className="text-center max-w-md w-full px-8">
         <h1 className="sr-only">keeya - Record and Preserve the Voices You Love Forever with AI Voice Memories</h1>
         
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="w-full flex justify-center"
+          className="w-full flex flex-col items-center"
         >
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="mb-6 bg-white p-6 rounded-full shadow-lg inline-flex items-center justify-center"
+            className="mb-12 bg-white p-8 rounded-full shadow-lg inline-flex items-center justify-center"
           >
-            <Mic className="h-14 w-14 text-voicevault-primary" />
+            <Mic className="h-16 w-16 text-[#8B5CF6]" />
           </motion.div>
-        </motion.div>
-        
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="font-sans text-4xl font-semibold mb-4 text-voicevault-primary text-center"
-        >
-          keeya
-        </motion.h2>
-        
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-          className="font-sans text-lg text-voicevault-secondary h-8 flex justify-center overflow-hidden"
-        >
-          <Typewriter 
-            text={["Preserve the voices you love, forever.", "Record memories that last a lifetime.", "Capture voices that matter to you."]} 
-            loop={true} 
-            delay={2000}
-            cursor="|"
-            className="font-sans text-lg text-voicevault-secondary whitespace-nowrap overflow-hidden text-ellipsis"
-          />
-        </motion.div>
-        
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-          className="font-mono text-sm text-voicevault-tertiary mt-12"
-        >
-          Tap anywhere to continue
+          
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="font-sans text-4xl font-semibold mb-4 text-[#6842C2]"
+          >
+            keeya
+          </motion.h2>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="h-6 mb-12"
+          >
+            <Typewriter 
+              text={["Record memories that last a lifetime."]} 
+              loop={false}
+              delay={2000}
+              cursor="|"
+              className="font-sans text-lg text-[#8B5CF6]"
+            />
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="font-mono text-sm text-gray-500/80"
+          >
+            Tap anywhere to continue
+          </motion.div>
         </motion.div>
       </div>
     </div>
