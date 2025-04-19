@@ -14,58 +14,61 @@ const Landing: React.FC = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-voicevault-softpurple to-white"
+      className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-b from-[#E8E1FF] via-[#F4F0FF] to-white"
       onClick={handleClick}
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
-      <h1 className="sr-only">keeya - Record and Preserve the Voices You Love Forever with AI Voice Memories</h1>
-      
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        className="text-center w-full"
-      >
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="mb-8 bg-white p-6 rounded-full shadow-lg inline-block"
-        >
-          <Mic className="h-16 w-16 text-voicevault-primary" />
-        </motion.div>
-        
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="font-sans text-heading-lg font-semibold mb-2 text-voicevault-tertiary text-center"
-        >
-          keeya
-        </motion.h2>
-        
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-          className="font-sans text-body text-voicevault-secondary mb-8 text-center h-6"
-        >
-          <Typewriter 
-            text={["Preserve the voices you love, forever.", "Record memories that last a lifetime.", "Capture voices that matter to you."]} 
-            loop={true} 
-            delay={2000}
-            cursor="|"
-            className="font-sans text-body text-voicevault-secondary"
-          />
-        </motion.p>
+      <div className="text-center max-w-md w-full px-8">
+        <h1 className="sr-only">keeya - Record and Preserve the Voices You Love Forever with AI Voice Memories</h1>
         
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-          className="font-mono text-sm text-gray-500 text-center"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="w-full flex flex-col items-center"
         >
-          Tap anywhere to continue
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="mb-12 bg-white p-8 rounded-full shadow-lg inline-flex items-center justify-center"
+          >
+            <Mic className="h-16 w-16 text-[#8B5CF6]" />
+          </motion.div>
+          
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="font-sans text-4xl font-semibold mb-4 text-[#6842C2]"
+          >
+            keeya
+          </motion.h2>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="h-6 mb-12"
+          >
+            <Typewriter 
+              text={["Record memories that last a lifetime."]} 
+              loop={false}
+              delay={2000}
+              cursor="|"
+              className="font-sans text-lg text-[#8B5CF6]"
+            />
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="font-mono text-sm text-gray-500/80"
+          >
+            Tap anywhere to continue
+          </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
     </div>
   );
 };
