@@ -70,7 +70,9 @@ export function Typewriter({
   ]);
  
   return (
-    <span className={className}>
+    <span 
+      className={`${className} whitespace-nowrap overflow-hidden text-ellipsis`}
+    >
       {displayText}
       <span className="animate-pulse">{cursor}</span>
     </span>
