@@ -51,11 +51,15 @@ const Landing: React.FC = () => {
             className="h-6 mb-12"
           >
             <Typewriter 
-              text={["Record memories that last a lifetime."]} 
-              loop={false}
+              text={[
+                "Record memories that last a lifetime.",
+                "Preserve the voices you love.",
+                "Share stories across generations."
+              ]} 
+              loop={true}
               delay={2000}
               cursor="|"
-              className="font-sans text-lg text-[#8B5CF6]"
+              className="font-sans text-lg text-[#8B5CF6] whitespace-nowrap overflow-hidden text-ellipsis"
             />
           </motion.div>
           
@@ -74,3 +78,4 @@ const Landing: React.FC = () => {
 };
 
 export default Landing;
+
