@@ -20,7 +20,7 @@ const Pricing: React.FC = () => {
         >
           <DashboardSidebar />
           <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="bg-gradient-to-b from-voicevault-softpurple to-transparent">
+            <div className="pt-safe">
               <div className="flex justify-between items-center px-6 py-4">
                 <CommonHeader />
               </div>

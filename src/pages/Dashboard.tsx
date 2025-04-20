@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -60,14 +59,9 @@ const Dashboard: React.FC = () => {
           <DashboardSidebar />
           
           <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="bg-white border-b border-[#F0F0F0] pt-safe">
+            <div className="pt-safe">
               <div className="flex justify-between items-center px-6 py-4">
                 <CommonHeader />
-                <div className="flex items-center gap-4">
-                  <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-500 hover:bg-red-50">
-                    <LogOut size={16} />
-                  </Button>
-                </div>
               </div>
             </div>
 
