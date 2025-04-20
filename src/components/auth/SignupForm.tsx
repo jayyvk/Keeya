@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -90,17 +89,12 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
         )) {
         setIsEmailTaken(true);
         setRegistrationError("This email is already registered. Please log in instead.");
-        toast({
-          title: "Email already registered",
-          description: "Please log in with your existing account instead.",
-          style: {
-            backgroundColor: '#ffc86b',
-            color: '#333'
-          }
+        toast.warning("Email already registered", {
+          description: "Please log in with your existing account instead."
         });
       } else {
         setRegistrationError(err.message || "Registration failed");
-        toast.error(err.message || "Registration failed", {
+        toast.error("Registration failed", {
           description: "Please try again or contact support."
         });
       }
