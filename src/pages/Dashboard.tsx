@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,7 +14,6 @@ import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { toast } from "sonner";
 import CommonHeader from "@/components/CommonHeader";
 import { MonetizationProvider } from "@/contexts/MonetizationContext";
-
 const Dashboard: React.FC = () => {
   const {
     recordings,
@@ -29,10 +27,11 @@ const Dashboard: React.FC = () => {
     saveRecording,
     discardRecording
   } = useRecording();
-  
-  const { user, logout } = useAuth();
+  const {
+    user,
+    logout
+  } = useAuth();
   const navigate = useNavigate();
-  
   const handleLogout = async () => {
     try {
       await logout();
@@ -48,13 +47,10 @@ const Dashboard: React.FC = () => {
       });
     }
   };
-  
   const goToVoiceCloning = () => {
     navigate("/voice-cloning");
   };
-  
-  return (
-    <SidebarProvider>
+  return <SidebarProvider>
       <MonetizationProvider>
         <div className="min-h-screen w-full bg-white flex">
           <DashboardSidebar />
@@ -73,16 +69,7 @@ const Dashboard: React.FC = () => {
 
             <div className="flex-1 flex flex-col justify-start items-center overflow-hidden">
               <main className="container mx-auto max-w-md w-full flex-1 flex flex-col justify-start items-center px-6 py-6">
-                {recordingStatus === "reviewing" && currentRecording ? (
-                  <RecordingReview 
-                    recordingBlob={currentRecording} 
-                    duration={recordingTime} 
-                    onSave={saveRecording} 
-                    onDiscard={discardRecording} 
-                    className="py-6 my-8 card-modern" 
-                  />
-                ) : (
-                  <div className="flex flex-col items-center justify-start text-center space-y-6 w-full">
+                {recordingStatus === "reviewing" && currentRecording ? <RecordingReview recordingBlob={currentRecording} duration={recordingTime} onSave={saveRecording} onDiscard={discardRecording} className="py-6 my-8 card-modern" /> : <div className="flex flex-col items-center justify-start text-center space-y-6 w-full py-[30px] my-[20px]">
                     <div>
                       <h2 className="text-heading font-bold text-[#1A1A1A] mb-2 my-2">
                         Record a Voice Memory
@@ -101,17 +88,12 @@ const Dashboard: React.FC = () => {
                     </div>
                     
                     <div className="flex flex-col items-center space-y-2 w-full">
-                      <Button 
-                        variant="outline" 
-                        onClick={goToVoiceCloning} 
-                        className="bg-white border-2 border-[#F0F0F0] hover:bg-[#F8F8FC] w-full font-medium py-0 my-4 shadow-button"
-                      >
+                      <Button variant="outline" onClick={goToVoiceCloning} className="bg-white border-2 border-[#F0F0F0] hover:bg-[#F8F8FC] w-full font-medium py-0 my-4 shadow-button">
                         <Wand2 className="mr-2 h-4 w-4 text-voicevault-primary" />
                         Voice Cloning Studio
                       </Button>
                     </div>
-                  </div>
-                )}
+                  </div>}
               </main>
               
               <div className="flex-shrink-0 overflow-hidden w-full bg-[#F8F8FC]">
@@ -121,8 +103,6 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </MonetizationProvider>
-    </SidebarProvider>
-  );
+    </SidebarProvider>;
 };
-
 export default Dashboard;
