@@ -57,7 +57,7 @@ const Dashboard: React.FC = () => {
           
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="bg-white border-b border-[#F0F0F0] pt-safe">
-              <div className="flex justify-between items-center px-6 py-4">
+              <div className="flex justify-between items-center px-6 py-[10px]">
                 <CommonHeader />
                 <div className="flex items-center gap-4">
                   <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-500 hover:bg-red-50">
@@ -69,7 +69,7 @@ const Dashboard: React.FC = () => {
 
             <div className="flex-1 flex flex-col justify-start items-center overflow-hidden">
               <main className="container mx-auto max-w-md w-full flex-1 flex flex-col justify-start items-center px-6 py-6">
-                {recordingStatus === "reviewing" && currentRecording ? <RecordingReview recordingBlob={currentRecording} duration={recordingTime} onSave={saveRecording} onDiscard={discardRecording} className="py-6 my-8 card-modern" /> : <div className="flex flex-col items-center justify-start text-center space-y-6 w-full py-[30px] my-[20px]">
+                {recordingStatus === "reviewing" && currentRecording ? <RecordingReview recordingBlob={currentRecording} duration={recordingTime} onSave={saveRecording} onDiscard={discardRecording} className="my-8 card-modern py-[2px]" /> : <div className="flex flex-col items-center justify-start text-center space-y-6 w-full py-[30px] my-[20px]">
                     <div>
                       <h2 className="text-heading font-bold text-[#1A1A1A] mb-2 my-2">
                         Record a Voice Memory
