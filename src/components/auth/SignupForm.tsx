@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +13,7 @@ import { TermsModal } from "./TermsModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 type SignupFormInputs = z.infer<typeof signupSchema>;
 
@@ -35,6 +37,8 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
   const [showTermsModal, setShowTermsModal] = React.useState(false);
   const [modalType, setModalType] = React.useState<'terms' | 'privacy'>('terms');
   const [isRegistering, setIsRegistering] = React.useState(false);
+  const [registrationError, setRegistrationError] = React.useState("");
+  const [isEmailTaken, setIsEmailTaken] = React.useState(false);
 
   const nextStep = async () => {
     if (step === 1) {
@@ -69,17 +73,51 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
   };
 
   const onSubmit = async (data: SignupFormInputs) => {
+    setRegistrationError("");
+    setIsEmailTaken(false);
+    
     try {
       setIsRegistering(true);
       await registerUser(data.name, data.email, data.password);
       toast.success("Registration successful!");
       navigate('/dashboard'); // Redirect to dashboard after successful registration
     } catch (err: any) {
-      toast.error(err.message || "Registration failed", {
-        description: "Please try again or contact support."
-      });
+      // Check if this is a "User already registered" error
+      if (err.message && (
+          err.message.includes("already registered") || 
+          err.message.includes("already in use") || 
+          err.message.includes("already exists")
+        )) {
+        setIsEmailTaken(true);
+        setRegistrationError("This email is already registered. Please log in instead.");
+        toast({
+          title: "Email already registered",
+          description: "Please log in with your existing account instead.",
+          style: {
+            backgroundColor: '#ffc86b',
+            color: '#333'
+          }
+        });
+      } else {
+        setRegistrationError(err.message || "Registration failed");
+        toast.error(err.message || "Registration failed", {
+          description: "Please try again or contact support."
+        });
+      }
     } finally {
       setIsRegistering(false);
+    }
+  };
+
+  const switchToLogin = () => {
+    // This function will be called from the parent component
+    // We're accessing it through a prop
+    const authComponent = document.querySelector('[data-auth-component]');
+    if (authComponent) {
+      const loginButton = authComponent.querySelector('[data-login-switch]');
+      if (loginButton && loginButton instanceof HTMLButtonElement) {
+        loginButton.click();
+      }
     }
   };
 
@@ -88,6 +126,20 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
       case 1:
         return (
           <div className="space-y-4">
+            {isEmailTaken && (
+              <Alert variant="destructive" className="bg-amber-50 border-amber-200 text-amber-800">
+                <AlertDescription>
+                  {registrationError}
+                  <Button 
+                    variant="link" 
+                    className="pl-1 text-voicevault-primary font-medium"
+                    onClick={switchToLogin}
+                  >
+                    Switch to login
+                  </Button>
+                </AlertDescription>
+              </Alert>
+            )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -215,7 +267,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
           type="button"
           onClick={nextStep}
           className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
-          disabled={isSubmitting}
+          disabled={isSubmitting || (isEmailTaken && step === 1)}
         >
           Continue
         </Button>

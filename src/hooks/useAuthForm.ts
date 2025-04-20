@@ -48,13 +48,31 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
       }
     } catch (err: any) {
       console.error(isLogin ? "Login error:" : "Registration error:", err);
-      setError(err.message || `${isLogin ? "Login" : "Registration"} failed`);
-      toast(err.message || `${isLogin ? "Login" : "Registration"} failed`, {
-        style: {
-          backgroundColor: 'red',
-          color: 'white'
-        }
-      });
+      
+      // Check if this is a "User already registered" error
+      if (!isLogin && err.message && (
+          err.message.includes("already registered") || 
+          err.message.includes("already in use") || 
+          err.message.includes("already exists")
+        )) {
+        setError("This email is already registered. Please log in instead.");
+        toast({
+          title: "Email already registered",
+          description: "Please log in with your existing account instead.",
+          style: {
+            backgroundColor: '#ffc86b',
+            color: '#333'
+          }
+        });
+      } else {
+        setError(err.message || `${isLogin ? "Login" : "Registration"} failed`);
+        toast(err.message || `${isLogin ? "Login" : "Registration"} failed`, {
+          style: {
+            backgroundColor: 'red',
+            color: 'white'
+          }
+        });
+      }
     } finally {
       setIsLoading(false);
     }
