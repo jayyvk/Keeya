@@ -14,7 +14,7 @@ const Landing: React.FC = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-voicevault-softpurple via-white to-white"
+      className="min-h-screen flex flex-col items-center justify-center p-6 bg-white"
       onClick={handleClick}
     >
       <h1 className="sr-only">keeya - Save the voices you love with AI Voice Memories</h1>
