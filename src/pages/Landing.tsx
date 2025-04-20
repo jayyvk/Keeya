@@ -14,10 +14,10 @@ const Landing: React.FC = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-voicevault-softpurple to-white"
+      className="min-h-screen flex flex-col items-center justify-center p-6 bg-white"
       onClick={handleClick}
     >
-      <h1 className="sr-only">keeya - Record and Preserve the Voices You Love Forever with AI Voice Memories</h1>
+      <h1 className="sr-only">keeya - Save the voices you love with AI Voice Memories</h1>
       
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
@@ -28,7 +28,7 @@ const Landing: React.FC = () => {
         <motion.div
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="mb-8 bg-white p-6 rounded-full shadow-lg inline-block"
+          className="mb-8 bg-[#F8F8FC] p-6 rounded-full shadow-button inline-block"
         >
           <Mic className="h-16 w-16 text-voicevault-primary" />
         </motion.div>
@@ -37,7 +37,7 @@ const Landing: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="font-sans text-heading-lg font-semibold mb-2 text-voicevault-tertiary text-center"
+          className="font-sans text-heading-lg font-bold mb-2 text-[#1A1A1A] text-center"
         >
           keeya
         </motion.h2>
@@ -46,14 +46,14 @@ const Landing: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5 }}
-          className="font-sans text-body text-voicevault-secondary mb-8 text-center h-6"
+          className="font-sans text-body text-[#333333] mb-8 text-center h-6"
         >
           <Typewriter 
-            text={["Preserve the voices you love, forever.", "Record memories that last a lifetime.", "Capture voices that matter to you."]} 
+            text={["Save the voices you love, forever.", "Record memories that last a lifetime.", "Capture voices that matter to you."]} 
             loop={true} 
             delay={2000}
             cursor="|"
-            className="font-sans text-body text-voicevault-secondary"
+            className="font-sans text-body text-[#333333]"
           />
         </motion.p>
         
@@ -61,7 +61,7 @@ const Landing: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.5 }}
-          className="font-mono text-sm text-gray-500 text-center"
+          className="font-mono text-xs text-gray-500 text-center"
         >
           Tap anywhere to continue
         </motion.div>

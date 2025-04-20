@@ -19,14 +19,16 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Apercu', 'Sora', 'Work Sans', 'system-ui', 'sans-serif'],
-        mono: ['Apercu Mono', 'Roboto Mono', 'monospace'],
+        sans: ['Apercu', 'Inter', 'system-ui', 'sans-serif'],
+        mono: ['Apercu Mono', 'DM Mono', 'Roboto Mono', 'monospace'],
       },
       fontSize: {
-        'heading-lg': '2rem',
-        'heading': '1.5rem',
-        'body': '1rem',
-        'button': '0.95rem',
+        'heading-lg': '32px',
+        'heading': '24px',
+        'body': '16px',
+        'small': '14px',
+        'xs': '12px',
+        'button': '16px',
       },
       colors: {
         border: 'hsl(var(--border))',
@@ -73,14 +75,14 @@ export default {
           ring: 'hsl(var(--sidebar-ring))'
         },
         voicevault: {
-          softpurple: '#E5DEFF',
-          softpink: '#FFDEE2',
-          softpeach: '#FDE1D3',
-          softgray: '#F1F0FB',
+          softpurple: '#F0EBFF',
+          softpink: '#FFF0F2',
+          softpeach: '#FFF5EF',
+          softgray: '#F8F8FC',
           neutralgray: '#8E9196',
-          primary: '#9b87f5',
-          secondary: '#7E69AB',
-          tertiary: '#6E59A5',
+          primary: '#A084DC',
+          secondary: '#9371D9',
+          tertiary: '#7759C3',
           light: '#D6BCFA'
         },
         fontFamily: {
@@ -91,9 +93,13 @@ export default {
         'safe': 'env(safe-area-inset-top)'
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)'
+        lg: '16px',
+        md: '12px',
+        sm: '8px'
+      },
+      boxShadow: {
+        'card': '0px 4px 12px rgba(0,0,0,0.05)',
+        'button': '0px 2px 6px rgba(0,0,0,0.08)',
       },
       keyframes: {
         'accordion-down': {

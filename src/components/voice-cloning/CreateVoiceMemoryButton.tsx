@@ -17,10 +17,10 @@ const CreateVoiceMemoryButton: React.FC<CreateVoiceMemoryButtonProps> = ({
   isMobile = false
 }) => {
   return (
-    <section className="flex justify-center mb-6 md:mb-8">
+    <section className="flex justify-center mb-8">
       <Button 
         size={isMobile ? "default" : "lg"}
-        className={`${isReadyToClone ? 'animate-pulse' : 'opacity-70'} ${isMobile ? 'px-4 py-2 text-base w-full' : 'px-8 py-6 text-lg'}`}
+        className={`${isReadyToClone ? '' : 'opacity-70'} ${isMobile ? 'px-4 py-2 w-full' : 'px-8 py-5'} bg-voicevault-primary hover:bg-voicevault-secondary text-white rounded-full shadow-button`}
         onClick={onClick}
         disabled={!isReadyToClone || isCloning}
       >
