@@ -11,11 +11,14 @@ import { z } from "zod";
 import { TermsModal } from "./TermsModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 type SignupFormInputs = z.infer<typeof signupSchema>;
 
 export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: number) => void }) => {
   const { register: registerUser } = useAuth();
+  const navigate = useNavigate();
+  
   const {
     register,
     handleSubmit,
@@ -31,6 +34,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
   const [agreeToTerms, setAgreeToTerms] = React.useState(false);
   const [showTermsModal, setShowTermsModal] = React.useState(false);
   const [modalType, setModalType] = React.useState<'terms' | 'privacy'>('terms');
+  const [isRegistering, setIsRegistering] = React.useState(false);
 
   const nextStep = async () => {
     if (step === 1) {
@@ -66,11 +70,16 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
 
   const onSubmit = async (data: SignupFormInputs) => {
     try {
+      setIsRegistering(true);
       await registerUser(data.name, data.email, data.password);
+      toast.success("Registration successful!");
+      navigate('/dashboard'); // Redirect to dashboard after successful registration
     } catch (err: any) {
       toast.error(err.message || "Registration failed", {
         description: "Please try again or contact support."
       });
+    } finally {
+      setIsRegistering(false);
     }
   };
 
@@ -214,10 +223,10 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
         <Button 
           type="submit"
           onClick={handleSubmit(onSubmit)}
-          disabled={isSubmitting || !purpose || !recordingFrequency}
+          disabled={isSubmitting || isRegistering || !purpose || !recordingFrequency}
           className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
         >
-          {isSubmitting ? (
+          {isSubmitting || isRegistering ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Creating Account...

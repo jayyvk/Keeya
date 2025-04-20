@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,7 +12,7 @@ import { toast } from "sonner";
 const Auth = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(false); // Changed to false to show signup by default
   const [step, setStep] = useState(1);
 
   useEffect(() => {
