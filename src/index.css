@@ -4,178 +4,27 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    /* Base colors */
-    --background: 0 0% 100%;
-    --foreground: 240 10% 10%;
-
-    /* Card */
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 10%;
-
-    /* Popover */
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 10%;
-
-    /* Primary (Purple) */
-    --primary: 260 57% 69%;
-    --primary-foreground: 0 0% 100%;
-
-    /* Secondary (Soft Grey) */
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 240 10% 10%;
-
-    /* Muted */
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 10% 40%;
-
-    /* Accent (Soft Purple) */
-    --accent: 260 40% 96%;
-    --accent-foreground: 240 10% 10%;
-
-    /* Destructive */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-
-    /* Border & Controls */
-    --border: 240 5% 90%;
-    --input: 240 5% 90%;
-    --ring: 260 57% 69%;
-
-    --radius: 16px;
-
-    /* Sidebar */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 240 10% 10%;
-    --sidebar-primary: 260 57% 69%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 5% 96%;
-    --sidebar-accent-foreground: 240 10% 10%;
-    --sidebar-border: 240 5% 90%;
-    --sidebar-ring: 260 57% 69%;
-  }
-
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 260 57% 69%;
-    --primary-foreground: 0 0% 98%;
-
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 260 57% 69%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-
   body {
-    @apply bg-white text-foreground font-sans text-body antialiased;
+    @apply bg-white text-text-primary font-sans antialiased;
     min-height: 100vh;
-    min-height: -webkit-fill-available;
-    padding-top: env(safe-area-inset-top);
-  }
-
-  html {
-    height: -webkit-fill-available;
+    line-height: 1.6;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-sans font-semibold text-[#1A1A1A];
+    @apply font-sans font-bold text-text-primary;
   }
 
-  button {
-    @apply font-sans text-button font-medium;
+  p {
+    @apply text-text-secondary;
   }
 }
 
 @layer components {
-  /* Clean Shadows */
-  .shadow-card {
-    @apply shadow-[0px_4px_12px_rgba(0,0,0,0.05)];
+  .card-modern {
+    @apply bg-white rounded-lg shadow-card border border-gray-100 p-4 md:p-6;
   }
-  
-  .shadow-button {
-    @apply shadow-[0px_2px_6px_rgba(0,0,0,0.08)];
-  }
-  
-  /* Vertical spacers */
-  .spacer-sm {
-    @apply my-4;
-  }
-  
-  .spacer-md {
-    @apply my-6;
-  }
-  
-  .spacer-lg {
-    @apply my-8;
-  }
-  
-  /* Responsive paddings */
+
   .section-padding {
     @apply px-4 py-4 md:px-6 md:py-6;
   }
-  
-  /* Cards */
-  .card-modern {
-    @apply bg-white rounded-lg shadow-card border border-[#F0F0F0] p-4 md:p-6;
-  }
-  
-  /* Audio visualization bars */
-  .waveform-bar {
-    @apply rounded-full bg-voicevault-primary;
-    transition: height 0.2s ease-in-out;
-  }
-  
-  /* Interactive elements */
-  .hover-scale {
-    @apply transition-transform duration-200 hover:scale-105;
-  }
-  
-  .pulse-element {
-    @apply animate-pulse-recording;
-  }
-}
-
-/* Custom scrollbar styling */
-* {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none;  /* Internet Explorer 10+ */
-}
-
-/* WebKit browsers */
-*::-webkit-scrollbar {
-  display: none;
 }

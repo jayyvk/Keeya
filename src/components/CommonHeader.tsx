@@ -30,15 +30,16 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
   const showCredits = location.pathname === "/voice-cloning";
 
   return (
-    <div className="flex justify-between items-center w-full px-0 py-0">
-      <div className="flex items-center gap-4 py-4 px-2">
+    <div className="flex justify-between items-center w-full px-4 py-4">
+      <div className="flex items-center gap-4">
         <SidebarTrigger />
       </div>
       
       <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center">
         <h1 
           onClick={handleHeaderClick} 
-          className="text-2xl md:text-3xl font-bold text-[#1A1A1A] cursor-pointer hover:text-voicevault-primary transition-colors text-center"
+          className="text-3xl font-bold cursor-pointer hover:opacity-80 transition-opacity text-center"
+          style={{ color: '#A084DC' }} // Preserve the specific purple
         >
           keeya
         </h1>
