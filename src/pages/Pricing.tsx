@@ -1,3 +1,4 @@
+
 import React from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
@@ -20,7 +21,7 @@ const Pricing: React.FC = () => {
           <DashboardSidebar />
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="">
-              <div className="flex justify-between items-center px-6 py-4">
+              <div className="flex justify-between items-center px-6 py-4 bg-transparent">
                 <CommonHeader />
               </div>
             </div>

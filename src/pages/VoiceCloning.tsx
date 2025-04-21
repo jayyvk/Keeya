@@ -1,4 +1,5 @@
-import React, { Suspense } from "react";
+
+import React, { Suspense, useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import VoiceCloneContent from "@/components/voice-cloning/VoiceCloneContent";
@@ -6,8 +7,16 @@ import CommonHeader from "@/components/CommonHeader";
 import { MonetizationProvider } from "@/contexts/MonetizationContext";
 import { Toaster } from "@/components/ui/sonner";
 import PageTransition from "@/components/PageTransition";
+import { useAuth } from "@/contexts/AuthContext";
+import AuthRequiredModal from "@/components/AuthRequiredModal";
 
 const VoiceCloning: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+
+  // All actual AI/clone actions should be gated in child components,
+  // but provide modal support here as well if needed.
+
   return (
     <SidebarProvider>
       <MonetizationProvider>
@@ -15,7 +24,7 @@ const VoiceCloning: React.FC = () => {
           <DashboardSidebar />
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="">
-              <div className="flex justify-between items-center px-6 py-4">
+              <div className="flex justify-between items-center px-6 py-4 bg-transparent">
                 <CommonHeader />
               </div>
             </div>
@@ -26,6 +35,7 @@ const VoiceCloning: React.FC = () => {
             </div>
           </div>
           <Toaster />
+          <AuthRequiredModal open={authModalOpen} onClose={() => setAuthModalOpen(false)} />
         </PageTransition>
       </MonetizationProvider>
     </SidebarProvider>

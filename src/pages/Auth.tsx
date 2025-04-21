@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,24 +11,25 @@ import { toast } from "sonner";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated, user } = useAuth();
-  const [isLogin, setIsLogin] = useState(false); // Show signup by default
+  const [isLogin, setIsLogin] = useState(false);
   const [step, setStep] = useState(1);
 
+  // Get the intended redirect after auth (from state)
+  const redirectTo = location.state?.redirectTo || "/dashboard";
+
   useEffect(() => {
-    console.log("Auth page - Authentication status:", { isAuthenticated, user });
-    
     if (isAuthenticated && user) {
-      // Only show the welcome toast
       toast(`Welcome, ${user.name || 'there'}!`);
-      navigate("/dashboard", { replace: true });
+      navigate(redirectTo, { replace: true });
     }
-  }, [isAuthenticated, navigate, user]);
+  }, [isAuthenticated, navigate, user, redirectTo]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-white" data-auth-component>
+    <div className="keeya-bg min-h-screen flex items-center justify-center p-6" data-auth-component>
       <Card className="w-full max-w-md shadow-card animate-fade-in border border-[#F0F0F0] rounded-lg">
-        <CardHeader className="text-center">
+        <CardHeader className="text-center bg-transparent">
           <CardTitle className="text-2xl font-bold text-[#1A1A1A]">
             {isLogin ? "Welcome Back" : (
               <>
@@ -48,7 +49,6 @@ const Auth = () => {
             )}
           </CardDescription>
         </CardHeader>
-        
         <AnimatePresence mode="wait">
           <motion.div 
             key={`${isLogin ? 'login' : `signup-${step}`}`}
@@ -63,7 +63,6 @@ const Auth = () => {
               ) : (
                 <SignupForm step={step} setStep={setStep} />
               )}
-              
               {(isLogin || step === 1) && (
                 <div className="text-center mt-6">
                   <span className="text-small text-[#333333]">

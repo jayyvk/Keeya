@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useState } from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { toast } from "sonner";
 import CommonHeader from "@/components/CommonHeader";
 import { MonetizationProvider } from "@/contexts/MonetizationContext";
+import AuthRequiredModal from "@/components/AuthRequiredModal";
 
 const Dashboard: React.FC = () => {
   const {
@@ -30,9 +32,13 @@ const Dashboard: React.FC = () => {
   } = useRecording();
   const {
     user,
-    logout
+    logout,
+    isAuthenticated
   } = useAuth();
   const navigate = useNavigate();
+
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [postAuthAction, setPostAuthAction] = useState<(() => void) | null>(null);
 
   const handleLogout = async () => {
     try {
@@ -50,31 +56,63 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const goToVoiceCloning = () => {
-    navigate("/voice-cloning");
+  const attemptProtectedAction = (action: () => void) => {
+    if (isAuthenticated) {
+      action();
+    } else {
+      setAuthModalOpen(true);
+      setPostAuthAction(() => action);
+    }
   };
+
+  const protectedSaveRecording = (title: string, tags: string[]) => {
+    attemptProtectedAction(() => saveRecording(title, tags));
+  };
+
+  const goToVoiceCloning = () => {
+    if (isAuthenticated) {
+      navigate("/voice-cloning");
+    } else {
+      setAuthModalOpen(true);
+      setPostAuthAction(() => () => navigate("/voice-cloning"));
+    }
+  };
+
+  const onCloseAuthModal = () => setAuthModalOpen(false);
+
+  // If user logs in via Auth modal, run the desired action
+  // (Handled in AuthRequiredModal with redirectTo/support)
 
   return (
     <SidebarProvider>
       <MonetizationProvider>
         <div className="keeya-bg min-h-screen w-full flex">
           <DashboardSidebar />
-          
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="">
-              <div className="flex justify-between items-center px-6 py-[10px]">
+              <div className="flex justify-between items-center px-6 py-[10px] bg-transparent">
                 <CommonHeader />
-                <div className="flex items-center gap-4">
-                  <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-500 hover:bg-red-50">
-                    <LogOut size={16} />
-                  </Button>
-                </div>
+                {isAuthenticated && (
+                  <div className="flex items-center gap-4">
+                    <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-500 hover:bg-red-50">
+                      <LogOut size={16} />
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
-
             <div className="flex-1 flex flex-col justify-start items-center overflow-hidden">
               <main className="container mx-auto max-w-md w-full flex-1 flex flex-col justify-start items-center px-6 py-6">
-                {recordingStatus === "reviewing" && currentRecording ? <RecordingReview recordingBlob={currentRecording} duration={recordingTime} onSave={saveRecording} onDiscard={discardRecording} className="my-8 card-modern py-[2px]" /> : <div className="flex flex-col items-center justify-start text-center space-y-6 w-full py-[30px] my-[20px]">
+                {recordingStatus === "reviewing" && currentRecording ? (
+                  <RecordingReview
+                    recordingBlob={currentRecording}
+                    duration={recordingTime}
+                    onSave={protectedSaveRecording}
+                    onDiscard={discardRecording}
+                    className="my-8 card-modern py-[2px]"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-start text-center space-y-6 w-full py-[30px] my-[20px]">
                     <div>
                       <h2 className="text-heading font-bold text-[#1A1A1A] mb-2 my-2">
                         Record a Voice Memory
@@ -83,29 +121,36 @@ const Dashboard: React.FC = () => {
                         Tap the microphone to start recording your precious voice memories
                       </p>
                     </div>
-                    
                     <RecordingTimer status={recordingStatus} time={recordingTime} />
-                    
                     <AudioWaveform status={recordingStatus} />
-                    
                     <div className="transform scale-95">
-                      <RecordButton status={recordingStatus} onStart={startRecording} onStop={stopRecording} onPause={pauseRecording} onResume={resumeRecording} />
+                      <RecordButton
+                        status={recordingStatus}
+                        onStart={startRecording}
+                        onStop={stopRecording}
+                        onPause={pauseRecording}
+                        onResume={resumeRecording}
+                      />
                     </div>
-                    
                     <div className="flex flex-col items-center space-y-2 w-full">
-                      <Button variant="outline" onClick={goToVoiceCloning} className="bg-white border-2 border-[#F0F0F0] hover:bg-[#F8F8FC] w-full font-medium py-0 my-4 shadow-button">
+                      <Button
+                        variant="outline"
+                        onClick={goToVoiceCloning}
+                        className="bg-white border-2 border-[#F0F0F0] hover:bg-[#F8F8FC] w-full font-medium py-0 my-4 shadow-button"
+                      >
                         <Wand2 className="mr-2 h-4 w-4 text-voicevault-primary" />
                         Voice Cloning Studio
                       </Button>
                     </div>
-                  </div>}
+                  </div>
+                )}
               </main>
-              
               <div className="flex-shrink-0 overflow-hidden w-full bg-[#F8F8FC]">
                 <AudioVault recordings={recordings} />
               </div>
             </div>
           </div>
+          <AuthRequiredModal open={authModalOpen} onClose={onCloseAuthModal} next={postAuthAction} />
         </div>
       </MonetizationProvider>
     </SidebarProvider>

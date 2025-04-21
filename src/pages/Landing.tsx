@@ -1,24 +1,16 @@
+
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { Mic } from "lucide-react";
 import { motion } from "framer-motion";
 import { Typewriter } from "@/components/ui/typewriter";
 
 const Landing: React.FC = () => {
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    navigate("/auth");
-  };
-
+  // No auto-auth or navigation
   return (
     <div 
-      className="keeya-bg flex flex-col items-center justify-center p-6"
-      style={{ minHeight: "100vh" }}
-      onClick={handleClick}
+      className="keeya-bg flex flex-col items-center justify-center p-6 min-h-screen"
     >
       <h1 className="sr-only">keeya - Save the voices you love with AI Voice Memories</h1>
-      
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -32,7 +24,6 @@ const Landing: React.FC = () => {
         >
           <Mic className="h-16 w-16 text-voicevault-primary" />
         </motion.div>
-        
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -41,7 +32,6 @@ const Landing: React.FC = () => {
         >
           keeya
         </motion.h2>
-        
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -56,14 +46,13 @@ const Landing: React.FC = () => {
             className="font-sans text-body text-[#333333]"
           />
         </motion.p>
-        
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.5 }}
           className="font-mono text-xs text-gray-500 text-center"
         >
-          Tap anywhere to continue
+          Welcome to Keeya – scroll down to get started
         </motion.div>
       </motion.div>
     </div>
