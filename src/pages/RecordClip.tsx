@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -97,13 +96,13 @@ const RecordClip = () => {
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">
+    return <div className="keeya-bg min-h-screen flex items-center justify-center">
       <p>Loading...</p>
     </div>;
   }
 
   if (error) {
-    return <div className="min-h-screen flex items-center justify-center">
+    return <div className="keeya-bg min-h-screen flex items-center justify-center">
       <div className="text-center">
         <h1 className="text-2xl font-bold text-red-500 mb-2">Error</h1>
         <p className="text-gray-600">{error}</p>
@@ -112,7 +111,7 @@ const RecordClip = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-voicevault-softpurple to-white flex items-center justify-center px-4">
+    <div className="keeya-bg min-h-screen flex items-center justify-center px-4">
       <div className="max-w-md w-full space-y-8 text-center">
         <div>
           <h1 className="text-2xl font-bold text-voicevault-tertiary mb-2">

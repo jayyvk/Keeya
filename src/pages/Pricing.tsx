@@ -1,4 +1,3 @@
-
 import React from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
@@ -12,7 +11,7 @@ const Pricing: React.FC = () => {
     <SidebarProvider>
       <MonetizationProvider>
         <motion.div 
-          className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex"
+          className="keeya-bg min-h-screen w-full flex"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -20,7 +19,7 @@ const Pricing: React.FC = () => {
         >
           <DashboardSidebar />
           <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="bg-gradient-to-b from-voicevault-softpurple to-transparent">
+            <div className="">
               <div className="flex justify-between items-center px-6 py-4">
                 <CommonHeader />
               </div>

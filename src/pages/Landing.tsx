@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Mic } from "lucide-react";
@@ -14,7 +13,8 @@ const Landing: React.FC = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col items-center justify-center p-6 bg-white"
+      className="keeya-bg flex flex-col items-center justify-center p-6"
+      style={{ minHeight: "100vh" }}
       onClick={handleClick}
     >
       <h1 className="sr-only">keeya - Save the voices you love with AI Voice Memories</h1>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Mail, Star } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
@@ -50,7 +49,6 @@ const About = () => {
         description: "We really appreciate your input.",
       });
 
-      // Reset rating after submission
       setRating(0);
     } catch (error) {
       console.error('Error submitting rating:', error);
@@ -65,7 +63,7 @@ const About = () => {
   return (
     <SidebarProvider>
       <MonetizationProvider>
-        <div className="min-h-screen bg-gradient-to-b from-voicevault-softpurple via-white to-white flex">
+        <div className="keeya-bg min-h-screen flex">
           <DashboardSidebar />
           <div className="flex-1">
             <div className="pt-safe">
@@ -73,10 +71,8 @@ const About = () => {
                 <CommonHeader />
               </div>
             </div>
-
             <main className="container mx-auto px-6 py-8 max-w-2xl">
               <div className="space-y-12">
-                {/* About Description */}
                 <section className="text-center space-y-6">
                   <p className="text-lg leading-relaxed text-gray-700">
                     Keeya is a voice memory app that helps you record, store, and relive voices that matter.
@@ -84,14 +80,12 @@ const About = () => {
                   </p>
                 </section>
 
-                {/* Subheading */}
                 <section className="text-center">
                   <p className="text-base text-gray-600">
                     We're still building. If something feels off or something feels right — we'd love to hear it.
                   </p>
                 </section>
 
-                {/* Contact Section */}
                 <section className="flex justify-center">
                   <button
                     onClick={handleEmailClick}
@@ -102,7 +96,6 @@ const About = () => {
                   </button>
                 </section>
 
-                {/* Rating Stars */}
                 <section className="space-y-4">
                   <div className="flex justify-center gap-2">
                     {[1, 2, 3, 4, 5].map((starIndex) => (

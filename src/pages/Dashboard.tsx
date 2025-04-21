@@ -14,6 +14,7 @@ import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { toast } from "sonner";
 import CommonHeader from "@/components/CommonHeader";
 import { MonetizationProvider } from "@/contexts/MonetizationContext";
+
 const Dashboard: React.FC = () => {
   const {
     recordings,
@@ -32,6 +33,7 @@ const Dashboard: React.FC = () => {
     logout
   } = useAuth();
   const navigate = useNavigate();
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -47,16 +49,19 @@ const Dashboard: React.FC = () => {
       });
     }
   };
+
   const goToVoiceCloning = () => {
     navigate("/voice-cloning");
   };
-  return <SidebarProvider>
+
+  return (
+    <SidebarProvider>
       <MonetizationProvider>
-        <div className="min-h-screen w-full bg-white flex">
+        <div className="keeya-bg min-h-screen w-full flex">
           <DashboardSidebar />
           
           <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="bg-white border-b border-[#F0F0F0] pt-safe">
+            <div className="">
               <div className="flex justify-between items-center px-6 py-[10px]">
                 <CommonHeader />
                 <div className="flex items-center gap-4">
@@ -103,6 +108,8 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </MonetizationProvider>
-    </SidebarProvider>;
+    </SidebarProvider>
+  );
 };
+
 export default Dashboard;

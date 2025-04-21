@@ -1,4 +1,3 @@
-
 import React, { Suspense } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
@@ -12,16 +11,14 @@ const VoiceCloning: React.FC = () => {
   return (
     <SidebarProvider>
       <MonetizationProvider>
-        <PageTransition className="min-h-screen w-full bg-gradient-to-b from-voicevault-softpurple via-white to-white flex">
+        <PageTransition className="keeya-bg min-h-screen w-full flex">
           <DashboardSidebar />
-          
           <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="bg-gradient-to-b from-voicevault-softpurple to-transparent">
+            <div className="">
               <div className="flex justify-between items-center px-6 py-4">
                 <CommonHeader />
               </div>
             </div>
-
             <div className="flex-1 overflow-y-auto">
               <Suspense fallback={<div className="p-8 text-center">Loading voice tools...</div>}>
                 <VoiceCloneContent />
