@@ -3,12 +3,19 @@ import React from "react";
 import { Mic } from "lucide-react";
 import { motion } from "framer-motion";
 import { Typewriter } from "@/components/ui/typewriter";
+import { useNavigate } from "react-router-dom";
 
 const Landing: React.FC = () => {
-  // No auto-auth or navigation
+  const navigate = useNavigate();
+
+  const handleTap = () => {
+    navigate("/dashboard");
+  };
+
   return (
     <div 
-      className="keeya-bg flex flex-col items-center justify-center p-6 min-h-screen"
+      className="keeya-bg flex flex-col items-center justify-center p-6 min-h-screen cursor-pointer"
+      onClick={handleTap}
     >
       <h1 className="sr-only">keeya - Save the voices you love with AI Voice Memories</h1>
       <motion.div
@@ -60,4 +67,3 @@ const Landing: React.FC = () => {
 };
 
 export default Landing;
-
