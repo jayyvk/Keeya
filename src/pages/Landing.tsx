@@ -52,7 +52,7 @@ const Landing: React.FC = () => {
           transition={{ delay: 0.6, duration: 0.5 }}
           className="font-mono text-xs text-gray-500 text-center"
         >
-          Welcome to Keeya – scroll down to get started
+          Tap anywhere to continue
         </motion.div>
       </motion.div>
     </div>
@@ -60,3 +60,4 @@ const Landing: React.FC = () => {
 };
 
 export default Landing;
+
