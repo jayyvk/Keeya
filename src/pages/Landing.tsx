@@ -2,6 +2,7 @@
 import React from "react";
 import { Mic } from "lucide-react";
 import { motion } from "framer-motion";
+import { Typewriter } from "@/components/ui/typewriter";
 
 const Landing: React.FC = () => {
   // No auto-auth or navigation
@@ -37,7 +38,13 @@ const Landing: React.FC = () => {
           transition={{ delay: 0.4, duration: 0.5 }}
           className="font-sans text-body text-[#333333] mb-8 text-center h-6"
         >
-          Tap anywhere to continue
+          <Typewriter 
+            text={["Save the voices you love, forever.", "Record memories that last a lifetime.", "Capture voices that matter to you."]} 
+            loop={true} 
+            delay={2000}
+            cursor="|"
+            className="font-sans text-body text-[#333333]"
+          />
         </motion.p>
         <motion.div
           initial={{ opacity: 0 }}
@@ -53,4 +60,3 @@ const Landing: React.FC = () => {
 };
 
 export default Landing;
-
