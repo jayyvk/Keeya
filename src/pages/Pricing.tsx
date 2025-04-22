@@ -12,7 +12,7 @@ const Pricing: React.FC = () => {
     <SidebarProvider>
       <MonetizationProvider>
         <motion.div 
-          className="keeya-bg min-h-screen w-full flex"
+          className="bg-white min-h-screen w-full flex"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

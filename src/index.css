@@ -167,22 +167,17 @@
     @apply animate-pulse-recording;
   }
   
-  /* Keeya universal purple gradient background */
+  /* Keeya universal background */
   .keeya-bg {
-    background: linear-gradient(145deg, #F0EBFF 0%, #FFFFFF 100%);
-    /* This matches the purple gradient effect from the Landing page */
-    min-height: 100vh;
-    width: 100vw;
+    @apply bg-white;
   }
 }
 
-/* Custom scrollbar styling */
 * {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none;  /* Internet Explorer 10+ */
 }
 
-/* WebKit browsers */
 *::-webkit-scrollbar {
   display: none;
 }

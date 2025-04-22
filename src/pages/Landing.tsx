@@ -14,7 +14,7 @@ const Landing: React.FC = () => {
 
   return (
     <div 
-      className="keeya-bg flex flex-col items-center justify-center p-6 min-h-screen cursor-pointer"
+      className="bg-white flex flex-col items-center justify-center p-6 min-h-screen cursor-pointer fixed inset-0 overflow-hidden"
       onClick={handleTap}
     >
       <h1 className="sr-only">keeya - Save the voices you love with AI Voice Memories</h1>

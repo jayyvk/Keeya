@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -80,13 +79,10 @@ const Dashboard: React.FC = () => {
 
   const onCloseAuthModal = () => setAuthModalOpen(false);
 
-  // If user logs in via Auth modal, run the desired action
-  // (Handled in AuthRequiredModal with redirectTo/support)
-
   return (
     <SidebarProvider>
       <MonetizationProvider>
-        <div className="keeya-bg min-h-screen w-full flex">
+        <div className="bg-white min-h-screen w-full flex">
           <DashboardSidebar />
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="">
@@ -101,8 +97,8 @@ const Dashboard: React.FC = () => {
                 )}
               </div>
             </div>
-            <div className="flex-1 flex flex-col justify-start items-center overflow-hidden">
-              <main className="container mx-auto max-w-md w-full flex-1 flex flex-col justify-start items-center px-6 py-6">
+            <div className="flex-1 flex flex-col justify-center items-center overflow-hidden">
+              <main className="container mx-auto max-w-md w-full flex-1 flex flex-col justify-center items-center px-6">
                 {recordingStatus === "reviewing" && currentRecording ? (
                   <RecordingReview
                     recordingBlob={currentRecording}
@@ -112,7 +108,7 @@ const Dashboard: React.FC = () => {
                     className="my-8 card-modern py-[2px]"
                   />
                 ) : (
-                  <div className="flex flex-col items-center justify-start text-center space-y-6 w-full py-[30px] my-[20px]">
+                  <div className="flex flex-col items-center justify-center text-center space-y-6 w-full">
                     <div>
                       <h2 className="text-heading font-bold text-[#1A1A1A] mb-2 my-2">
                         Record a Voice Memory
@@ -145,7 +141,7 @@ const Dashboard: React.FC = () => {
                   </div>
                 )}
               </main>
-              <div className="flex-shrink-0 overflow-hidden w-full bg-[#F8F8FC]">
+              <div className="flex-shrink-0 overflow-hidden w-full">
                 <AudioVault recordings={recordings} />
               </div>
             </div>

@@ -1,4 +1,3 @@
-
 import React, { Suspense, useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
@@ -14,13 +13,10 @@ const VoiceCloning: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const [authModalOpen, setAuthModalOpen] = useState(false);
 
-  // All actual AI/clone actions should be gated in child components,
-  // but provide modal support here as well if needed.
-
   return (
     <SidebarProvider>
       <MonetizationProvider>
-        <PageTransition className="keeya-bg min-h-screen w-full flex">
+        <PageTransition className="bg-white min-h-screen w-full flex">
           <DashboardSidebar />
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="">
