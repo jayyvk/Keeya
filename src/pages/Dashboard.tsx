@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import CommonHeader from "@/components/CommonHeader";
 import { MonetizationProvider } from "@/contexts/MonetizationContext";
 import AuthRequiredModal from "@/components/AuthRequiredModal";
+
 const Dashboard: React.FC = () => {
   const {
     recordings,
@@ -36,6 +37,7 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [postAuthAction, setPostAuthAction] = useState<(() => void) | null>(null);
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -51,6 +53,7 @@ const Dashboard: React.FC = () => {
       });
     }
   };
+
   const attemptProtectedAction = (action: () => void) => {
     if (isAuthenticated) {
       action();
@@ -59,9 +62,11 @@ const Dashboard: React.FC = () => {
       setPostAuthAction(() => action);
     }
   };
+
   const protectedSaveRecording = (title: string, tags: string[]) => {
     attemptProtectedAction(() => saveRecording(title, tags));
   };
+
   const goToVoiceCloning = () => {
     if (isAuthenticated) {
       navigate("/voice-cloning");
@@ -70,8 +75,11 @@ const Dashboard: React.FC = () => {
       setPostAuthAction(() => () => navigate("/voice-cloning"));
     }
   };
+
   const onCloseAuthModal = () => setAuthModalOpen(false);
-  return <SidebarProvider>
+
+  return (
+    <SidebarProvider defaultOpen={false}>
       <MonetizationProvider>
         <div className="bg-white min-h-screen w-full flex">
           <DashboardSidebar />
@@ -118,6 +126,8 @@ const Dashboard: React.FC = () => {
           <AuthRequiredModal open={authModalOpen} onClose={onCloseAuthModal} next={postAuthAction} />
         </div>
       </MonetizationProvider>
-    </SidebarProvider>;
+    </SidebarProvider>
+  );
 };
+
 export default Dashboard;

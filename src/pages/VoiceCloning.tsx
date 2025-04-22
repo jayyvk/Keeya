@@ -1,3 +1,4 @@
+
 import React, { Suspense, useState } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
@@ -14,7 +15,7 @@ const VoiceCloning: React.FC = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <MonetizationProvider>
         <PageTransition className="bg-white min-h-screen w-full flex">
           <DashboardSidebar />

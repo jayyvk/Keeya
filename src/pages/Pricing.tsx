@@ -9,7 +9,7 @@ import { MonetizationProvider } from "@/contexts/MonetizationContext";
 
 const Pricing: React.FC = () => {
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <MonetizationProvider>
         <motion.div 
           className="bg-white min-h-screen w-full flex"
