@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useRecording } from "@/contexts/RecordingContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -98,8 +97,8 @@ const Dashboard: React.FC = () => {
                 )}
               </div>
             </div>
-            <div className="flex-1 overflow-hidden flex flex-col items-center justify-center">
-              <main className="container mx-auto max-w-md w-full flex-1 flex flex-col justify-center items-center px-6 overflow-hidden">
+            <div className="flex-1 overflow-hidden flex flex-col">
+              <main className="container mx-auto max-w-md w-full flex-1 flex flex-col justify-center items-center px-6">
                 {recordingStatus === "reviewing" && currentRecording ? (
                   <RecordingReview
                     recordingBlob={currentRecording}
@@ -142,7 +141,7 @@ const Dashboard: React.FC = () => {
                   </div>
                 )}
               </main>
-              <div className="w-full overflow-y-auto">
+              <div className="w-full overflow-y-auto flex-1">
                 <AudioVault recordings={recordings} />
               </div>
             </div>
@@ -155,4 +154,3 @@ const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
-
