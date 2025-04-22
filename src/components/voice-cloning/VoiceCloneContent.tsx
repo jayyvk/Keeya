@@ -17,7 +17,6 @@ import VoiceCloneIntro from "./VoiceCloneIntro";
 import CreateVoiceMemoryButton from "./CreateVoiceMemoryButton";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
-
 const VoiceCloneContent: React.FC = () => {
   const {
     recordings
@@ -59,23 +58,19 @@ const VoiceCloneContent: React.FC = () => {
   const [generatedAudioUrl, setGeneratedAudioUrl] = useState<string | null>(null);
   const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
   const [selectedVoiceEngine, setSelectedVoiceEngine] = useState<'standard' | 'elevenlabs'>('standard');
-
   useEffect(() => {
     if (user) {
       refreshCredits();
     }
   }, [user, refreshCredits]);
-
   useEffect(() => {
     const total = selectedSources.reduce((sum, recording) => sum + recording.duration, 0);
     setTotalSelectedDuration(total);
   }, [selectedSources, setTotalSelectedDuration]);
-
   const textToUse = activeTab === "enhanced" ? enhancedText : inputText;
   const isReadyToClone = selectedSources.length > 0 && textToUse.trim().length > 0;
   const hasEnoughCredits = credits.available > 0;
   const hasEnoughAudio = totalSelectedDuration >= 30;
-
   const handleGenerateVoice = async () => {
     if (!user) {
       toast({
@@ -155,15 +150,11 @@ const VoiceCloneContent: React.FC = () => {
       setIsProcessing(false);
     }
   };
-
   const handleElevenLabsClick = () => {
     setIsWaitlistModalOpen(true);
   };
-
   return <main className="mx-auto p-4 md:p-6 max-w-4xl">
-      <div 
-        className="bg-[#F6F6F6] border border-voicevault-softpurple/30 rounded-2xl p-4 mb-6 flex items-start space-x-3"
-      >
+      <div className="bg-[#F6F6F6] border border-voicevault-softpurple/30 rounded-2xl p-4 mb-6 flex items-start space-x-3">
         <AlertTriangle className="text-amber-500 mt-1 flex-shrink-0" size={24} />
         <div>
           <h3 className="font-bold text-base mb-2">Voice Engine Notice</h3>
@@ -200,11 +191,7 @@ const VoiceCloneContent: React.FC = () => {
           
           <div className="bg-white border border-voicevault-softpurple/20 rounded-2xl p-4 mb-6">
             <h3 className="font-bold text-base mb-4">Choose Voice Engine:</h3>
-            <RadioGroup 
-              value={selectedVoiceEngine} 
-              onValueChange={(value: 'standard' | 'elevenlabs') => setSelectedVoiceEngine(value)}
-              className="space-y-3"
-            >
+            <RadioGroup value={selectedVoiceEngine} onValueChange={(value: 'standard' | 'elevenlabs') => setSelectedVoiceEngine(value)} className="space-y-3">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="standard" id="standard" />
                 <Label htmlFor="standard" className="flex-1">
@@ -212,18 +199,13 @@ const VoiceCloneContent: React.FC = () => {
                 </Label>
               </div>
               <div className="flex items-center space-x-2 opacity-50">
-                <RadioGroupItem 
-                  value="elevenlabs" 
-                  id="elevenlabs" 
-                  disabled 
-                  onClick={handleElevenLabsClick}
-                />
+                <RadioGroupItem value="elevenlabs" id="elevenlabs" disabled onClick={handleElevenLabsClick} />
                 <Label htmlFor="elevenlabs" className="flex-1 flex items-center">
                   ElevenLabs (Coming Soon – ultra-realistic)
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <Info className="ml-2 text-gray-500" size={16} />
+                        
                       </TooltipTrigger>
                       <TooltipContent>
                         We're working to integrate ElevenLabs soon. 
@@ -266,5 +248,4 @@ const VoiceCloneContent: React.FC = () => {
         </> : <CloneResult audioUrl={clonedAudioUrl} text={textToUse} onBack={() => setClonedAudioUrl(null)} isMobile={isMobile} />}
     </main>;
 };
-
 export default VoiceCloneContent;
