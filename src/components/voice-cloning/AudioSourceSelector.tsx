@@ -50,12 +50,24 @@ const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
     return recordings.filter(recording => recording.title.toLowerCase().includes(searchQuery.toLowerCase()));
   }, [recordings, searchQuery]);
 
-  return <div className="border rounded-lg bg-white overflow-hidden">
+  // Calculate dynamic height based on number of recordings
+  const calculateHeight = () => {
+    if (recordings.length === 0) {
+      return 'min-h-[200px]';
+    } else if (recordings.length <= 4) {
+      return 'min-h-[280px]';
+    } else {
+      return 'min-h-[400px]';
+    }
+  };
+
+  return (
+    <div className="border rounded-lg bg-white overflow-hidden">
       <div className="p-4 border-b">
         <VoiceSourceSearch searchQuery={searchQuery} onSearchChange={setSearchQuery} />
       </div>
 
-      <ScrollArea className="h-[400px]">
+      <ScrollArea className={`${calculateHeight()} transition-all duration-300`}>
         <div className={`flex ${isMobile ? 'flex-wrap' : ''} gap-3 p-4`}>
           <input 
             type="file"
@@ -94,14 +106,17 @@ const AudioSourceSelector: React.FC<AudioSourceSelectorProps> = ({
               </div>;
         })}
           
-          {filteredRecordings.length === 0 && <div className={`${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg border border-voicevault-softpurple bg-voicevault-softgray/30 flex flex-col items-center justify-center`}>
+          {filteredRecordings.length === 0 && (
+            <div className={`${isMobile ? 'w-full' : 'min-w-[180px]'} h-[120px] rounded-lg border border-voicevault-softpurple bg-voicevault-softgray/30 flex flex-col items-center justify-center`}>
               <span className="text-sm text-gray-500 text-center px-4">
                 {searchQuery ? "No matching recordings found" : "No recordings in your vault. Record some memories first!"}
               </span>
-            </div>}
+            </div>
+          )}
         </div>
       </ScrollArea>
-    </div>;
+    </div>
+  );
 };
 
 export default AudioSourceSelector;
