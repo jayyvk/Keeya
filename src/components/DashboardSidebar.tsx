@@ -14,11 +14,14 @@ const menuItems = [{
   title: "Clone Voice",
   icon: Mic2,
   url: "/voice-cloning"
-}, {
-  title: "Buy Credits",
-  icon: CreditCard,
-  url: "/pricing"
-}, {
+},
+// Hide Buy Credits section for now
+// {
+//   title: "Buy Credits",
+//   icon: CreditCard,
+//   url: "/pricing"
+// }, 
+{
   title: "Marketplace",
   icon: PackageSearch,
   url: "#marketplace",

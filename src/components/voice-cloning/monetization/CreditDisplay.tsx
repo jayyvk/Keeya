@@ -4,17 +4,40 @@ import { Button } from "@/components/ui/button";
 import { Coins, CreditCard, Info } from "lucide-react";
 import { Credits } from "@/types";
 import { useNavigate } from "react-router-dom";
+
 interface CreditDisplayProps {
   credits: Credits;
   onManageSubscription: () => void;
   onAddCredits: () => void;
 }
+
 const CreditDisplay: React.FC<CreditDisplayProps> = ({
   credits,
   onManageSubscription,
   onAddCredits
 }) => {
   const navigate = useNavigate();
+
+  // If out of credits, show the "Out of credits?" prompt with "Request More Credits" button.
+  if (credits.available === 0) {
+    return (
+      <div className="flex flex-col items-end gap-2">
+        <div className="bg-white/90 border border-voicevault-softpurple/50 rounded-lg p-4 shadow-md text-gray-700 w-[260px]">
+          <div className="font-bold text-sm mb-1 text-amber-600">Out of credits?</div>
+          <p className="text-xs text-gray-600 mb-3">
+            We’re still testing and improving Keeya every day.<br />
+            <span className="whitespace-nowrap">For now, we’re giving away 5 more free credits if you help us with feedback.</span>
+          </p>
+          <button
+            className="bg-voicevault-primary hover:bg-voicevault-secondary transition-colors text-white rounded px-3 py-2 w-full text-sm font-medium"
+            onClick={() => navigate("/about")}
+          >
+            Request More Credits
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Format subscription end date
   const formatDate = (date: Date | null) => {
@@ -86,4 +109,5 @@ const CreditDisplay: React.FC<CreditDisplayProps> = ({
       </Popover>
     </div>;
 };
+
 export default CreditDisplay;
