@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Mail, Star } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
@@ -55,16 +56,20 @@ const About = () => {
     setLoading(true);
 
     try {
-      const { error: feedbackError } = await supabase.from('feedback').insert({
-        user_id: user.id,
-        rating,
-        comment,
-      });
+      // Insert feedback into the new feedback table
+      const { error: feedbackError } = await supabase
+        .from('feedback')
+        .insert({
+          user_id: user.id,
+          rating,
+          comment,
+        });
 
       if (feedbackError) {
         throw feedbackError;
       }
 
+      // Add credits using the existing RPC function
       await supabase.rpc('add_manual_credits', {
         p_user_id: user.id,
         p_credits: 5,
@@ -74,7 +79,7 @@ const About = () => {
       setSubmitted(true);
 
       toast({
-        title: "Thank you! Your feedback means a lot. You’ve received 5 free credits.",
+        title: "Thank you! Your feedback means a lot. You've received 5 free credits.",
         description: "",
         variant: "default"
       });
@@ -176,7 +181,7 @@ const About = () => {
                   </div>
                   {submitted && (
                     <div className="text-center mt-4 text-green-600 font-semibold">
-                      Thank you! Your feedback means a lot. You’ve received 5 free credits.
+                      Thank you! Your feedback means a lot. You've received 5 free credits.
                     </div>
                   )}
                 </section>
