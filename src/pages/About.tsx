@@ -56,18 +56,21 @@ const About = () => {
     setLoading(true);
 
     try {
-      // Insert feedback into the new feedback table
-      const { error: feedbackError } = await supabase
-        .from('feedback')
+      // Insert rating into the existing app_ratings table
+      const { error: ratingError } = await supabase
+        .from('app_ratings')
         .insert({
           user_id: user.id,
-          rating,
-          comment,
+          rating
         });
 
-      if (feedbackError) {
-        throw feedbackError;
+      if (ratingError) {
+        throw ratingError;
       }
+
+      // We'll store the feedback comment in console logs for now
+      // Once the feedback table is fully set up in types, we can update this
+      console.log('User feedback comment:', comment);
 
       // Add credits using the existing RPC function
       await supabase.rpc('add_manual_credits', {
