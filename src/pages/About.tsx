@@ -118,7 +118,7 @@ const About = () => {
                   </p>
                 </section>
                 <section className="flex justify-center">
-                  <button onClick={handleEmailClick} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-voicevault-softgray/30 hover:bg-voicevault-softgray/50 transition-colors">
+                  <button onClick={handleEmailClick} className="flex items-center gap-2 px-4 rounded-lg bg-voicevault-softgray/30 hover:bg-voicevault-softgray/50 transition-colors py-0">
                     <Mail className="h-5 w-5 text-voicevault-primary" />
                     <span className="text-gray-700">Contact us: keeya.app@gmail.com</span>
                   </button>
