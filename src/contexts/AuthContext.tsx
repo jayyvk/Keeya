@@ -155,6 +155,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     if (data.user) {
       console.log("Registration successful for user:", data.user.id);
+      // After successful registration, create an initial profile
+      // This ensures the profile is created even if the trigger fails
+      try {
+        await supabase
+          .from('profiles')
+          .upsert({
+            id: data.user.id,
+            display_name: name,
+            terms_accepted: true,
+            age_verified: true
+          }, { onConflict: 'id' });
+        
+        // Also ensure user has initial credits
+        await supabase
+          .from('user_credits')
+          .upsert({
+            user_id: data.user.id,
+            credits_balance: 5
+          }, { onConflict: 'user_id' });
+      } catch (profileError) {
+        console.error("Error creating initial profile:", profileError);
+        // We continue even if profile creation fails, as the database trigger should handle it
+      }
+      
       const userData = {
         id: data.user.id,
         name: name,

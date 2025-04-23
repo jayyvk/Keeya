@@ -21,6 +21,7 @@ const Auth = () => {
 
   useEffect(() => {
     if (isAuthenticated && user) {
+      console.log("User is authenticated, redirecting to:", redirectTo);
       toast(`Welcome, ${user.name || 'there'}!`);
       navigate(redirectTo, { replace: true });
     }
