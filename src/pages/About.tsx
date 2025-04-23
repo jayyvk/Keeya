@@ -9,24 +9,24 @@ import { MonetizationProvider } from "@/contexts/MonetizationContext";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { Textarea } from "@/components/ui/textarea";
-
 const About = () => {
   const [rating, setRating] = useState<number>(0);
   const [hoveredStar, setHoveredStar] = useState<number>(0);
   const [comment, setComment] = useState<string>('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
-  const { user } = useAuth();
-
+  const {
+    toast
+  } = useToast();
+  const {
+    user
+  } = useAuth();
   const handleStarHover = (starIndex: number) => setHoveredStar(starIndex);
   const handleStarLeave = () => setHoveredStar(0);
   const handleStarClick = (starIndex: number) => setRating(starIndex);
-
   const handleEmailClick = () => {
     window.location.href = 'mailto:keeya.app@gmail.com?subject=Feedback%20for%20Keeya';
   };
-
   const handleSubmitRating = async () => {
     if (rating < 1 || rating > 5) {
       toast({
@@ -51,18 +51,15 @@ const About = () => {
       });
       return;
     }
-
     setLoading(true);
-
     try {
       // Insert rating into the existing app_ratings table
-      const { error: ratingError } = await supabase
-        .from('app_ratings')
-        .insert({
-          user_id: user.id,
-          rating
-        });
-
+      const {
+        error: ratingError
+      } = await supabase.from('app_ratings').insert({
+        user_id: user.id,
+        rating
+      });
       if (ratingError) {
         throw ratingError;
       }
@@ -77,15 +74,12 @@ const About = () => {
         p_credits: 5,
         p_reason: "Feedback"
       });
-
       setSubmitted(true);
-
       toast({
         title: "Thank you! Your feedback means a lot. You've received 5 free credits.",
         description: "",
         variant: "default"
       });
-
       setRating(0);
       setComment("");
     } catch (error) {
@@ -93,17 +87,14 @@ const About = () => {
       toast({
         title: "Couldn't submit feedback",
         description: "Please try again later.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
     }
   };
-
   const disabled = rating === 0 || comment.trim().length < 50 || loading;
-
-  return (
-    <SidebarProvider>
+  return <SidebarProvider>
       <MonetizationProvider>
         <div className="keeya-bg min-h-screen flex">
           <DashboardSidebar />
@@ -127,17 +118,14 @@ const About = () => {
                   </p>
                 </section>
                 <section className="flex justify-center">
-                  <button
-                    onClick={handleEmailClick}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-voicevault-softgray/30 hover:bg-voicevault-softgray/50 transition-colors"
-                  >
+                  <button onClick={handleEmailClick} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-voicevault-softgray/30 hover:bg-voicevault-softgray/50 transition-colors">
                     <Mail className="h-5 w-5 text-voicevault-primary" />
                     <span className="text-gray-700">Contact us: keeya.app@gmail.com</span>
                   </button>
                 </section>
                 
                 <section className="text-center space-y-6">
-                  <div className="bg-voicevault-softgray/30 p-6 rounded-lg">
+                  <div className="bg-voicevault-softgray/30 p-6 rounded-lg py-0">
                     <h2 className="text-xl font-semibold mb-4">Earn 5 Free Credits!</h2>
                     <p className="text-base text-gray-600 mb-4">
                       Help us improve Keeya by sharing your honest feedback. 
@@ -151,63 +139,30 @@ const About = () => {
 
                 <section className="space-y-4">
                   <div className="flex justify-center gap-2">
-                    {[1, 2, 3, 4, 5].map((starIndex) => (
-                      <button
-                        key={starIndex}
-                        onMouseEnter={() => handleStarHover(starIndex)}
-                        onMouseLeave={handleStarLeave}
-                        onClick={() => handleStarClick(starIndex)}
-                        className="p-1 transition-transform hover:scale-110"
-                        aria-label={`Rate ${starIndex} star${starIndex > 1 ? 's' : ''}`}
-                        type="button"
-                      >
-                        <Star
-                          className={`h-8 w-8 ${
-                            starIndex <= (hoveredStar || rating)
-                              ? 'fill-voicevault-primary text-voicevault-primary'
-                              : 'text-gray-300'
-                          }`}
-                        />
-                      </button>
-                    ))}
+                    {[1, 2, 3, 4, 5].map(starIndex => <button key={starIndex} onMouseEnter={() => handleStarHover(starIndex)} onMouseLeave={handleStarLeave} onClick={() => handleStarClick(starIndex)} className="p-1 transition-transform hover:scale-110" aria-label={`Rate ${starIndex} star${starIndex > 1 ? 's' : ''}`} type="button">
+                        <Star className={`h-8 w-8 ${starIndex <= (hoveredStar || rating) ? 'fill-voicevault-primary text-voicevault-primary' : 'text-gray-300'}`} />
+                      </button>)}
                   </div>
                   <div className="flex justify-center mt-3">
-                    <Textarea
-                      minLength={50}
-                      rows={4}
-                      value={comment}
-                      onChange={(e) => setComment(e.target.value)}
-                      placeholder="Share a short message (at least 50 characters). What do you like or what could be better?"
-                      required
-                      className="w-full max-w-lg"
-                      disabled={loading}
-                    />
+                    <Textarea minLength={50} rows={4} value={comment} onChange={e => setComment(e.target.value)} placeholder="Share a short message (at least 50 characters). What do you like or what could be better?" required className="w-full max-w-lg" disabled={loading} />
                   </div>
                   <div className="flex justify-center mt-1">
-                    <Button
-                      onClick={handleSubmitRating}
-                      disabled={disabled}
-                      className="bg-voicevault-primary hover:bg-voicevault-primary/90"
-                    >
+                    <Button onClick={handleSubmitRating} disabled={disabled} className="bg-voicevault-primary hover:bg-voicevault-primary/90">
                       {loading ? "Submitting..." : "Submit Feedback"}
                     </Button>
                   </div>
                   <div className="text-center text-xs text-gray-400 mt-2">
                     {comment.length < 50 && "Minimum 50 characters required."}
                   </div>
-                  {submitted && (
-                    <div className="text-center mt-4 text-green-600 font-semibold">
+                  {submitted && <div className="text-center mt-4 text-green-600 font-semibold">
                       Thank you! Your feedback means a lot. You've received 5 free credits.
-                    </div>
-                  )}
+                    </div>}
                 </section>
               </div>
             </main>
           </div>
         </div>
       </MonetizationProvider>
-    </SidebarProvider>
-  );
+    </SidebarProvider>;
 };
-
 export default About;
