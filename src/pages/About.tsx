@@ -131,13 +131,13 @@ const About = () => {
                       Help us improve Keeya by sharing your honest feedback. 
                       Rate our app and provide a detailed comment, and we'll reward you with 5 credits.
                     </p>
-                    <p className="text-sm text-gray-500 italic mb-4">
+                    <p className="text-sm text-gray-500 italic mb-4 py-[5px]">
                       ✨ Minimum 50 characters required
                     </p>
                   </div>
                 </section>
 
-                <section className="space-y-4">
+                <section className="space-y-3">
                   <div className="flex justify-center gap-2">
                     {[1, 2, 3, 4, 5].map(starIndex => <button key={starIndex} onMouseEnter={() => handleStarHover(starIndex)} onMouseLeave={handleStarLeave} onClick={() => handleStarClick(starIndex)} className="p-1 transition-transform hover:scale-110" aria-label={`Rate ${starIndex} star${starIndex > 1 ? 's' : ''}`} type="button">
                         <Star className={`h-8 w-8 ${starIndex <= (hoveredStar || rating) ? 'fill-voicevault-primary text-voicevault-primary' : 'text-gray-300'}`} />
