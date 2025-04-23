@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Mail, Star } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
@@ -136,6 +135,20 @@ const About = () => {
                     <span className="text-gray-700">Contact us: keeya.app@gmail.com</span>
                   </button>
                 </section>
+                
+                <section className="text-center space-y-6">
+                  <div className="bg-voicevault-softgray/30 p-6 rounded-lg">
+                    <h2 className="text-xl font-semibold mb-4">Earn 5 Free Credits!</h2>
+                    <p className="text-base text-gray-600 mb-4">
+                      Help us improve Keeya by sharing your honest feedback. 
+                      Rate our app and provide a detailed comment, and we'll reward you with 5 credits.
+                    </p>
+                    <p className="text-sm text-gray-500 italic mb-4">
+                      ✨ Minimum 50 characters required
+                    </p>
+                  </div>
+                </section>
+
                 <section className="space-y-4">
                   <div className="flex justify-center gap-2">
                     {[1, 2, 3, 4, 5].map((starIndex) => (
