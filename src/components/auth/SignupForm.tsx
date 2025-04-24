@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +11,7 @@ import { z } from "zod";
 import { TermsModal } from "./TermsModal";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuthForm } from "@/hooks/useAuthForm";
+import { toast } from "sonner";
 
 type SignupFormInputs = z.infer<typeof signupSchema>;
 
@@ -39,23 +39,6 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
     }
   });
 
-  // Watch form fields to sync with authForm state
-  const watchedEmail = watch("email");
-  const watchedPassword = watch("password");
-  const watchedName = watch("name");
-  
-  useEffect(() => {
-    updateFormData("email", watchedEmail || "");
-  }, [watchedEmail]);
-  
-  useEffect(() => {
-    updateFormData("password", watchedPassword || "");
-  }, [watchedPassword]);
-  
-  useEffect(() => {
-    updateFormData("name", watchedName || "");
-  }, [watchedName]);
-
   const [purpose, setPurpose] = React.useState("");
   const [recordingFrequency, setRecordingFrequency] = React.useState("");
   const [agreeToTerms, setAgreeToTerms] = React.useState(false);
@@ -64,7 +47,18 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
   const [isEmailTaken, setIsEmailTaken] = React.useState(false);
   const [registrationError, setRegistrationError] = React.useState("");
 
-  // Reset error states when step changes
+  useEffect(() => {
+    updateFormData("email", watch("email") || "");
+  }, [watch("email")]);
+  
+  useEffect(() => {
+    updateFormData("password", watch("password") || "");
+  }, [watch("password")]);
+  
+  useEffect(() => {
+    updateFormData("name", watch("name") || "");
+  }, [watch("name")]);
+
   useEffect(() => {
     setIsEmailTaken(false);
     setRegistrationError("");
