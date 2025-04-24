@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
@@ -10,31 +10,51 @@ import { Loader2 } from "lucide-react";
 import { signupSchema } from "@/lib/validations/auth";
 import { z } from "zod";
 import { TermsModal } from "./TermsModal";
-import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuthForm } from "@/hooks/useAuthForm";
 
 type SignupFormInputs = z.infer<typeof signupSchema>;
 
 export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: number) => void }) => {
-  const navigate = useNavigate();
-  const { isLoading, error, email, setEmail, password, setPassword, name, setName, handleSubmit } = useAuthForm({ isLogin: false });
+  const { 
+    isLoading, 
+    error, 
+    formData,
+    updateFormData,
+    handleSubmit 
+  } = useAuthForm({ isLogin: false });
   
   const {
     register,
     formState: { errors },
     trigger,
-    getValues,
+    setValue,
+    watch
   } = useForm<SignupFormInputs>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      email: email,
-      password: password,
-      name: name
+      email: formData.email,
+      password: formData.password,
+      name: formData.name
     }
   });
+
+  // Watch form fields to sync with authForm state
+  const watchedEmail = watch("email");
+  const watchedPassword = watch("password");
+  const watchedName = watch("name");
+  
+  useEffect(() => {
+    updateFormData("email", watchedEmail || "");
+  }, [watchedEmail]);
+  
+  useEffect(() => {
+    updateFormData("password", watchedPassword || "");
+  }, [watchedPassword]);
+  
+  useEffect(() => {
+    updateFormData("name", watchedName || "");
+  }, [watchedName]);
 
   const [purpose, setPurpose] = React.useState("");
   const [recordingFrequency, setRecordingFrequency] = React.useState("");
@@ -44,34 +64,27 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
   const [isEmailTaken, setIsEmailTaken] = React.useState(false);
   const [registrationError, setRegistrationError] = React.useState("");
 
+  // Reset error states when step changes
+  useEffect(() => {
+    setIsEmailTaken(false);
+    setRegistrationError("");
+  }, [step]);
+
   const nextStep = async () => {
     if (step === 1) {
       const isValid = await trigger(['email', 'password']);
       if (!isValid) {
-        if (errors.email) {
-          toast.error("Invalid email format", {
-            description: "Please enter a valid email address"
-          });
-        }
         return;
       }
-      // Update values in the shared auth form state
-      setEmail(getValues('email'));
-      setPassword(getValues('password'));
     }
     
-    if (step === 2 && (!getValues('name') || errors.name || !agreeToTerms)) {
+    if (step === 2 && (!watchedName || errors.name || !agreeToTerms)) {
       if (!agreeToTerms) {
         toast.error("Terms agreement required", {
           description: "Please agree to the terms to continue"
         });
       }
       return;
-    }
-
-    if (step === 2) {
-      // Update name in the shared auth form state
-      setName(getValues('name'));
     }
     
     setStep(step + 1);
@@ -94,8 +107,11 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
     setIsEmailTaken(false);
 
     console.log("Form submission with:", { 
-      email, password, name, 
-      purpose, recordingFrequency, 
+      email: formData.email, 
+      password: formData.password, 
+      name: formData.name, 
+      purpose, 
+      recordingFrequency, 
       step
     });
 
@@ -107,12 +123,10 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
     }
     
     try {
-      // Pass the additional data to the handleSubmit function
       await handleSubmit({ 
         purpose, 
         recordingFrequency 
       });
-      // Navigation is handled in useAuthForm
     } catch (err: any) {
       console.error("Error in form submission:", err);
       if (err.message && (
@@ -162,7 +176,6 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 type="email"
                 placeholder="your@email.com"
                 {...register("email")}
-                onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
               />
               {errors.email && (
@@ -176,7 +189,6 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 type="password"
                 placeholder="••••••••"
                 {...register("password")}
-                onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
               />
               {errors.password && (
@@ -194,7 +206,6 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 id="name"
                 placeholder="John Doe"
                 {...register("name")}
-                onChange={(e) => setName(e.target.value)}
                 disabled={isLoading}
               />
               {errors.name && (
@@ -212,10 +223,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 I am over 18 and agree to the{" "}
                 <button 
                   type="button"
-                  onClick={() => {
-                    setModalType('terms');
-                    setShowTermsModal(true);
-                  }} 
+                  onClick={handleTermsClick} 
                   className="text-voicevault-primary hover:underline"
                 >
                   Terms
@@ -223,10 +231,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 and{" "}
                 <button 
                   type="button"
-                  onClick={() => {
-                    setModalType('privacy');
-                    setShowTermsModal(true);
-                  }} 
+                  onClick={handlePrivacyClick} 
                   className="text-voicevault-primary hover:underline"
                 >
                   Privacy Policy
@@ -284,7 +289,6 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
 
   return (
     <div className="space-y-4">
-      
       {renderStepContent()}
       
       {step < 3 ? (

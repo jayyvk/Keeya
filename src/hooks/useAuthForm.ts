@@ -13,33 +13,47 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    name: ""
+  });
+  
+  const updateFormData = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const validateForm = (additionalData?: { purpose?: string; recordingFrequency?: string }) => {
+    const { email, password, name } = formData;
+    
+    if (isLogin && (!email || !password)) {
+      setError("Please fill in all fields");
+      return false;
+    }
+
+    if (!isLogin && (!email || !password || !name)) {
+      setError("Please fill in all fields");
+      return false;
+    }
+
+    if (!isLogin && (!additionalData?.purpose || !additionalData?.recordingFrequency)) {
+      setError("Please complete all steps");
+      console.log("Missing additional data:", additionalData);
+      return false;
+    }
+
+    return true;
+  };
 
   const handleSubmit = async (additionalData?: { purpose?: string; recordingFrequency?: string }) => {
     setIsLoading(true);
     setError("");
     
     try {
-      console.log("Checking form data before submit:", { isLogin, email, password, name, additionalData });
+      const { email, password, name } = formData;
+      console.log("Form submission data:", { isLogin, email, password, name, additionalData });
       
-      if (isLogin && (!email || !password)) {
-        setError("Please fill in all fields");
-        setIsLoading(false);
-        return;
-      }
-
-      if (!isLogin && (!email || !password || !name)) {
-        setError("Please fill in all fields");
-        setIsLoading(false);
-        return;
-      }
-
-      // For registration, check additional fields
-      if (!isLogin && (!additionalData?.purpose || !additionalData?.recordingFrequency)) {
-        console.log("Missing additional data:", additionalData);
-        setError("Please complete all steps");
+      if (!validateForm(additionalData)) {
         setIsLoading(false);
         return;
       }
@@ -54,13 +68,11 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
         await register(name, email, password, additionalData);
         console.log("Registration successful, navigating to dashboard");
         toast.success("Account created successfully!");
-        // Explicitly navigate to dashboard after registration
         navigate("/dashboard", { replace: true });
       }
     } catch (err: any) {
       console.error(isLogin ? "Login error:" : "Registration error:", err);
       
-      // Check if this is a "User already registered" error
       if (!isLogin && err.message && (
           err.message.includes("already registered") || 
           err.message.includes("already in use") || 
@@ -82,12 +94,8 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
   return {
     isLoading,
     error,
-    email,
-    setEmail,
-    password,
-    setPassword,
-    name,
-    setName,
+    formData,
+    updateFormData,
     handleSubmit,
   };
 };
