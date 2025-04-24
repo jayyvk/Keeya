@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
@@ -9,34 +9,25 @@ import { Loader2 } from "lucide-react";
 import { signupSchema } from "@/lib/validations/auth";
 import { z } from "zod";
 import { TermsModal } from "./TermsModal";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useAuthForm } from "@/hooks/useAuthForm";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 type SignupFormInputs = z.infer<typeof signupSchema>;
 
 export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: number) => void }) => {
-  const { 
-    isLoading, 
-    error, 
-    formData,
-    updateFormData,
-    handleSubmit 
-  } = useAuthForm({ isLogin: false });
+  const { register: registerUser } = useAuth();
+  const navigate = useNavigate();
   
   const {
     register,
-    formState: { errors },
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    getValues,
     trigger,
-    setValue,
-    watch
   } = useForm<SignupFormInputs>({
-    resolver: zodResolver(signupSchema),
-    defaultValues: {
-      email: formData.email,
-      password: formData.password,
-      name: formData.name
-    }
+    resolver: zodResolver(signupSchema)
   });
 
   const [purpose, setPurpose] = React.useState("");
@@ -44,40 +35,24 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
   const [agreeToTerms, setAgreeToTerms] = React.useState(false);
   const [showTermsModal, setShowTermsModal] = React.useState(false);
   const [modalType, setModalType] = React.useState<'terms' | 'privacy'>('terms');
-  const [isEmailTaken, setIsEmailTaken] = React.useState(false);
+  const [isRegistering, setIsRegistering] = React.useState(false);
   const [registrationError, setRegistrationError] = React.useState("");
-
-  useEffect(() => {
-    updateFormData("email", watch("email") || "");
-  }, [watch("email")]);
-  
-  useEffect(() => {
-    updateFormData("password", watch("password") || "");
-  }, [watch("password")]);
-  
-  useEffect(() => {
-    updateFormData("name", watch("name") || "");
-  }, [watch("name")]);
-
-  useEffect(() => {
-    setIsEmailTaken(false);
-    setRegistrationError("");
-  }, [step]);
+  const [isEmailTaken, setIsEmailTaken] = React.useState(false);
 
   const nextStep = async () => {
     if (step === 1) {
       const isValid = await trigger(['email', 'password']);
       if (!isValid) {
+        if (errors.email) {
+          toast.error("Invalid email format", {
+            description: "Please enter a valid email address"
+          });
+        }
         return;
       }
     }
     
-    if (step === 2 && (!watchedName || errors.name || !agreeToTerms)) {
-      if (!agreeToTerms) {
-        toast.error("Terms agreement required", {
-          description: "Please agree to the terms to continue"
-        });
-      }
+    if (step === 2 && (!getValues('name') || errors.name || !agreeToTerms)) {
       return;
     }
     
@@ -96,45 +71,41 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
     setShowTermsModal(true);
   };
 
-  const onSubmit = async () => {
+  const onSubmit = async (data: SignupFormInputs) => {
     setRegistrationError("");
     setIsEmailTaken(false);
-
-    console.log("Form submission with:", { 
-      email: formData.email, 
-      password: formData.password, 
-      name: formData.name, 
-      purpose, 
-      recordingFrequency, 
-      step
-    });
-
-    if (!purpose || !recordingFrequency) {
-      toast.error("Please complete all fields", {
-        description: "Select your purpose and recording frequency to continue."
-      });
-      return;
-    }
     
     try {
-      await handleSubmit({ 
-        purpose, 
-        recordingFrequency 
-      });
+      setIsRegistering(true);
+      await registerUser(data.name, data.email, data.password);
+      toast.success("Registration successful!");
+      navigate('/dashboard'); // Redirect to dashboard after successful registration
     } catch (err: any) {
-      console.error("Error in form submission:", err);
+      // Check if this is a "User already registered" error
       if (err.message && (
-        err.message.includes("already registered") || 
-        err.message.includes("already in use") || 
-        err.message.includes("already exists")
-      )) {
+          err.message.includes("already registered") || 
+          err.message.includes("already in use") || 
+          err.message.includes("already exists")
+        )) {
         setIsEmailTaken(true);
         setRegistrationError("This email is already registered. Please log in instead.");
+        toast.warning("Email already registered", {
+          description: "Please log in with your existing account instead."
+        });
+      } else {
+        setRegistrationError(err.message || "Registration failed");
+        toast.error("Registration failed", {
+          description: "Please try again or contact support."
+        });
       }
+    } finally {
+      setIsRegistering(false);
     }
   };
 
   const switchToLogin = () => {
+    // This function will be called from the parent component
+    // We're accessing it through a prop
     const authComponent = document.querySelector('[data-auth-component]');
     if (authComponent) {
       const loginButton = authComponent.querySelector('[data-login-switch]');
@@ -170,7 +141,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 type="email"
                 placeholder="your@email.com"
                 {...register("email")}
-                disabled={isLoading}
+                disabled={isSubmitting}
               />
               {errors.email && (
                 <p className="text-red-500 text-sm">{errors.email.message}</p>
@@ -183,7 +154,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 type="password"
                 placeholder="••••••••"
                 {...register("password")}
-                disabled={isLoading}
+                disabled={isSubmitting}
               />
               {errors.password && (
                 <p className="text-red-500 text-sm">{errors.password.message}</p>
@@ -200,7 +171,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 id="name"
                 placeholder="John Doe"
                 {...register("name")}
-                disabled={isLoading}
+                disabled={isSubmitting}
               />
               {errors.name && (
                 <p className="text-red-500 text-sm">{errors.name.message}</p>
@@ -211,13 +182,16 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 id="terms" 
                 checked={agreeToTerms}
                 onCheckedChange={(checked) => setAgreeToTerms(checked as boolean)}
-                disabled={isLoading}
+                disabled={isSubmitting}
               />
               <Label htmlFor="terms" className="text-sm">
                 I am over 18 and agree to the{" "}
                 <button 
                   type="button"
-                  onClick={handleTermsClick} 
+                  onClick={() => {
+                    setModalType('terms');
+                    setShowTermsModal(true);
+                  }} 
                   className="text-voicevault-primary hover:underline"
                 >
                   Terms
@@ -225,7 +199,10 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 and{" "}
                 <button 
                   type="button"
-                  onClick={handlePrivacyClick} 
+                  onClick={() => {
+                    setModalType('privacy');
+                    setShowTermsModal(true);
+                  }} 
                   className="text-voicevault-primary hover:underline"
                 >
                   Privacy Policy
@@ -246,8 +223,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                     variant={purpose === option ? "default" : "outline"}
                     onClick={() => setPurpose(option)}
                     className="w-full"
-                    disabled={isLoading}
-                    type="button"
+                    disabled={isSubmitting}
                   >
                     {option}
                   </Button>
@@ -263,19 +239,13 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                     variant={recordingFrequency === option ? "default" : "outline"}
                     onClick={() => setRecordingFrequency(option)}
                     className="w-full"
-                    disabled={isLoading}
-                    type="button"
+                    disabled={isSubmitting}
                   >
                     {option}
                   </Button>
                 ))}
               </div>
             </div>
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
           </div>
         );
     }
@@ -283,6 +253,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
 
   return (
     <div className="space-y-4">
+      
       {renderStepContent()}
       
       {step < 3 ? (
@@ -290,18 +261,18 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
           type="button"
           onClick={nextStep}
           className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
-          disabled={isLoading || (isEmailTaken && step === 1)}
+          disabled={isSubmitting || (isEmailTaken && step === 1)}
         >
           Continue
         </Button>
       ) : (
         <Button 
-          type="button"
-          onClick={onSubmit}
-          disabled={isLoading || !purpose || !recordingFrequency}
+          type="submit"
+          onClick={handleSubmit(onSubmit)}
+          disabled={isSubmitting || isRegistering || !purpose || !recordingFrequency}
           className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
         >
-          {isLoading ? (
+          {isSubmitting || isRegistering ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Creating Account...

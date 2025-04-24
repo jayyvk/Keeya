@@ -8,50 +8,33 @@ import { Label } from "@/components/ui/label";
 import { loginSchema } from "@/lib/validations/auth";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useAuthForm } from "@/hooks/useAuthForm";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 type LoginFormInputs = z.infer<typeof loginSchema>;
 
 export const LoginForm = () => {
-  const { isLoading, error, formData, updateFormData, handleSubmit } = useAuthForm({ isLogin: true });
-  
+  const { login } = useAuth();
   const {
     register,
-    handleSubmit: handleFormSubmit,
-    formState: { errors },
-    watch
+    handleSubmit,
+    formState: { errors, isSubmitting },
   } = useForm<LoginFormInputs>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: formData.email,
-      password: formData.password
-    }
+    resolver: zodResolver(loginSchema)
   });
 
-  // Watch form fields to sync with authForm state
-  const watchedEmail = watch("email");
-  const watchedPassword = watch("password");
-  
-  React.useEffect(() => {
-    updateFormData("email", watchedEmail || "");
-  }, [watchedEmail]);
-  
-  React.useEffect(() => {
-    updateFormData("password", watchedPassword || "");
-  }, [watchedPassword]);
-
-  const onSubmit = async () => {
+  const onSubmit = async (data: LoginFormInputs) => {
     try {
-      await handleSubmit();
+      await login(data.email, data.password);
     } catch (err: any) {
-      console.error("Login error:", err);
+      toast.error(err.message || "Login failed", {
+        description: "Please check your credentials and try again."
+      });
     }
   };
 
   return (
-    <form onSubmit={handleFormSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input
@@ -59,7 +42,7 @@ export const LoginForm = () => {
           type="email"
           placeholder="your@email.com"
           {...register("email")}
-          disabled={isLoading}
+          disabled={isSubmitting}
         />
         {errors.email && (
           <p className="text-red-500 text-sm">{errors.email.message}</p>
@@ -73,25 +56,19 @@ export const LoginForm = () => {
           type="password"
           placeholder="••••••••"
           {...register("password")}
-          disabled={isLoading}
+          disabled={isSubmitting}
         />
         {errors.password && (
           <p className="text-red-500 text-sm">{errors.password.message}</p>
         )}
       </div>
       
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-      
       <Button 
         type="submit" 
         className="w-full" 
-        disabled={isLoading}
+        disabled={isSubmitting}
       >
-        {isLoading ? (
+        {isSubmitting ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Signing In...

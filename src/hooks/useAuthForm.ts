@@ -13,66 +13,43 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    name: ""
-  });
-  
-  const updateFormData = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
 
-  const validateForm = (additionalData?: { purpose?: string; recordingFrequency?: string }) => {
-    const { email, password, name } = formData;
-    
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    setError("");
+
     if (isLogin && (!email || !password)) {
       setError("Please fill in all fields");
-      return false;
+      setIsLoading(false);
+      return;
     }
 
     if (!isLogin && (!email || !password || !name)) {
       setError("Please fill in all fields");
-      return false;
+      setIsLoading(false);
+      return;
     }
 
-    if (!isLogin && (!additionalData?.purpose || !additionalData?.recordingFrequency)) {
-      setError("Please complete all steps");
-      console.log("Missing additional data:", additionalData);
-      return false;
-    }
-
-    return true;
-  };
-
-  const handleSubmit = async (additionalData?: { purpose?: string; recordingFrequency?: string }) => {
-    setIsLoading(true);
-    setError("");
-    
     try {
-      const { email, password, name } = formData;
-      console.log("Form submission data:", { isLogin, email, password, name, additionalData });
-      
-      if (!validateForm(additionalData)) {
-        setIsLoading(false);
-        return;
-      }
-
       if (isLogin) {
         console.log("Attempting to login with:", { email });
         await login(email, password);
-        console.log("Login successful, navigating to dashboard");
-        navigate("/dashboard", { replace: true });
+        console.log("Login successful, Auth component will handle redirect");
       } else {
-        console.log("Attempting to register with:", { name, email, additionalData });
-        await register(name, email, password, additionalData);
-        console.log("Registration successful, navigating to dashboard");
+        console.log("Attempting to register with:", { name, email });
+        await register(name, email, password);
+        console.log("Registration successful, Auth component will handle redirect");
+        // Add toast notification for successful registration
         toast.success("Account created successfully!");
-        navigate("/dashboard", { replace: true });
+        // Redirect to dashboard (Auth component already handles this via useEffect)
       }
     } catch (err: any) {
       console.error(isLogin ? "Login error:" : "Registration error:", err);
       
+      // Check if this is a "User already registered" error
       if (!isLogin && err.message && (
           err.message.includes("already registered") || 
           err.message.includes("already in use") || 
@@ -94,8 +71,12 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
   return {
     isLoading,
     error,
-    formData,
-    updateFormData,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    name,
+    setName,
     handleSubmit,
   };
 };

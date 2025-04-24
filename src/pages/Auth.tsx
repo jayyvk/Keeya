@@ -21,13 +21,10 @@ const Auth = () => {
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      console.log("Auth page: User is authenticated, redirecting to:", redirectTo);
-      toast.success(`Welcome, ${user.name || 'there'}!`);
+      toast(`Welcome, ${user.name || 'there'}!`);
       navigate(redirectTo, { replace: true });
     }
-  }, [isAuthenticated, user, navigate, redirectTo]);
-
-  console.log("Auth page state:", { isAuthenticated, user, isLogin, step, redirectTo });
+  }, [isAuthenticated, navigate, user, redirectTo]);
 
   return (
     <div className="keeya-bg min-h-screen flex items-center justify-center p-6" data-auth-component>
