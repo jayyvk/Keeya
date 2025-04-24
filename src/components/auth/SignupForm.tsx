@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -41,9 +40,8 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
   const [agreeToTerms, setAgreeToTerms] = React.useState(false);
   const [showTermsModal, setShowTermsModal] = React.useState(false);
   const [modalType, setModalType] = React.useState<'terms' | 'privacy'>('terms');
-  const [isRegistering, setIsRegistering] = React.useState(false);
-  const [registrationError, setRegistrationError] = React.useState("");
   const [isEmailTaken, setIsEmailTaken] = React.useState(false);
+  const [registrationError, setRegistrationError] = React.useState("");
 
   const nextStep = async () => {
     if (step === 1) {
@@ -102,15 +100,19 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
     }
     
     try {
-      setIsRegistering(true);
-      // Use the shared handleSubmit function from useAuthForm
-      await handleSubmit();
+      // Pass the additional data to the handleSubmit function
+      await handleSubmit({ purpose, recordingFrequency });
       // Navigation is handled in useAuthForm
     } catch (err: any) {
-      // Error handling is done in useAuthForm
       console.error("Error in form submission:", err);
-    } finally {
-      setIsRegistering(false);
+      if (err.message && (
+        err.message.includes("already registered") || 
+        err.message.includes("already in use") || 
+        err.message.includes("already exists")
+      )) {
+        setIsEmailTaken(true);
+        setRegistrationError("This email is already registered. Please log in instead.");
+      }
     }
   };
 
@@ -151,7 +153,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 placeholder="your@email.com"
                 {...register("email")}
                 onChange={(e) => setEmail(e.target.value)}
-                disabled={isRegistering || isLoading}
+                disabled={isLoading}
               />
               {errors.email && (
                 <p className="text-red-500 text-sm">{errors.email.message}</p>
@@ -165,7 +167,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 placeholder="••••••••"
                 {...register("password")}
                 onChange={(e) => setPassword(e.target.value)}
-                disabled={isRegistering || isLoading}
+                disabled={isLoading}
               />
               {errors.password && (
                 <p className="text-red-500 text-sm">{errors.password.message}</p>
@@ -183,7 +185,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 placeholder="John Doe"
                 {...register("name")}
                 onChange={(e) => setName(e.target.value)}
-                disabled={isRegistering || isLoading}
+                disabled={isLoading}
               />
               {errors.name && (
                 <p className="text-red-500 text-sm">{errors.name.message}</p>
@@ -194,7 +196,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 id="terms" 
                 checked={agreeToTerms}
                 onCheckedChange={(checked) => setAgreeToTerms(checked as boolean)}
-                disabled={isRegistering || isLoading}
+                disabled={isLoading}
               />
               <Label htmlFor="terms" className="text-sm">
                 I am over 18 and agree to the{" "}
@@ -235,7 +237,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                     variant={purpose === option ? "default" : "outline"}
                     onClick={() => setPurpose(option)}
                     className="w-full"
-                    disabled={isRegistering || isLoading}
+                    disabled={isLoading}
                     type="button"
                   >
                     {option}
@@ -252,7 +254,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                     variant={recordingFrequency === option ? "default" : "outline"}
                     onClick={() => setRecordingFrequency(option)}
                     className="w-full"
-                    disabled={isRegistering || isLoading}
+                    disabled={isLoading}
                     type="button"
                   >
                     {option}
@@ -280,7 +282,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
           type="button"
           onClick={nextStep}
           className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
-          disabled={isRegistering || isLoading || (isEmailTaken && step === 1)}
+          disabled={isLoading || (isEmailTaken && step === 1)}
         >
           Continue
         </Button>
@@ -288,10 +290,10 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
         <Button 
           type="button"
           onClick={onSubmit}
-          disabled={isRegistering || isLoading || !purpose || !recordingFrequency}
+          disabled={isLoading || !purpose || !recordingFrequency}
           className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
         >
-          {isRegistering || isLoading ? (
+          {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Creating Account...

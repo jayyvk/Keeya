@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { User } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,7 +7,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string, additionalData?: { purpose?: string, recordingFrequency?: string }) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -136,14 +135,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const register = async (name: string, email: string, password: string) => {
-    console.log("Register attempt with:", { name, email });
+  const register = async (name: string, email: string, password: string, additionalData?: { purpose?: string, recordingFrequency?: string }) => {
+    console.log("Register attempt with:", { name, email, additionalData });
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           name,
+          purpose: additionalData?.purpose || "",
+          recording_frequency: additionalData?.recordingFrequency || "",
         },
       },
     });

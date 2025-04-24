@@ -17,7 +17,7 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (additionalData?: { purpose?: string; recordingFrequency?: string }) => {
     setIsLoading(true);
     setError("");
 
@@ -40,8 +40,8 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
         console.log("Login successful, navigating to dashboard");
         navigate("/dashboard", { replace: true });
       } else {
-        console.log("Attempting to register with:", { name, email });
-        await register(name, email, password);
+        console.log("Attempting to register with:", { name, email, additionalData });
+        await register(name, email, password, additionalData);
         console.log("Registration successful, navigating to dashboard");
         toast.success("Account created successfully!");
         // Explicitly navigate to dashboard after registration
