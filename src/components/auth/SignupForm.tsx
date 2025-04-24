@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -92,6 +93,12 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
     setRegistrationError("");
     setIsEmailTaken(false);
 
+    console.log("Form submission with:", { 
+      email, password, name, 
+      purpose, recordingFrequency, 
+      step
+    });
+
     if (!purpose || !recordingFrequency) {
       toast.error("Please complete all fields", {
         description: "Select your purpose and recording frequency to continue."
@@ -101,7 +108,10 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
     
     try {
       // Pass the additional data to the handleSubmit function
-      await handleSubmit({ purpose, recordingFrequency });
+      await handleSubmit({ 
+        purpose, 
+        recordingFrequency 
+      });
       // Navigation is handled in useAuthForm
     } catch (err: any) {
       console.error("Error in form submission:", err);

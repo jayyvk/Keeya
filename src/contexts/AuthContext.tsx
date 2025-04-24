@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { User } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
@@ -137,14 +138,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (name: string, email: string, password: string, additionalData?: { purpose?: string, recordingFrequency?: string }) => {
     console.log("Register attempt with:", { name, email, additionalData });
+    
+    if (!additionalData?.purpose || !additionalData?.recordingFrequency) {
+      console.error("Missing required additional data for registration");
+      throw new Error("Please complete all registration steps");
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           name,
-          purpose: additionalData?.purpose || "",
-          recording_frequency: additionalData?.recordingFrequency || "",
+          purpose: additionalData.purpose,
+          recording_frequency: additionalData.recordingFrequency,
+          terms_accepted: true,
+          age_verified: true
         },
       },
     });
@@ -156,10 +165,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     if (data.user) {
       console.log("Registration successful for user:", data.user.id);
-      // After successful registration, create an initial profile
-      // This ensures the profile is created even if the trigger fails
+      
       try {
-        await supabase
+        // Create the profile entry
+        const { error: profileError } = await supabase
           .from('profiles')
           .upsert({
             id: data.user.id,
@@ -167,27 +176,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             terms_accepted: true,
             age_verified: true
           }, { onConflict: 'id' });
+          
+        if (profileError) {
+          console.error("Error creating profile:", profileError);
+        }
         
-        // Also ensure user has initial credits
-        await supabase
+        // Create initial credits
+        const { error: creditsError } = await supabase
           .from('user_credits')
           .upsert({
             user_id: data.user.id,
             credits_balance: 5
           }, { onConflict: 'user_id' });
-      } catch (profileError) {
-        console.error("Error creating initial profile:", profileError);
-        // We continue even if profile creation fails, as the database trigger should handle it
+          
+        if (creditsError) {
+          console.error("Error creating user credits:", creditsError);
+        }
+        
+        // Now log the user in automatically after successful registration
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (signInError) {
+          console.error("Auto sign-in after registration failed:", signInError);
+          throw signInError;
+        }
+        
+        if (signInData.user) {
+          console.log("Auto sign-in after registration successful for user:", signInData.user.id);
+          
+          const userData = {
+            id: data.user.id,
+            name: name,
+            email: data.user.email || "",
+          };
+          
+          console.log("Setting user after registration and auto sign-in:", userData);
+          setUser(userData);
+        }
+        
+      } catch (error) {
+        console.error("Error during post-registration setup:", error);
+        // Continue anyway, as the user registration was successful
       }
-      
-      const userData = {
-        id: data.user.id,
-        name: name,
-        email: data.user.email || "",
-      };
-      
-      console.log("Setting user after registration:", userData);
-      setUser(userData);
     }
   };
 

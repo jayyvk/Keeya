@@ -20,20 +20,30 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
   const handleSubmit = async (additionalData?: { purpose?: string; recordingFrequency?: string }) => {
     setIsLoading(true);
     setError("");
-
-    if (isLogin && (!email || !password)) {
-      setError("Please fill in all fields");
-      setIsLoading(false);
-      return;
-    }
-
-    if (!isLogin && (!email || !password || !name)) {
-      setError("Please fill in all fields");
-      setIsLoading(false);
-      return;
-    }
-
+    
     try {
+      console.log("Checking form data before submit:", { isLogin, email, password, name, additionalData });
+      
+      if (isLogin && (!email || !password)) {
+        setError("Please fill in all fields");
+        setIsLoading(false);
+        return;
+      }
+
+      if (!isLogin && (!email || !password || !name)) {
+        setError("Please fill in all fields");
+        setIsLoading(false);
+        return;
+      }
+
+      // For registration, check additional fields
+      if (!isLogin && (!additionalData?.purpose || !additionalData?.recordingFrequency)) {
+        console.log("Missing additional data:", additionalData);
+        setError("Please complete all steps");
+        setIsLoading(false);
+        return;
+      }
+
       if (isLogin) {
         console.log("Attempting to login with:", { email });
         await login(email, password);
