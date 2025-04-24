@@ -37,14 +37,15 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
       if (isLogin) {
         console.log("Attempting to login with:", { email });
         await login(email, password);
-        console.log("Login successful, Auth component will handle redirect");
+        console.log("Login successful, navigating to dashboard");
+        navigate("/dashboard", { replace: true });
       } else {
         console.log("Attempting to register with:", { name, email });
         await register(name, email, password);
-        console.log("Registration successful, Auth component will handle redirect");
-        // Add toast notification for successful registration
+        console.log("Registration successful, navigating to dashboard");
         toast.success("Account created successfully!");
-        // Redirect to dashboard (Auth component already handles this via useEffect)
+        // Explicitly navigate to dashboard after registration
+        navigate("/dashboard", { replace: true });
       }
     } catch (err: any) {
       console.error(isLogin ? "Login error:" : "Registration error:", err);
