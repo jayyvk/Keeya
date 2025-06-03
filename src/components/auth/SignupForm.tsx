@@ -38,6 +38,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
       return;
     }
     
+    console.log("Moving to next step. Current name:", name, "Name length:", name.trim().length);
     setStep(step + 1);
   };
 
@@ -116,7 +117,10 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 id="name"
                 placeholder="John Doe"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  console.log("Name changed to:", e.target.value);
+                  setName(e.target.value);
+                }}
                 disabled={isLoading}
                 required
               />
