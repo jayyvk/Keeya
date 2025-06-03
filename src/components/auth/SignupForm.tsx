@@ -34,7 +34,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
       }
     }
     
-    if (step === 2 && (!name || !agreeToTerms)) {
+    if (step === 2 && (!name || name.trim().length < 2 || !agreeToTerms)) {
       return;
     }
     
@@ -43,10 +43,21 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted with purpose:", purpose, "frequency:", recordingFrequency);
+    console.log("Form submitted with:", { 
+      name: name.trim(), 
+      email, 
+      purpose, 
+      recordingFrequency,
+      nameLength: name.trim().length 
+    });
     
     if (!purpose || !recordingFrequency) {
       console.log("Missing required fields - purpose:", purpose, "frequency:", recordingFrequency);
+      return;
+    }
+
+    if (!name || name.trim().length < 2) {
+      console.log("Name validation failed - name:", name, "trimmed length:", name.trim().length);
       return;
     }
     
@@ -194,14 +205,14 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
           type="button"
           onClick={nextStep}
           className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
-          disabled={isLoading || (step === 1 && (!email || !password)) || (step === 2 && (!name || !agreeToTerms))}
+          disabled={isLoading || (step === 1 && (!email || !password)) || (step === 2 && (!name || name.trim().length < 2 || !agreeToTerms))}
         >
           Continue
         </Button>
       ) : (
         <Button 
           type="submit"
-          disabled={isLoading || !purpose || !recordingFrequency}
+          disabled={isLoading || !purpose || !recordingFrequency || !name || name.trim().length < 2}
           className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
         >
           {isLoading ? (

@@ -23,6 +23,8 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
     setIsLoading(true);
     setError("");
 
+    console.log("HandleSubmit called with:", { isLogin, email, name: name.trim(), additionalData });
+
     // Validation
     if (!email || !password) {
       setError("Please fill in all fields");
@@ -30,8 +32,16 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
       return;
     }
 
-    if (!isLogin && !name) {
-      setError("Please enter your name");
+    if (!isLogin && (!name || name.trim().length < 2)) {
+      setError("Please enter your name (at least 2 characters)");
+      setIsLoading(false);
+      return;
+    }
+
+    // For signup, validate additional data on step 3
+    if (!isLogin && additionalData && (!additionalData.purpose || !additionalData.recordingFrequency)) {
+      console.log("Missing additional data:", additionalData);
+      setError("Please select your purpose and recording frequency");
       setIsLoading(false);
       return;
     }
@@ -43,8 +53,8 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
         toast.success("Login successful!");
         navigate("/dashboard", { replace: true });
       } else {
-        console.log("Attempting registration with:", { name, email, additionalData });
-        await register(name, email, password);
+        console.log("Attempting registration with:", { name: name.trim(), email, additionalData });
+        await register(name.trim(), email, password);
         toast.success("Account created successfully!");
         navigate("/dashboard", { replace: true });
       }
