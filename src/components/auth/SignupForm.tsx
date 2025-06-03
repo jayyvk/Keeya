@@ -48,7 +48,8 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
       email, 
       purpose, 
       recordingFrequency,
-      nameLength: name.trim().length 
+      nameLength: name.trim().length,
+      hasAllRequiredFields: !!(purpose && recordingFrequency && name && name.trim().length >= 2)
     });
     
     if (!purpose || !recordingFrequency) {
@@ -63,6 +64,13 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
     
     await handleSubmit({ purpose, recordingFrequency });
   };
+
+  // Debug log to see current state
+  React.useEffect(() => {
+    if (step === 3) {
+      console.log("Step 3 state:", { purpose, recordingFrequency, name: name.trim(), nameLength: name.trim().length });
+    }
+  }, [step, purpose, recordingFrequency, name]);
 
   const renderStepContent = () => {
     switch (step) {
@@ -165,7 +173,10 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                     key={option}
                     type="button"
                     variant={purpose === option ? "default" : "outline"}
-                    onClick={() => setPurpose(option)}
+                    onClick={() => {
+                      console.log("Purpose selected:", option);
+                      setPurpose(option);
+                    }}
                     className="w-full"
                     disabled={isLoading}
                   >
@@ -182,7 +193,10 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                     key={option}
                     type="button"
                     variant={recordingFrequency === option ? "default" : "outline"}
-                    onClick={() => setRecordingFrequency(option)}
+                    onClick={() => {
+                      console.log("Recording frequency selected:", option);
+                      setRecordingFrequency(option);
+                    }}
                     className="w-full"
                     disabled={isLoading}
                   >
@@ -195,6 +209,9 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
         );
     }
   };
+
+  // Check if all required fields are filled for step 3
+  const isStep3Valid = purpose && recordingFrequency && name && name.trim().length >= 2;
 
   return (
     <form onSubmit={step === 3 ? onSubmit : (e) => e.preventDefault()} className="space-y-4">
@@ -212,7 +229,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
       ) : (
         <Button 
           type="submit"
-          disabled={isLoading || !purpose || !recordingFrequency || !name || name.trim().length < 2}
+          disabled={isLoading || !isStep3Valid}
           className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
         >
           {isLoading ? (
