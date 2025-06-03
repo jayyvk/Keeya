@@ -67,9 +67,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
 
   // Debug log to see current state
   React.useEffect(() => {
-    if (step === 3) {
-      console.log("Step 3 state:", { purpose, recordingFrequency, name: name.trim(), nameLength: name.trim().length });
-    }
+    console.log("Current state - Step:", step, "Purpose:", purpose, "Frequency:", recordingFrequency, "Name:", name, "Name length:", name.trim().length);
   }, [step, purpose, recordingFrequency, name]);
 
   const renderStepContent = () => {
@@ -210,8 +208,26 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
     }
   };
 
-  // Check if all required fields are filled for step 3
-  const isStep3Valid = purpose && recordingFrequency && name && name.trim().length >= 2;
+  // Check if all required fields are filled for step 3 - using more explicit checks
+  const isStep3Valid = React.useMemo(() => {
+    const hasValidName = name && name.trim().length >= 2;
+    const hasPurpose = purpose && purpose.length > 0;
+    const hasFrequency = recordingFrequency && recordingFrequency.length > 0;
+    const isValid = hasValidName && hasPurpose && hasFrequency;
+    
+    console.log("Step 3 validation:", {
+      hasValidName,
+      hasPurpose,
+      hasFrequency,
+      isValid,
+      name: name,
+      nameLength: name.trim().length,
+      purpose,
+      recordingFrequency
+    });
+    
+    return isValid;
+  }, [name, purpose, recordingFrequency]);
 
   return (
     <form onSubmit={step === 3 ? onSubmit : (e) => e.preventDefault()} className="space-y-4">
