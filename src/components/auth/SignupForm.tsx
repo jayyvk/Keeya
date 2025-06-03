@@ -41,9 +41,16 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
     setStep(step + 1);
   };
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    handleSubmit();
+    console.log("Form submitted with purpose:", purpose, "frequency:", recordingFrequency);
+    
+    if (!purpose || !recordingFrequency) {
+      console.log("Missing required fields - purpose:", purpose, "frequency:", recordingFrequency);
+      return;
+    }
+    
+    await handleSubmit({ purpose, recordingFrequency });
   };
 
   const renderStepContent = () => {
@@ -134,6 +141,11 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
       case 3:
         return (
           <div className="space-y-4">
+            {error && (
+              <div className="text-red-500 text-sm text-center">
+                {error}
+              </div>
+            )}
             <div className="space-y-2">
               <Label>What's your main purpose?</Label>
               <div className="grid grid-cols-2 gap-2">
@@ -174,7 +186,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
   };
 
   return (
-    <div className="space-y-4">
+    <form onSubmit={step === 3 ? onSubmit : (e) => e.preventDefault()} className="space-y-4">
       {renderStepContent()}
       
       {step < 3 ? (
@@ -189,7 +201,6 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
       ) : (
         <Button 
           type="submit"
-          onClick={onSubmit}
           disabled={isLoading || !purpose || !recordingFrequency}
           className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
         >
@@ -209,6 +220,6 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
         onClose={() => setShowTermsModal(false)} 
         type={modalType}
       />
-    </div>
+    </form>
   );
 };

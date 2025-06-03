@@ -17,7 +17,7 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (additionalData?: { purpose?: string; recordingFrequency?: string }) => {
     if (isLoading) return;
     
     setIsLoading(true);
@@ -43,7 +43,7 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
         toast.success("Login successful!");
         navigate("/dashboard", { replace: true });
       } else {
-        console.log("Attempting registration with:", { name, email });
+        console.log("Attempting registration with:", { name, email, additionalData });
         await register(name, email, password);
         toast.success("Account created successfully!");
         navigate("/dashboard", { replace: true });
