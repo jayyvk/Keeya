@@ -18,52 +18,41 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
   const [name, setName] = useState("");
 
   const handleSubmit = async () => {
+    if (isLoading) return;
+    
     setIsLoading(true);
     setError("");
 
-    if (isLogin && (!email || !password)) {
+    // Validation
+    if (!email || !password) {
       setError("Please fill in all fields");
       setIsLoading(false);
       return;
     }
 
-    if (!isLogin && (!email || !password || !name)) {
-      setError("Please fill in all fields");
+    if (!isLogin && !name) {
+      setError("Please enter your name");
       setIsLoading(false);
       return;
     }
 
     try {
       if (isLogin) {
-        console.log("Attempting to login with:", { email });
+        console.log("Attempting login with:", { email });
         await login(email, password);
-        console.log("Login successful, navigating to dashboard");
+        toast.success("Login successful!");
         navigate("/dashboard", { replace: true });
       } else {
-        console.log("Attempting to register with:", { name, email });
+        console.log("Attempting registration with:", { name, email });
         await register(name, email, password);
-        console.log("Registration successful, navigating to dashboard");
         toast.success("Account created successfully!");
-        // Explicitly navigate to dashboard after registration
         navigate("/dashboard", { replace: true });
       }
     } catch (err: any) {
       console.error(isLogin ? "Login error:" : "Registration error:", err);
-      
-      // Check if this is a "User already registered" error
-      if (!isLogin && err.message && (
-          err.message.includes("already registered") || 
-          err.message.includes("already in use") || 
-          err.message.includes("already exists")
-        )) {
-        setError("This email is already registered. Please log in instead.");
-        toast.warning("Email already registered", {
-          description: "Please log in with your existing account instead."
-        });
-      } else {
-        setError(err.message || `${isLogin ? "Login" : "Registration"} failed`);
-        toast.error(err.message || `${isLogin ? "Login" : "Registration"} failed`);
-      }
+      const errorMessage = err.message || `${isLogin ? "Login" : "Registration"} failed`;
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

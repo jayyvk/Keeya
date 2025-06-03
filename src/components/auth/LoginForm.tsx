@@ -1,52 +1,46 @@
 
 import React from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { loginSchema } from "@/lib/validations/auth";
-import { z } from "zod";
 import { Loader2 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
-
-type LoginFormInputs = z.infer<typeof loginSchema>;
+import { useAuthForm } from "@/hooks/useAuthForm";
 
 export const LoginForm = () => {
-  const { login } = useAuth();
   const {
-    register,
+    email,
+    setEmail,
+    password,
+    setPassword,
     handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginFormInputs>({
-    resolver: zodResolver(loginSchema)
-  });
+    isLoading,
+    error
+  } = useAuthForm({ isLogin: true });
 
-  const onSubmit = async (data: LoginFormInputs) => {
-    try {
-      await login(data.email, data.password);
-    } catch (err: any) {
-      toast.error(err.message || "Login failed", {
-        description: "Please check your credentials and try again."
-      });
-    }
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSubmit();
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={onSubmit} className="space-y-4">
+      {error && (
+        <div className="text-red-500 text-sm text-center">
+          {error}
+        </div>
+      )}
+      
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input
           id="email"
           type="email"
           placeholder="your@email.com"
-          {...register("email")}
-          disabled={isSubmitting}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={isLoading}
+          required
         />
-        {errors.email && (
-          <p className="text-red-500 text-sm">{errors.email.message}</p>
-        )}
       </div>
       
       <div className="space-y-2">
@@ -55,20 +49,19 @@ export const LoginForm = () => {
           id="password"
           type="password"
           placeholder="••••••••"
-          {...register("password")}
-          disabled={isSubmitting}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          disabled={isLoading}
+          required
         />
-        {errors.password && (
-          <p className="text-red-500 text-sm">{errors.password.message}</p>
-        )}
       </div>
       
       <Button 
         type="submit" 
         className="w-full" 
-        disabled={isSubmitting}
+        disabled={isLoading}
       >
-        {isSubmitting ? (
+        {isLoading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Signing In...

@@ -1,118 +1,49 @@
+
 import React from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2 } from "lucide-react";
-import { signupSchema } from "@/lib/validations/auth";
-import { z } from "zod";
 import { TermsModal } from "./TermsModal";
-import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-
-type SignupFormInputs = z.infer<typeof signupSchema>;
+import { useAuthForm } from "@/hooks/useAuthForm";
 
 export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: number) => void }) => {
-  const { register: registerUser } = useAuth();
-  const navigate = useNavigate();
-  
   const {
-    register,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    name,
+    setName,
     handleSubmit,
-    formState: { errors, isSubmitting },
-    getValues,
-    trigger,
-  } = useForm<SignupFormInputs>({
-    resolver: zodResolver(signupSchema)
-  });
+    isLoading,
+    error
+  } = useAuthForm({ isLogin: false });
 
   const [purpose, setPurpose] = React.useState("");
   const [recordingFrequency, setRecordingFrequency] = React.useState("");
   const [agreeToTerms, setAgreeToTerms] = React.useState(false);
   const [showTermsModal, setShowTermsModal] = React.useState(false);
   const [modalType, setModalType] = React.useState<'terms' | 'privacy'>('terms');
-  const [isRegistering, setIsRegistering] = React.useState(false);
-  const [registrationError, setRegistrationError] = React.useState("");
-  const [isEmailTaken, setIsEmailTaken] = React.useState(false);
 
-  const nextStep = async () => {
+  const nextStep = () => {
     if (step === 1) {
-      const isValid = await trigger(['email', 'password']);
-      if (!isValid) {
-        if (errors.email) {
-          toast.error("Invalid email format", {
-            description: "Please enter a valid email address"
-          });
-        }
+      if (!email || !password) {
         return;
       }
     }
     
-    if (step === 2 && (!getValues('name') || errors.name || !agreeToTerms)) {
+    if (step === 2 && (!name || !agreeToTerms)) {
       return;
     }
     
     setStep(step + 1);
   };
 
-  const handleTermsClick = (e: React.MouseEvent) => {
+  const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setModalType('terms');
-    setShowTermsModal(true);
-  };
-
-  const handlePrivacyClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setModalType('privacy');
-    setShowTermsModal(true);
-  };
-
-  const onSubmit = async (data: SignupFormInputs) => {
-    setRegistrationError("");
-    setIsEmailTaken(false);
-    
-    try {
-      setIsRegistering(true);
-      await registerUser(data.name, data.email, data.password);
-      toast.success("Registration successful!");
-      navigate('/dashboard'); // Redirect to dashboard after successful registration
-    } catch (err: any) {
-      // Check if this is a "User already registered" error
-      if (err.message && (
-          err.message.includes("already registered") || 
-          err.message.includes("already in use") || 
-          err.message.includes("already exists")
-        )) {
-        setIsEmailTaken(true);
-        setRegistrationError("This email is already registered. Please log in instead.");
-        toast.warning("Email already registered", {
-          description: "Please log in with your existing account instead."
-        });
-      } else {
-        setRegistrationError(err.message || "Registration failed");
-        toast.error("Registration failed", {
-          description: "Please try again or contact support."
-        });
-      }
-    } finally {
-      setIsRegistering(false);
-    }
-  };
-
-  const switchToLogin = () => {
-    // This function will be called from the parent component
-    // We're accessing it through a prop
-    const authComponent = document.querySelector('[data-auth-component]');
-    if (authComponent) {
-      const loginButton = authComponent.querySelector('[data-login-switch]');
-      if (loginButton && loginButton instanceof HTMLButtonElement) {
-        loginButton.click();
-      }
-    }
+    handleSubmit();
   };
 
   const renderStepContent = () => {
@@ -120,19 +51,10 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
       case 1:
         return (
           <div className="space-y-4">
-            {isEmailTaken && (
-              <Alert variant="destructive" className="bg-amber-50 border-amber-200 text-amber-800">
-                <AlertDescription>
-                  {registrationError}
-                  <Button 
-                    variant="link" 
-                    className="pl-1 text-voicevault-primary font-medium"
-                    onClick={switchToLogin}
-                  >
-                    Switch to login
-                  </Button>
-                </AlertDescription>
-              </Alert>
+            {error && (
+              <div className="text-red-500 text-sm text-center">
+                {error}
+              </div>
             )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -140,12 +62,11 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 id="email"
                 type="email"
                 placeholder="your@email.com"
-                {...register("email")}
-                disabled={isSubmitting}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+                required
               />
-              {errors.email && (
-                <p className="text-red-500 text-sm">{errors.email.message}</p>
-              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -153,12 +74,12 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 id="password"
                 type="password"
                 placeholder="••••••••"
-                {...register("password")}
-                disabled={isSubmitting}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+                required
+                minLength={8}
               />
-              {errors.password && (
-                <p className="text-red-500 text-sm">{errors.password.message}</p>
-              )}
             </div>
           </div>
         );
@@ -170,19 +91,18 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
               <Input
                 id="name"
                 placeholder="John Doe"
-                {...register("name")}
-                disabled={isSubmitting}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                disabled={isLoading}
+                required
               />
-              {errors.name && (
-                <p className="text-red-500 text-sm">{errors.name.message}</p>
-              )}
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox 
                 id="terms" 
                 checked={agreeToTerms}
                 onCheckedChange={(checked) => setAgreeToTerms(checked as boolean)}
-                disabled={isSubmitting}
+                disabled={isLoading}
               />
               <Label htmlFor="terms" className="text-sm">
                 I am over 18 and agree to the{" "}
@@ -220,10 +140,11 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 {["Personal memories", "Family", "Fun", "Other"].map((option) => (
                   <Button
                     key={option}
+                    type="button"
                     variant={purpose === option ? "default" : "outline"}
                     onClick={() => setPurpose(option)}
                     className="w-full"
-                    disabled={isSubmitting}
+                    disabled={isLoading}
                   >
                     {option}
                   </Button>
@@ -236,10 +157,11 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 {["Daily", "Weekly", "Monthly", "Occasionally"].map((option) => (
                   <Button
                     key={option}
+                    type="button"
                     variant={recordingFrequency === option ? "default" : "outline"}
                     onClick={() => setRecordingFrequency(option)}
                     className="w-full"
-                    disabled={isSubmitting}
+                    disabled={isLoading}
                   >
                     {option}
                   </Button>
@@ -253,7 +175,6 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
 
   return (
     <div className="space-y-4">
-      
       {renderStepContent()}
       
       {step < 3 ? (
@@ -261,18 +182,18 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
           type="button"
           onClick={nextStep}
           className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
-          disabled={isSubmitting || (isEmailTaken && step === 1)}
+          disabled={isLoading || (step === 1 && (!email || !password)) || (step === 2 && (!name || !agreeToTerms))}
         >
           Continue
         </Button>
       ) : (
         <Button 
           type="submit"
-          onClick={handleSubmit(onSubmit)}
-          disabled={isSubmitting || isRegistering || !purpose || !recordingFrequency}
+          onClick={onSubmit}
+          disabled={isLoading || !purpose || !recordingFrequency}
           className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
         >
-          {isSubmitting || isRegistering ? (
+          {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Creating Account...
