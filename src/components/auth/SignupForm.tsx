@@ -27,25 +27,34 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
   const [showTermsModal, setShowTermsModal] = React.useState(false);
   const [modalType, setModalType] = React.useState<'terms' | 'privacy'>('terms');
 
+  // Debug the name state consistently
+  React.useEffect(() => {
+    console.log("SignupForm state update - Step:", step, "Name:", `"${name}"`, "Name length:", name.trim().length);
+  }, [step, name]);
+
   const nextStep = () => {
+    console.log("nextStep called - Current step:", step, "Name:", `"${name}"`, "Name length:", name.trim().length);
+    
     if (step === 1) {
       if (!email || !password) {
+        console.log("Step 1 validation failed - missing email or password");
         return;
       }
     }
     
     if (step === 2 && (!name || name.trim().length < 2 || !agreeToTerms)) {
+      console.log("Step 2 validation failed - name:", `"${name}"`, "length:", name.trim().length, "terms:", agreeToTerms);
       return;
     }
     
-    console.log("Moving to next step. Current name:", name, "Name length:", name.trim().length);
+    console.log("Moving to next step. Current name:", `"${name}"`, "Name length:", name.trim().length);
     setStep(step + 1);
   };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submitted with:", { 
-      name: name.trim(), 
+      name: `"${name.trim()}"`, 
       email, 
       purpose, 
       recordingFrequency,
@@ -59,17 +68,12 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
     }
 
     if (!name || name.trim().length < 2) {
-      console.log("Name validation failed - name:", name, "trimmed length:", name.trim().length);
+      console.log("Name validation failed - name:", `"${name}"`, "trimmed length:", name.trim().length);
       return;
     }
     
     await handleSubmit({ purpose, recordingFrequency });
   };
-
-  // Debug log to see current state
-  React.useEffect(() => {
-    console.log("Current state - Step:", step, "Purpose:", purpose, "Frequency:", recordingFrequency, "Name:", name, "Name length:", name.trim().length);
-  }, [step, purpose, recordingFrequency, name]);
 
   const renderStepContent = () => {
     switch (step) {
@@ -118,7 +122,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 placeholder="John Doe"
                 value={name}
                 onChange={(e) => {
-                  console.log("Name changed to:", e.target.value);
+                  console.log("Name changed to:", `"${e.target.value}"`);
                   setName(e.target.value);
                 }}
                 disabled={isLoading}
@@ -212,7 +216,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
     }
   };
 
-  // Check if all required fields are filled for step 3 - using more explicit checks
+  // Simplified validation for step 3
   const isStep3Valid = React.useMemo(() => {
     const hasValidName = name && name.trim().length >= 2;
     const hasPurpose = purpose && purpose.length > 0;
@@ -224,7 +228,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
       hasPurpose,
       hasFrequency,
       isValid,
-      name: name,
+      name: `"${name}"`,
       nameLength: name.trim().length,
       purpose,
       recordingFrequency
