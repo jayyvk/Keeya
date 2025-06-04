@@ -13,9 +13,17 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    name: "",
+    agreeToTerms: false
+  });
+
+  const updateField = (field: string, value: string | boolean) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    setError(""); // Clear error when user starts typing
+  };
 
   const handleSubmit = async () => {
     if (isLoading) return;
@@ -23,41 +31,41 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
     setIsLoading(true);
     setError("");
 
-    console.log("HandleSubmit called with:", { isLogin, email, name: name.trim() });
-
-    if (isLogin) {
-      // Login validation
-      if (!email || !password) {
-        setError("Please fill in all fields");
-        setIsLoading(false);
-        return;
-      }
-    } else {
-      // Signup validation - we need all fields for signup
-      if (!email || !password) {
-        setError("Please fill in all fields");
-        setIsLoading(false);
-        return;
-      }
-      if (!name || name.trim().length < 2) {
-        setError("Please enter your name (at least 2 characters)");
-        setIsLoading(false);
-        return;
-      }
-    }
+    console.log("HandleSubmit called with:", { isLogin, formData });
 
     try {
       if (isLogin) {
-        console.log("Attempting login with:", { email });
-        await login(email, password);
+        // Login validation
+        if (!formData.email || !formData.password) {
+          setError("Please fill in all fields");
+          setIsLoading(false);
+          return;
+        }
+
+        console.log("Attempting login with:", { email: formData.email });
+        await login(formData.email, formData.password);
         toast.success("Login successful!");
         navigate("/dashboard", { replace: true });
       } else {
-        console.log("Attempting registration with:", { name: name.trim(), email });
+        // Signup validation
+        if (!formData.email || !formData.password || !formData.name || !formData.agreeToTerms) {
+          if (!formData.email || !formData.password) {
+            setError("Please fill in email and password");
+          } else if (!formData.name || formData.name.trim().length < 2) {
+            setError("Please enter your name (at least 2 characters)");
+          } else if (!formData.agreeToTerms) {
+            setError("Please agree to the terms and conditions");
+          }
+          setIsLoading(false);
+          return;
+        }
+
+        console.log("Attempting registration with:", { 
+          name: formData.name.trim(), 
+          email: formData.email 
+        });
         
-        // Register the user
-        await register(name.trim(), email, password);
-        
+        await register(formData.name.trim(), formData.email, formData.password);
         toast.success("Account created successfully!");
         navigate("/dashboard", { replace: true });
       }
@@ -74,12 +82,8 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
   return {
     isLoading,
     error,
-    email,
-    setEmail,
-    password,
-    setPassword,
-    name,
-    setName,
+    formData,
+    updateField,
     handleSubmit,
   };
 };

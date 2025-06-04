@@ -7,15 +7,9 @@ import { Loader2 } from "lucide-react";
 import { useAuthForm } from "@/hooks/useAuthForm";
 
 export const LoginForm = () => {
-  const {
-    email,
-    setEmail,
-    password,
-    setPassword,
-    handleSubmit,
-    isLoading,
-    error
-  } = useAuthForm({ isLogin: true });
+  const { formData, updateField, handleSubmit, isLoading, error } = useAuthForm({ 
+    isLogin: true 
+  });
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,8 +30,8 @@ export const LoginForm = () => {
           id="email"
           type="email"
           placeholder="your@email.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={formData.email}
+          onChange={(e) => updateField("email", e.target.value)}
           disabled={isLoading}
           required
         />
@@ -49,8 +43,8 @@ export const LoginForm = () => {
           id="password"
           type="password"
           placeholder="••••••••"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={formData.password}
+          onChange={(e) => updateField("password", e.target.value)}
           disabled={isLoading}
           required
         />
@@ -58,8 +52,8 @@ export const LoginForm = () => {
       
       <Button 
         type="submit" 
-        className="w-full" 
-        disabled={isLoading}
+        className="w-full bg-voicevault-primary hover:bg-voicevault-secondary" 
+        disabled={isLoading || !formData.email || !formData.password}
       >
         {isLoading ? (
           <>

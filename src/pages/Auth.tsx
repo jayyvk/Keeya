@@ -14,7 +14,6 @@ const Auth = () => {
   const location = useLocation();
   const { isAuthenticated, user } = useAuth();
   const [isLogin, setIsLogin] = useState(false);
-  const [step, setStep] = useState(1);
 
   // Get the intended redirect after auth (from state)
   const redirectTo = location.state?.redirectTo || "/dashboard";
@@ -32,25 +31,15 @@ const Auth = () => {
       <Card className="w-full max-w-md shadow-card animate-fade-in border border-[#F0F0F0] rounded-lg">
         <CardHeader className="text-center bg-transparent">
           <CardTitle className="text-2xl font-bold text-[#1A1A1A]">
-            {isLogin ? "Welcome Back" : (
-              <>
-                {step === 1 && "Welcome to Keeya"}
-                {step === 2 && "Tell us about yourself"}
-              </>
-            )}
+            {isLogin ? "Welcome Back" : "Welcome to Keeya"}
           </CardTitle>
           <CardDescription className="text-[#333333]">
-            {isLogin ? "Sign in to your account" : (
-              <>
-                {step === 1 && "Save the voices you love, forever."}
-                {step === 2 && "Help us personalize your experience"}
-              </>
-            )}
+            {isLogin ? "Sign in to your account" : "Save the voices you love, forever."}
           </CardDescription>
         </CardHeader>
         <AnimatePresence mode="wait">
           <motion.div 
-            key={`${isLogin ? 'login' : `signup-${step}`}`}
+            key={isLogin ? 'login' : 'signup'}
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
@@ -60,26 +49,22 @@ const Auth = () => {
               {isLogin ? (
                 <LoginForm />
               ) : (
-                <SignupForm step={step} setStep={setStep} />
+                <SignupForm />
               )}
-              {(isLogin || step === 1) && (
-                <div className="text-center mt-6">
-                  <span className="text-small text-[#333333]">
-                    {isLogin ? "Don't have an account? " : "Already have an account? "}
-                    <Button 
-                      variant="link" 
-                      className="text-voicevault-primary font-medium"
-                      onClick={() => {
-                        setIsLogin(!isLogin);
-                        setStep(1);
-                      }}
-                      data-login-switch
-                    >
-                      {isLogin ? "Sign Up" : "Sign In"}
-                    </Button>
-                  </span>
-                </div>
-              )}
+              
+              <div className="text-center mt-6">
+                <span className="text-small text-[#333333]">
+                  {isLogin ? "Don't have an account? " : "Already have an account? "}
+                  <Button 
+                    variant="link" 
+                    className="text-voicevault-primary font-medium"
+                    onClick={() => setIsLogin(!isLogin)}
+                    data-login-switch
+                  >
+                    {isLogin ? "Sign Up" : "Sign In"}
+                  </Button>
+                </span>
+              </div>
             </CardContent>
           </motion.div>
         </AnimatePresence>
