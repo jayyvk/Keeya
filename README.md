@@ -1,67 +1,56 @@
-# VoiceVault: Preserve the voices you love, forever.
+# Keeya – A Voice Memory Vault
 
-VoiceVault is a personal voice memory platform where users can record, save, and organize the voices of their loved ones in a secure and emotionally calming space.
+Keeya is a voice-first memory platform that helps users record, save, and relive emotional audio messages from loved ones. Designed with a soft, nostalgic aesthetic and mobile-first UI, Keeya transforms voice into a deeply personal experience.
 
-![VoiceVault](https://i.imgur.com/v1OaHkG.png)
+---
 
-## Features
+## 🎧 What It Does
 
-### 🎙️ Voice Recording
-- Simple tap-to-record interface
-- Animated soundwave visualization
-- Pause, resume, and stop controls
-- Name and tag your recordings
+- **Record Voice Messages**: Simple, tap-to-record interface using HTML5 Audio APIs.
+- **Save to Your Vault**: Securely stores audio in Supabase for easy access and organization.
+- **Replay Anytime**: Cassette-style layout with playback, animations, and tagging.
+- **Delightful UX**: Designed with a calming UI using Tailwind CSS, shadcn/ui, and Framer Motion.
 
-### 🔒 Secure Audio Vault
-- Cassette-style layout for saved recordings
-- Search and filter by tags
-- Play recordings directly from the vault
-- Mobile-first responsive design
+---
 
-### ✨ Beautiful Design
-- Ghibli-inspired, nostalgic aesthetics
-- Soft gradients and calming color palette
-- Simple animations for a delightful experience
-- Intuitive user interface
+## 🛠 Tech Stack
 
-## Getting Started
+- **Frontend**: React with TypeScript
+- **Styling**: Tailwind CSS + shadcn/ui
+- **Animation**: Framer Motion
+- **Backend**: Supabase (auth + storage)
+- **Audio**: Native HTML5 Audio API
 
-Clone the repository and install the dependencies:
+---
 
-```bash
-git clone <repository-url>
-cd voice-memory-garden
-npm install
-npm run dev
-```
+## 🌱 Project Highlights
 
-## Technologies Used
+- Built to help preserve voices of loved ones in a way that feels human and warm.
+- Focused on emotional use cases like grief support, memory preservation, and storytelling.
+- Inspired by Studio Ghibli design language and gentle UI transitions.
 
-- React with TypeScript
-- Tailwind CSS for styling
-- shadcn/ui component library
-- HTML5 Audio APIs for recording
-- Framer Motion for animations
+---
 
-## Project Structure
+## 🚀 How to Use
 
-- `src/components/` - UI components
-- `src/contexts/` - React context providers
-- `src/pages/` - Main application pages
-- `src/types/` - TypeScript type definitions
-- `src/utils/` - Utility functions
+1. Open the app (currently hosted privately or locally).
+2. Record a new voice message using the mic button.
+3. Save and label your clip into your personal vault.
+4. Revisit, replay, and organize memories as needed.
 
-## Future Roadmap
+---
 
-- Voice cloning for storytelling with ElevenLabs API
-- Share & request voice clips with friends and family
-- Community marketplace for shared voices and stories
-- Mobile apps for iOS and Android
+## 📌 Roadmap
 
-## Contributing
+- Voice cloning with ElevenLabs API for storytelling.
+- Shareable voice requests via link or message.
+- Mobile apps (React Native or Flutter) for iOS and Android.
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+---
 
-## License
+## 🤝 Credits
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+Created by [Jay Kilaparthi](https://www.linkedin.com/in/jayvk)  
+Using Lovable.dev(https://lovable.dev) 
+
+---
