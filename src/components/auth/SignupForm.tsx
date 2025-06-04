@@ -50,7 +50,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
       return;
     }
     
-    await handleSubmit({ name: name.trim() });
+    await handleSubmit();
   };
 
   const renderStepContent = () => {

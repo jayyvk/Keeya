@@ -17,16 +17,14 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
 
-  const handleSubmit = async (additionalData?: { name?: string }) => {
+  const handleSubmit = async () => {
     if (isLoading) return;
     
     setIsLoading(true);
     setError("");
 
-    console.log("HandleSubmit called with:", { isLogin, email, name: name.trim(), additionalData });
+    console.log("HandleSubmit called with:", { isLogin, email, name: name.trim() });
 
-    // For signup step 2, we should have email and password from previous step
-    // But the form might be calling this with just the name
     if (isLogin) {
       // Login validation
       if (!email || !password) {
@@ -35,21 +33,16 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
         return;
       }
     } else {
-      // Signup validation - if we have additionalData.name, we're on step 2
-      if (additionalData?.name) {
-        // Step 2 submission - validate name only
-        if (!additionalData.name || additionalData.name.trim().length < 2) {
-          setError("Please enter your name (at least 2 characters)");
-          setIsLoading(false);
-          return;
-        }
-      } else {
-        // Step 1 submission - validate email and password
-        if (!email || !password) {
-          setError("Please fill in all fields");
-          setIsLoading(false);
-          return;
-        }
+      // Signup validation - we need all fields for signup
+      if (!email || !password) {
+        setError("Please fill in all fields");
+        setIsLoading(false);
+        return;
+      }
+      if (!name || name.trim().length < 2) {
+        setError("Please enter your name (at least 2 characters)");
+        setIsLoading(false);
+        return;
       }
     }
 
