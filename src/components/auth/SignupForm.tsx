@@ -27,6 +27,8 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
   const [showTermsModal, setShowTermsModal] = React.useState(false);
   const [modalType, setModalType] = React.useState<'terms' | 'privacy'>('terms');
 
+  console.log("SignupForm render - step:", step, "name:", name, "purpose:", purpose, "recordingFrequency:", recordingFrequency);
+
   const nextStep = () => {
     if (step === 1) {
       if (!email || !password) {
@@ -46,7 +48,15 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log("Form submit - checking validation:", {
+      name: name,
+      nameLength: name?.length,
+      purpose,
+      recordingFrequency
+    });
+    
     if (!purpose || !recordingFrequency || !name || name.trim().length < 2) {
+      console.log("Validation failed");
       return;
     }
     
@@ -185,7 +195,9 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
     }
   };
 
+  // Fixed validation logic for step 3
   const isStep3Valid = name && name.trim().length >= 2 && purpose && recordingFrequency;
+  console.log("Step 3 validation:", { isStep3Valid, name, purpose, recordingFrequency });
 
   return (
     <form onSubmit={step === 3 ? onSubmit : (e) => e.preventDefault()} className="space-y-4">
