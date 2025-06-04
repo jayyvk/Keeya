@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 interface UseAuthFormProps {
   isLogin: boolean;
@@ -17,7 +18,7 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
 
-  const handleSubmit = async (additionalData?: { purpose?: string; recordingFrequency?: string }) => {
+  const handleSubmit = async (additionalData?: { purpose?: string; recordingFrequency?: string; name?: string }) => {
     if (isLoading) return;
     
     setIsLoading(true);
@@ -54,7 +55,32 @@ export const useAuthForm = ({ isLogin }: UseAuthFormProps) => {
         navigate("/dashboard", { replace: true });
       } else {
         console.log("Attempting registration with:", { name: name.trim(), email, additionalData });
+        
+        // Register the user first
         await register(name.trim(), email, password);
+        
+        // If registration is successful and we have additional data, save it to the profiles table
+        if (additionalData) {
+          try {
+            const { error: profileError } = await supabase
+              .from('profiles')
+              .update({
+                purpose: additionalData.purpose,
+                recording_frequency: additionalData.recordingFrequency,
+                onboarding_completed: true
+              })
+              .eq('id', (await supabase.auth.getUser()).data.user?.id);
+
+            if (profileError) {
+              console.error("Error updating profile:", profileError);
+              // Don't fail the entire registration for this
+            }
+          } catch (profileErr) {
+            console.error("Error saving profile data:", profileErr);
+            // Don't fail the entire registration for this
+          }
+        }
+        
         toast.success("Account created successfully!");
         navigate("/dashboard", { replace: true });
       }

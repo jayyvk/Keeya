@@ -27,52 +27,30 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
   const [showTermsModal, setShowTermsModal] = React.useState(false);
   const [modalType, setModalType] = React.useState<'terms' | 'privacy'>('terms');
 
-  // Debug the name state consistently
-  React.useEffect(() => {
-    console.log("SignupForm state update - Step:", step, "Name:", `"${name}"`, "Name length:", name.trim().length);
-  }, [step, name]);
-
   const nextStep = () => {
-    console.log("nextStep called - Current step:", step, "Name:", `"${name}"`, "Name length:", name.trim().length);
-    
     if (step === 1) {
       if (!email || !password) {
-        console.log("Step 1 validation failed - missing email or password");
         return;
       }
     }
     
-    if (step === 2 && (!name || name.trim().length < 2 || !agreeToTerms)) {
-      console.log("Step 2 validation failed - name:", `"${name}"`, "length:", name.trim().length, "terms:", agreeToTerms);
-      return;
+    if (step === 2) {
+      if (!name || name.trim().length < 2 || !agreeToTerms) {
+        return;
+      }
     }
     
-    console.log("Moving to next step. Current name:", `"${name}"`, "Name length:", name.trim().length);
     setStep(step + 1);
   };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted with:", { 
-      name: `"${name.trim()}"`, 
-      email, 
-      purpose, 
-      recordingFrequency,
-      nameLength: name.trim().length,
-      hasAllRequiredFields: !!(purpose && recordingFrequency && name && name.trim().length >= 2)
-    });
     
-    if (!purpose || !recordingFrequency) {
-      console.log("Missing required fields - purpose:", purpose, "frequency:", recordingFrequency);
-      return;
-    }
-
-    if (!name || name.trim().length < 2) {
-      console.log("Name validation failed - name:", `"${name}"`, "trimmed length:", name.trim().length);
+    if (!purpose || !recordingFrequency || !name || name.trim().length < 2) {
       return;
     }
     
-    await handleSubmit({ purpose, recordingFrequency });
+    await handleSubmit({ purpose, recordingFrequency, name: name.trim() });
   };
 
   const renderStepContent = () => {
@@ -121,10 +99,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                 id="name"
                 placeholder="John Doe"
                 value={name}
-                onChange={(e) => {
-                  console.log("Name changed to:", `"${e.target.value}"`);
-                  setName(e.target.value);
-                }}
+                onChange={(e) => setName(e.target.value)}
                 disabled={isLoading}
                 required
               />
@@ -179,10 +154,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                     key={option}
                     type="button"
                     variant={purpose === option ? "default" : "outline"}
-                    onClick={() => {
-                      console.log("Purpose selected:", option);
-                      setPurpose(option);
-                    }}
+                    onClick={() => setPurpose(option)}
                     className="w-full"
                     disabled={isLoading}
                   >
@@ -199,10 +171,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
                     key={option}
                     type="button"
                     variant={recordingFrequency === option ? "default" : "outline"}
-                    onClick={() => {
-                      console.log("Recording frequency selected:", option);
-                      setRecordingFrequency(option);
-                    }}
+                    onClick={() => setRecordingFrequency(option)}
                     className="w-full"
                     disabled={isLoading}
                   >
@@ -216,26 +185,7 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
     }
   };
 
-  // Simplified validation for step 3
-  const isStep3Valid = React.useMemo(() => {
-    const hasValidName = name && name.trim().length >= 2;
-    const hasPurpose = purpose && purpose.length > 0;
-    const hasFrequency = recordingFrequency && recordingFrequency.length > 0;
-    const isValid = hasValidName && hasPurpose && hasFrequency;
-    
-    console.log("Step 3 validation:", {
-      hasValidName,
-      hasPurpose,
-      hasFrequency,
-      isValid,
-      name: `"${name}"`,
-      nameLength: name.trim().length,
-      purpose,
-      recordingFrequency
-    });
-    
-    return isValid;
-  }, [name, purpose, recordingFrequency]);
+  const isStep3Valid = name && name.trim().length >= 2 && purpose && recordingFrequency;
 
   return (
     <form onSubmit={step === 3 ? onSubmit : (e) => e.preventDefault()} className="space-y-4">
@@ -246,7 +196,10 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
           type="button"
           onClick={nextStep}
           className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
-          disabled={isLoading || (step === 1 && (!email || !password)) || (step === 2 && (!name || name.trim().length < 2 || !agreeToTerms))}
+          disabled={isLoading || 
+            (step === 1 && (!email || !password)) || 
+            (step === 2 && (!name || name.trim().length < 2 || !agreeToTerms))
+          }
         >
           Continue
         </Button>
