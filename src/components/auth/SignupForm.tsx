@@ -21,28 +21,19 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
     error
   } = useAuthForm({ isLogin: false });
 
-  const [purpose, setPurpose] = React.useState("");
-  const [recordingFrequency, setRecordingFrequency] = React.useState("");
   const [agreeToTerms, setAgreeToTerms] = React.useState(false);
   const [showTermsModal, setShowTermsModal] = React.useState(false);
   const [modalType, setModalType] = React.useState<'terms' | 'privacy'>('terms');
 
-  console.log("SignupForm render - step:", step, "name:", name, "purpose:", purpose, "recordingFrequency:", recordingFrequency);
+  console.log("SignupForm render - step:", step, "name:", name, "agreeToTerms:", agreeToTerms);
 
   const nextStep = () => {
     if (step === 1) {
       if (!email || !password) {
         return;
       }
+      setStep(step + 1);
     }
-    
-    if (step === 2) {
-      if (!name || name.trim().length < 2 || !agreeToTerms) {
-        return;
-      }
-    }
-    
-    setStep(step + 1);
   };
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -51,16 +42,15 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
     console.log("Form submit - checking validation:", {
       name: name,
       nameLength: name?.length,
-      purpose,
-      recordingFrequency
+      agreeToTerms
     });
     
-    if (!purpose || !recordingFrequency || !name || name.trim().length < 2) {
+    if (!name || name.trim().length < 2 || !agreeToTerms) {
       console.log("Validation failed");
       return;
     }
     
-    await handleSubmit({ purpose, recordingFrequency, name: name.trim() });
+    await handleSubmit({ name: name.trim() });
   };
 
   const renderStepContent = () => {
@@ -103,6 +93,11 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
       case 2:
         return (
           <div className="space-y-4">
+            {error && (
+              <div className="text-red-500 text-sm text-center">
+                {error}
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
               <Input
@@ -148,77 +143,30 @@ export const SignupForm = ({ step, setStep }: { step: number; setStep: (step: nu
             </div>
           </div>
         );
-      case 3:
-        return (
-          <div className="space-y-4">
-            {error && (
-              <div className="text-red-500 text-sm text-center">
-                {error}
-              </div>
-            )}
-            <div className="space-y-2">
-              <Label>What's your main purpose?</Label>
-              <div className="grid grid-cols-2 gap-2">
-                {["Personal memories", "Family", "Fun", "Other"].map((option) => (
-                  <Button
-                    key={option}
-                    type="button"
-                    variant={purpose === option ? "default" : "outline"}
-                    onClick={() => setPurpose(option)}
-                    className="w-full"
-                    disabled={isLoading}
-                  >
-                    {option}
-                  </Button>
-                ))}
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>How often will you record?</Label>
-              <div className="grid grid-cols-2 gap-2">
-                {["Daily", "Weekly", "Monthly", "Occasionally"].map((option) => (
-                  <Button
-                    key={option}
-                    type="button"
-                    variant={recordingFrequency === option ? "default" : "outline"}
-                    onClick={() => setRecordingFrequency(option)}
-                    className="w-full"
-                    disabled={isLoading}
-                  >
-                    {option}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
     }
   };
 
-  // Fixed validation logic for step 3
-  const isStep3Valid = name && name.trim().length >= 2 && purpose && recordingFrequency;
-  console.log("Step 3 validation:", { isStep3Valid, name, purpose, recordingFrequency });
+  // Validation for step 2 (create account)
+  const isStep2Valid = name && name.trim().length >= 2 && agreeToTerms;
+  console.log("Step 2 validation:", { isStep2Valid, name, agreeToTerms });
 
   return (
-    <form onSubmit={step === 3 ? onSubmit : (e) => e.preventDefault()} className="space-y-4">
+    <form onSubmit={step === 2 ? onSubmit : (e) => e.preventDefault()} className="space-y-4">
       {renderStepContent()}
       
-      {step < 3 ? (
+      {step === 1 ? (
         <Button 
           type="button"
           onClick={nextStep}
           className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
-          disabled={isLoading || 
-            (step === 1 && (!email || !password)) || 
-            (step === 2 && (!name || name.trim().length < 2 || !agreeToTerms))
-          }
+          disabled={isLoading || !email || !password}
         >
           Continue
         </Button>
       ) : (
         <Button 
           type="submit"
-          disabled={isLoading || !isStep3Valid}
+          disabled={isLoading || !isStep2Valid}
           className="w-full bg-voicevault-primary hover:bg-voicevault-secondary"
         >
           {isLoading ? (

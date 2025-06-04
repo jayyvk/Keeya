@@ -36,7 +36,6 @@ const Auth = () => {
               <>
                 {step === 1 && "Welcome to Keeya"}
                 {step === 2 && "Tell us about yourself"}
-                {step === 3 && "How will you use Keeya?"}
               </>
             )}
           </CardTitle>
@@ -45,7 +44,6 @@ const Auth = () => {
               <>
                 {step === 1 && "Save the voices you love, forever."}
                 {step === 2 && "Help us personalize your experience"}
-                {step === 3 && "Understanding your goals helps us improve"}
               </>
             )}
           </CardDescription>
