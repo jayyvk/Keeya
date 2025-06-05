@@ -17,9 +17,8 @@ Keeya is a voice-first memory platform that helps users record, save, and relive
 
 - **Frontend**: React with TypeScript
 - **Styling**: Tailwind CSS + shadcn/ui
-- **Animation**: Framer Motion
 - **Backend**: Supabase (auth + storage)
-- **Audio**: Native HTML5 Audio API
+- **Audio**: XTTS v2
 
 ---
 
