@@ -50,6 +50,5 @@ Keeya is a voice-first memory platform that helps users record, save, and relive
 ## 🤝 Credits
 
 Created by [Jay Kilaparthi](https://www.linkedin.com/in/jayvk)  
-Using Lovable.dev(https://lovable.dev) 
 
 ---
